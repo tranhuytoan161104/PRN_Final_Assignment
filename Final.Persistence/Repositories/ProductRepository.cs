@@ -20,11 +20,34 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<PagedResult<Product>> GetAllProductsAsync(int pageNumber, int pageSize)
+        public async Task<PagedResult<Product>> GetAllProductsAsync (int pageNumber, int pageSize)
         {
             var totalItems = await _context.Products.CountAsync();
 
             var items = await _context.Products
+                .OrderBy(p => p.Id)
+                .Skip((pageNumber - 1) * pageSize)
+                .Take(pageSize)
+                .ToListAsync();
+
+            return new PagedResult<Product>
+            {
+                Items = items,
+                PageNumber = pageNumber,
+                PageSize = pageSize,
+                TotalItems = totalItems,
+                TotalPages = (int)Math.Ceiling(totalItems / (double)pageSize)
+            };
+        }
+
+        public async Task<PagedResult<Product>> GetProductsByCategoryAsync (int pageNumber, int pageSize, long categoryId)
+        {
+            var totalItems = await _context.Products
+                .Where(p => p.CategoryId == categoryId)
+                .CountAsync();
+
+            var items = await _context.Products
+                .Where(p => p.CategoryId == categoryId)
                 .OrderBy(p => p.Id)
                 .Skip((pageNumber - 1) * pageSize)
                 .Take(pageSize)

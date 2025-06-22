@@ -1,4 +1,5 @@
 ﻿using Final.Domain.Common;
+using Final.Domain.Entities;
 using Final.Domain.Interfaces;
 using Final.ProductAPI.DTOs;
 
@@ -17,7 +18,7 @@ namespace Final.ProductAPI.Services
         {
             var pagedResultEntity = await _productRepository.GetAllProductsAsync(pageNumber, pageSize);
 
-            var productDtos = pagedResultEntity.Items?.Select(p => new ProductDTO
+            var productDTOs = pagedResultEntity.Items?.Select(p => new ProductDTO
             {
                 Id = p.Id,
                 Name = p.Name,
@@ -26,7 +27,28 @@ namespace Final.ProductAPI.Services
 
             return new PagedResult<ProductDTO>
             {
-                Items = productDtos,
+                Items = productDTOs,
+                PageNumber = pagedResultEntity.PageNumber,
+                PageSize = pagedResultEntity.PageSize,
+                TotalItems = pagedResultEntity.TotalItems,
+                TotalPages = pagedResultEntity.TotalPages
+            };
+        }
+
+        public async Task<PagedResult<ProductDTO>> GetProductsByCategoryAsync(int pageNumber, int pageSize, long categoryId)
+        {
+            var pagedResultEntity = await _productRepository.GetProductsByCategoryAsync(pageNumber, pageSize, categoryId);
+
+            var productDTOs = pagedResultEntity.Items?.Select(p => new ProductDTO
+            {
+                Id = p.Id,
+                Name = p.Name,
+                Price = p.Price,  
+            }).ToList() ?? new List<ProductDTO>();
+
+            return new PagedResult<ProductDTO>
+            {
+                Items = productDTOs,
                 PageNumber = pagedResultEntity.PageNumber,
                 PageSize = pagedResultEntity.PageSize,
                 TotalItems = pagedResultEntity.TotalItems,

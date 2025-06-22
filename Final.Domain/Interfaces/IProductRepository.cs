@@ -11,5 +11,6 @@ namespace Final.Domain.Interfaces
     public interface IProductRepository
     {
         Task<PagedResult<Product>> GetAllProductsAsync(int pageNumber, int pageSize);
+        Task<PagedResult<Product>> GetProductsByCategoryAsync(int pageNumber, int pageSize, long categoryId);
     }
 }

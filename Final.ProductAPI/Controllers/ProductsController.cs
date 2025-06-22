@@ -14,11 +14,18 @@ namespace Final.ProductAPI.Controllers
             _productService = productService;
         }
 
-        [HttpGet]
-        public async Task<IActionResult> GetAllProducts([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [HttpGet("all")]
+        public async Task<IActionResult> GetAllProductsAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
         {
-            var result = await _productService.GetAllProductsAsync(pageNumber, pageSize);
-            return Ok(result);
+            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize);
+            return Ok(products);
+        }
+
+        [HttpGet("by_category")]
+        public async Task<IActionResult> GetProductsByCategoryAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] long categoryId = 1)
+        {
+            var products = await _productService.GetProductsByCategoryAsync(pageNumber, pageSize, categoryId);
+            return Ok(products);
         }
     }
 }

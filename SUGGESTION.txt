@@ -1,0 +1,7 @@
+
+1. For controllers: 
+- Use FromQuery for get a collection.
+- Use FromRoute for get one specific resource.
+- USE FromBody for POST/PUT requests.
+- Use QUERY OBJECT and SINGLE ENDPOINT for later optimazation.
+- Each GET requests of a resoucre should have idealy 2 different endpoints (for collection and for specific)

@@ -17,6 +17,10 @@ namespace Final.Domain.Entities
         [StringLength(100)]
         public string? Name { get; set; }
 
+        [Required]
+        [StringLength(100)]
+        public string? Slug { get; set; }
+
         public virtual ICollection<Product>? Products { get; set; }
     }
 }

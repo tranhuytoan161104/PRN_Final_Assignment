@@ -1,5 +1,6 @@
 ﻿using Final.Domain.Common;
 using Final.Domain.Entities;
+using Final.Domain.Queries;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -10,7 +11,7 @@ namespace Final.Domain.Interfaces
 {
     public interface IProductRepository
     {
-        Task<PagedResult<Product>> GetAllProductsAsync(int pageNumber, int pageSize);
-        Task<PagedResult<Product>> GetProductsByCategoryAsync(int pageNumber, int pageSize, long categoryId);
+        Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery query);
+        Task<Product?> GetProductDetailAsync(long productId);
     }
 }

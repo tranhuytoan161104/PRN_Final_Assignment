@@ -1,12 +1,12 @@
 ﻿using Final.Domain.Common;
-using Final.Domain.Entities;
 using Final.ProductAPI.DTOs;
+using Final.Domain.Queries;
 
 namespace Final.ProductAPI.Services
 {
     public interface IProductService
     {
-        Task<PagedResult<ProductDTO>> GetAllProductsAsync(int pageNumber, int pageSize);
-        Task<PagedResult<ProductDTO>> GetProductsByCategoryAsync(int pageNumber, int pageSize, long categoryId);
+        Task<PagedResult<ProductDTO>> GetAllProductsAsync(ProductQuery query);
+        Task<ProductDetailDTO?> GetProductDetailAsync(long productId);
     }
 }

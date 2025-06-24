@@ -16,11 +16,18 @@ namespace Final.Persistence.Data
 
         public DbSet<Product> Products { get; set; }
         public DbSet<Category> Categories { get; set; }
+        public DbSet<Brand> Brands { get; set; }
+        public DbSet<User> Users { get; set; }
+        public DbSet<Review> Reviews { get; set; }
+        public DbSet<Order> Orders { get; set; }
+        public DbSet<OrderItem> OrderItems { get; set; }
+
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
             base.OnModelCreating(modelBuilder);
 
+            #region === Category Seed Data ===
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "CPU (Vi xử lý)", Slug = "cpu" },
                 new Category { Id = 2, Name = "GPU (Card đồ họa)", Slug = "gpu" },
@@ -28,7 +35,9 @@ namespace Final.Persistence.Data
                 new Category { Id = 4, Name = "SSD (Ổ cứng thể rắn)", Slug = "ssd" },
                 new Category { Id = 5, Name = "PSU (Nguồn máy tính)", Slug = "psu" }
             );
+            #endregion
 
+            #region === Brand Seed Data ===
             modelBuilder.Entity<Brand>().HasData(
                 new Brand { Id = 1, Name = "Intel" },
                 new Brand { Id = 2, Name = "AMD" },
@@ -43,38 +52,45 @@ namespace Final.Persistence.Data
                 new Brand { Id = 11, Name = "Cooler Master" },
                 new Brand { Id = 12, Name = "MSI" }
             );
+            #endregion
 
-            modelBuilder.Entity<Product>().HasData(
-                new Product { Id = 1, CategoryId = 1, BrandId = 1, Name = "Intel Core i9-14900K", Sku = "CPU-INT-14900K", Price = 15500000m },
-                new Product { Id = 2, CategoryId = 1, BrandId = 1, Name = "Intel Core i7-14700K", Sku = "CPU-INT-14700K", Price = 11200000m },
-                new Product { Id = 3, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 9 7950X3D", Sku = "CPU-AMD-7950X3D", Price = 14800000m },
-                new Product { Id = 4, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 7 7800X3D", Sku = "CPU-AMD-7800X3D", Price = 9800000m },
-
-                new Product { Id = 5, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4090", Sku = "GPU-NV-4090", Price = 45000000m },
-                new Product { Id = 6, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4080 Super", Sku = "GPU-NV-4080S", Price = 31000000m },
-                new Product { Id = 7, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7900 XTX", Sku = "GPU-AMD-7900XTX", Price = 28500000m },
-                new Product { Id = 8, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7800 XT", Sku = "GPU-AMD-7800XT", Price = 15000000m },
-
-                new Product { Id = 9, CategoryId = 3, BrandId = 4, Name = "Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz", Sku = "RAM-COR-V32GB", Price = 3200000m },
-                new Product { Id = 10, CategoryId = 3, BrandId = 8, Name = "G.Skill Trident Z5 RGB DDR5 32GB (2x16GB) 6400MHz", Sku = "RAM-GSK-Z532GB", Price = 3800000m },
-                new Product { Id = 11, CategoryId = 3, BrandId = 5, Name = "Kingston Fury Beast DDR5 16GB 5200MHz", Sku = "RAM-KIN-F16GB", Price = 1500000m },
-                new Product { Id = 12, CategoryId = 3, BrandId = 9, Name = "Crucial Pro DDR5 16GB 5600MHz", Sku = "RAM-CRU-P16GB", Price = 1450000m },
-
-                new Product { Id = 13, CategoryId = 4, BrandId = 6, Name = "Samsung 990 Pro NVMe M.2 SSD 2TB", Sku = "SSD-SS-990P2TB", Price = 4500000m },
-                new Product { Id = 14, CategoryId = 4, BrandId = 7, Name = "WD Black SN850X NVMe M.2 SSD 2TB", Sku = "SSD-WD-850X2TB", Price = 4200000m },
-                new Product { Id = 15, CategoryId = 4, BrandId = 9, Name = "Crucial P5 Plus NVMe M.2 SSD 1TB", Sku = "SSD-CRU-P5P1TB", Price = 2100000m },
-                new Product { Id = 16, CategoryId = 4, BrandId = 5, Name = "Kingston KC3000 NVMe M.2 SSD 1TB", Sku = "SSD-KIN-KC3K1TB", Price = 2300000m },
-
-                new Product { Id = 17, CategoryId = 5, BrandId = 4, Name = "Corsair RM1000e 1000W 80+ Gold", Sku = "PSU-COR-RM1000E", Price = 4100000m },
-                new Product { Id = 18, CategoryId = 5, BrandId = 10, Name = "Seasonic FOCUS Plus Gold 850W", Sku = "PSU-SEA-FP850W", Price = 3400000m },
-                new Product { Id = 19, CategoryId = 5, BrandId = 11, Name = "Cooler Master MWE Gold 750 V2", Sku = "PSU-CM-MWE750", Price = 2500000m },
-                new Product { Id = 20, CategoryId = 5, BrandId = 12, Name = "MSI MPG A850G PCIE5 850W", Sku = "PSU-MSI-A850G", Price = 3600000m }
-            );
-
+            #region === User Seed Data ===
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, FirstName = "Admin", LastName = "User", Email = "admin@example.com", PasswordHash = "123", Role = "Admin" },
-                new User { Id = 2, FirstName = "Test", LastName = "Customer", Email = "customer@example.com", PasswordHash = "123", Role = "Customer" }
+                new User { Id = 1, FirstName = "Admin", LastName = "User", Email = "admin@example.com", PasswordHash = "$2a$11$9i.2nCqjA1DkC8B4lQ9C8uJ.Uj5GqXy.z/A7X2Q.Z9iB8qF.K/9W.", Role = "Admin", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 1), DateTimeKind.Utc) },
+                new User { Id = 2, FirstName = "An", LastName = "Nguyễn", Email = "customer1@example.com", PasswordHash = "$2a$11$gT/jKqC0Z.I7H.v2Uu4j6u8kK/gL7Xy.Z/Q5F/E9Z/A9qG.H/3e.", Role = "Customer", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 15), DateTimeKind.Utc) },
+                new User { Id = 3, FirstName = "Bình", LastName = "Trần", Email = "customer2@example.com", PasswordHash = "$2a$11$gT/jKqC0Z.I7H.v2Uu4j6u8kK/gL7Xy.Z/Q5F/E9Z/A9qG.H/3e.", Role = "Customer", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 20), DateTimeKind.Utc) }
             );
+            #endregion
+
+            #region === Product Seed Data ===
+            modelBuilder.Entity<Product>().HasData(
+                new Product { Id = 1, CategoryId = 1, BrandId = 1, Name = "Intel Core i9-14900K", Sku = "CPU-INT-14900K", Price = 15500000m, Description = "Vi xử lý đầu bảng cho gaming và sáng tạo nội dung, 24 nhân 32 luồng, tốc độ tối đa 6.0 GHz.", StockQuantity = 50, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=i9-14900K\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 10), DateTimeKind.Utc) },
+                new Product { Id = 2, CategoryId = 1, BrandId = 1, Name = "Intel Core i7-14700K", Sku = "CPU-INT-14700K", Price = 11200000m, Description = "Lựa chọn tuyệt vời cho gaming hiệu năng cao, 20 nhân 28 luồng.", StockQuantity = 80, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=i7-14700K\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 10), DateTimeKind.Utc) },
+                new Product { Id = 3, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 9 7950X3D", Sku = "CPU-AMD-7950X3D", Price = 14800000m, Description = "Vua gaming với công nghệ 3D V-Cache, 16 nhân 32 luồng.", StockQuantity = 45, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=R9-7950X3D\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 5), DateTimeKind.Utc) },
+                new Product { Id = 4, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 7 7800X3D", Sku = "CPU-AMD-7800X3D", Price = 9800000m, Description = "Hiệu năng gaming thuần túy tốt nhất phân khúc nhờ 3D V-Cache, 8 nhân 16 luồng.", StockQuantity = 120, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=R7-7800X3D\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 5), DateTimeKind.Utc) },
+
+                new Product { Id = 5, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4090", Sku = "GPU-NV-4090", Price = 45000000m, Description = "Sức mạnh tối thượng cho gaming 4K và các tác vụ AI, Ray Tracing đỉnh cao.", StockQuantity = 25, ImagesJson = "[\"https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090\", \"https://placehold.co/600x600/CCC/333?text=RTX+4090+Side\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 15), DateTimeKind.Utc) },
+                new Product { Id = 6, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4080 Super", Sku = "GPU-NV-4080S", Price = 31000000m, Description = "Hiệu năng vượt trội cho gaming 1440p và 4K, phiên bản nâng cấp của RTX 4080.", StockQuantity = 40, ImagesJson = "[\"https://placehold.co/600x600/1B3C34/FFF?text=RTX+4080S\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 20), DateTimeKind.Utc) },
+                new Product { Id = 7, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7900 XTX", Sku = "GPU-AMD-7900XTX", Price = 28500000m, Description = "Card đồ họa đầu bảng của AMD, đối thủ cạnh tranh trực tiếp với RTX 4080.", StockQuantity = 35, ImagesJson = "[\"https://placehold.co/600x600/BF0A30/FFF?text=RX+7900XTX\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 25), DateTimeKind.Utc) },
+                new Product { Id = 8, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7800 XT", Sku = "GPU-AMD-7800XT", Price = 15000000m, Description = "Lựa chọn p/p tốt nhất cho gaming 1440p.", StockQuantity = 90, ImagesJson = "[\"https://placehold.co/600x600/BF0A30/FFF?text=RX+7800XT\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 1), DateTimeKind.Utc) },
+
+                new Product { Id = 9, CategoryId = 3, BrandId = 4, Name = "Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz", Sku = "RAM-COR-V32GB", Price = 3200000m, Description = "Kit RAM DDR5 hiệu năng cao, tản nhiệt nhôm, tương thích tốt với Intel XMP và AMD EXPO.", StockQuantity = 150, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=Vengeance+DDR5\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 5), DateTimeKind.Utc) },
+                new Product { Id = 10, CategoryId = 3, BrandId = 8, Name = "G.Skill Trident Z5 RGB DDR5 32GB (2x16GB) 6400MHz", Sku = "RAM-GSK-Z532GB", Price = 3800000m, Description = "Thiết kế đẹp mắt với LED RGB, tốc độ bus cao dành cho người dùng chuyên nghiệp và game thủ.", StockQuantity = 110, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=Trident+Z5\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 12), DateTimeKind.Utc) },
+
+                new Product { Id = 13, CategoryId = 4, BrandId = 6, Name = "Samsung 990 Pro NVMe M.2 SSD 2TB", Sku = "SSD-SS-990P2TB", Price = 4500000m, Description = "Ổ cứng NVMe Gen4 nhanh nhất thị trường, lý tưởng cho hệ điều hành, game và ứng dụng nặng.", StockQuantity = 70, ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=990+Pro+2TB\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 18), DateTimeKind.Utc) },
+                new Product { Id = 14, CategoryId = 4, BrandId = 7, Name = "WD Black SN850X NVMe M.2 SSD 2TB", Sku = "SSD-WD-850X2TB", Price = 4200000m, Description = "Tốc độ đọc ghi cực nhanh, lựa chọn hàng đầu của game thủ.", StockQuantity = 85, ImagesJson = "[\"https://placehold.co/600x600/000/FFF?text=SN850X+2TB\"]", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 3), DateTimeKind.Utc) }
+            );
+            #endregion
+
+            #region === Review Seed Data ===
+            modelBuilder.Entity<Review>().HasData(
+                new Review { Id = 1, ProductId = 1, UserId = 2, Rating = 5, Comment = "CPU quá mạnh, chạy đa nhiệm và render video cực nhanh. Rất đáng tiền!", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 1), DateTimeKind.Utc) },
+                new Review { Id = 2, ProductId = 1, UserId = 3, Rating = 5, Comment = "Hiệu năng chơi game đỉnh cao, không có gì để chê.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 5), DateTimeKind.Utc) },
+                new Review { Id = 3, ProductId = 5, UserId = 2, Rating = 5, Comment = "Đúng là trùm cuối card đồ họa. Chơi Cyberpunk 2077 max setting 4K mượt mà. Đắt nhưng xắt ra miếng.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 10), DateTimeKind.Utc) },
+                new Review { Id = 4, ProductId = 8, UserId = 3, Rating = 4, Comment = "Hiệu năng chơi game 2K rất tốt trong tầm giá. Chỉ có điều card hơi nóng một chút.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 12), DateTimeKind.Utc) },
+                new Review { Id = 5, ProductId = 9, UserId = 2, Rating = 5, Comment = "RAM chạy ổn định, cắm vào là nhận ngay, không gặp vấn đề gì.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 29), DateTimeKind.Utc) }
+            );
+            #endregion
         }
     }
 }

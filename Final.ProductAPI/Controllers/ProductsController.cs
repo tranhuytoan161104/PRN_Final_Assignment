@@ -1,4 +1,5 @@
-﻿using Final.ProductAPI.Services;
+﻿using Final.Domain.Queries;
+using Final.ProductAPI.Services;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Final.ProductAPI.Controllers
@@ -14,18 +15,19 @@ namespace Final.ProductAPI.Controllers
             _productService = productService;
         }
 
-        [HttpGet("all")]
-        public async Task<IActionResult> GetAllProductsAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10)
+        [HttpGet]
+        public async Task<IActionResult> GetAllProductsAsync([FromQuery] ProductQuery query)
         {
-            var products = await _productService.GetAllProductsAsync(pageNumber, pageSize);
+            var products = await _productService.GetAllProductsAsync(query);
             return Ok(products);
         }
 
-        [HttpGet("by_category")]
-        public async Task<IActionResult> GetProductsByCategoryAsync([FromQuery] int pageNumber = 1, [FromQuery] int pageSize = 10, [FromQuery] long categoryId = 1)
+        [HttpGet("detail")]
+        public async Task<IActionResult> GetProductDetail([FromQuery] long productId)
         {
-            var products = await _productService.GetProductsByCategoryAsync(pageNumber, pageSize, categoryId);
-            return Ok(products);
+            var product = await _productService.GetProductDetailAsync(productId);
+            if (product == null) return NotFound();
+            return Ok(product);
         }
     }
 }

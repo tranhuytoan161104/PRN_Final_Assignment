@@ -88,6 +88,7 @@ namespace Final.Persistence.Repositories
         public async Task<Product?> GetProductDetailAsync(long productId)
         {
             return await _context.Products
+                .Include(p => p.Images)
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
                 .Include(p => p.Reviews)

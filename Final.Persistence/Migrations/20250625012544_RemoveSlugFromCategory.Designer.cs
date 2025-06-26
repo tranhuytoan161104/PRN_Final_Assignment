@@ -4,6 +4,7 @@ using Final.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Final.Persistence.Migrations
 {
     [DbContext(typeof(ApplicationDbContext))]
-    partial class ApplicationDbContextModelSnapshot : ModelSnapshot
+    [Migration("20250625012544_RemoveSlugFromCategory")]
+    partial class RemoveSlugFromCategory
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -215,9 +218,6 @@ namespace Final.Persistence.Migrations
 
                     SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
 
-                    b.Property<DateTime>("AddAt")
-                        .HasColumnType("datetime2");
-
                     b.Property<long>("BrandId")
                         .HasColumnType("bigint");
 
@@ -228,6 +228,9 @@ namespace Final.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("Description")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("ImagesJson")
                         .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("Name")
@@ -258,11 +261,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 1L,
                             CategoryId = 1L,
                             CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Vi xử lý đầu bảng cho gaming và sáng tạo nội dung, 24 nhân 32 luồng, tốc độ tối đa 6.0 GHz.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=i9-14900K\"]",
                             Name = "Intel Core i9-14900K",
                             Price = 15500000m,
                             Sku = "CPU-INT-14900K",
@@ -271,11 +274,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 2L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 1L,
                             CategoryId = 1L,
                             CreatedAt = new DateTime(2024, 1, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Lựa chọn tuyệt vời cho gaming hiệu năng cao, 20 nhân 28 luồng.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=i7-14700K\"]",
                             Name = "Intel Core i7-14700K",
                             Price = 11200000m,
                             Sku = "CPU-INT-14700K",
@@ -284,11 +287,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 3L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 2L,
                             CategoryId = 1L,
                             CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Vua gaming với công nghệ 3D V-Cache, 16 nhân 32 luồng.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=R9-7950X3D\"]",
                             Name = "AMD Ryzen 9 7950X3D",
                             Price = 14800000m,
                             Sku = "CPU-AMD-7950X3D",
@@ -297,11 +300,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 4L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 2L,
                             CategoryId = 1L,
                             CreatedAt = new DateTime(2024, 2, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Hiệu năng gaming thuần túy tốt nhất phân khúc nhờ 3D V-Cache, 8 nhân 16 luồng.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=R7-7800X3D\"]",
                             Name = "AMD Ryzen 7 7800X3D",
                             Price = 9800000m,
                             Sku = "CPU-AMD-7800X3D",
@@ -310,11 +313,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 5L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 3L,
                             CategoryId = 2L,
                             CreatedAt = new DateTime(2024, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Sức mạnh tối thượng cho gaming 4K và các tác vụ AI, Ray Tracing đỉnh cao.",
+                            ImagesJson = "[\"https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090\", \"https://placehold.co/600x600/CCC/333?text=RTX+4090+Side\"]",
                             Name = "NVIDIA GeForce RTX 4090",
                             Price = 45000000m,
                             Sku = "GPU-NV-4090",
@@ -323,11 +326,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 6L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 3L,
                             CategoryId = 2L,
                             CreatedAt = new DateTime(2024, 2, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Hiệu năng vượt trội cho gaming 1440p và 4K, phiên bản nâng cấp của RTX 4080.",
+                            ImagesJson = "[\"https://placehold.co/600x600/1B3C34/FFF?text=RTX+4080S\"]",
                             Name = "NVIDIA GeForce RTX 4080 Super",
                             Price = 31000000m,
                             Sku = "GPU-NV-4080S",
@@ -336,11 +339,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 7L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 2L,
                             CategoryId = 2L,
                             CreatedAt = new DateTime(2024, 1, 25, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Card đồ họa đầu bảng của AMD, đối thủ cạnh tranh trực tiếp với RTX 4080.",
+                            ImagesJson = "[\"https://placehold.co/600x600/BF0A30/FFF?text=RX+7900XTX\"]",
                             Name = "AMD Radeon RX 7900 XTX",
                             Price = 28500000m,
                             Sku = "GPU-AMD-7900XTX",
@@ -349,11 +352,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 8L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 2L,
                             CategoryId = 2L,
                             CreatedAt = new DateTime(2024, 3, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Lựa chọn p/p tốt nhất cho gaming 1440p.",
+                            ImagesJson = "[\"https://placehold.co/600x600/BF0A30/FFF?text=RX+7800XT\"]",
                             Name = "AMD Radeon RX 7800 XT",
                             Price = 15000000m,
                             Sku = "GPU-AMD-7800XT",
@@ -362,11 +365,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 9L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 4L,
                             CategoryId = 3L,
                             CreatedAt = new DateTime(2024, 1, 5, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Kit RAM DDR5 hiệu năng cao, tản nhiệt nhôm, tương thích tốt với Intel XMP và AMD EXPO.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=Vengeance+DDR5\"]",
                             Name = "Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz",
                             Price = 3200000m,
                             Sku = "RAM-COR-V32GB",
@@ -375,11 +378,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 10L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 8L,
                             CategoryId = 3L,
                             CreatedAt = new DateTime(2024, 2, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Thiết kế đẹp mắt với LED RGB, tốc độ bus cao dành cho người dùng chuyên nghiệp và game thủ.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=Trident+Z5\"]",
                             Name = "G.Skill Trident Z5 RGB DDR5 32GB (2x16GB) 6400MHz",
                             Price = 3800000m,
                             Sku = "RAM-GSK-Z532GB",
@@ -388,11 +391,11 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 13L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 6L,
                             CategoryId = 4L,
                             CreatedAt = new DateTime(2024, 2, 18, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Ổ cứng NVMe Gen4 nhanh nhất thị trường, lý tưởng cho hệ điều hành, game và ứng dụng nặng.",
+                            ImagesJson = "[\"https://placehold.co/600x600/EFEFEF/333?text=990+Pro+2TB\"]",
                             Name = "Samsung 990 Pro NVMe M.2 SSD 2TB",
                             Price = 4500000m,
                             Sku = "SSD-SS-990P2TB",
@@ -401,75 +404,15 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 14L,
-                            AddAt = new DateTime(2025, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             BrandId = 7L,
                             CategoryId = 4L,
                             CreatedAt = new DateTime(2024, 3, 3, 0, 0, 0, 0, DateTimeKind.Utc),
                             Description = "Tốc độ đọc ghi cực nhanh, lựa chọn hàng đầu của game thủ.",
+                            ImagesJson = "[\"https://placehold.co/600x600/000/FFF?text=SN850X+2TB\"]",
                             Name = "WD Black SN850X NVMe M.2 SSD 2TB",
                             Price = 4200000m,
                             Sku = "SSD-WD-850X2TB",
                             StockQuantity = 85
-                        });
-                });
-
-            modelBuilder.Entity("Final.Domain.Entities.ProductImage", b =>
-                {
-                    b.Property<long>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("bigint");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<long>("Id"));
-
-                    b.Property<string>("ImageUrl")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.Property<long>("ProductId")
-                        .HasColumnType("bigint");
-
-                    b.HasKey("Id");
-
-                    b.HasIndex("ProductId");
-
-                    b.ToTable("ProductImage");
-
-                    b.HasData(
-                        new
-                        {
-                            Id = 1L,
-                            ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i9-14900K-1",
-                            ProductId = 1L
-                        },
-                        new
-                        {
-                            Id = 2L,
-                            ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i9-14900K-2",
-                            ProductId = 1L
-                        },
-                        new
-                        {
-                            Id = 3L,
-                            ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i7-14700K",
-                            ProductId = 2L
-                        },
-                        new
-                        {
-                            Id = 4L,
-                            ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090-main",
-                            ProductId = 5L
-                        },
-                        new
-                        {
-                            Id = 5L,
-                            ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090-side",
-                            ProductId = 5L
-                        },
-                        new
-                        {
-                            Id = 6L,
-                            ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090-box",
-                            ProductId = 5L
                         });
                 });
 
@@ -673,17 +616,6 @@ namespace Final.Persistence.Migrations
                     b.Navigation("Category");
                 });
 
-            modelBuilder.Entity("Final.Domain.Entities.ProductImage", b =>
-                {
-                    b.HasOne("Final.Domain.Entities.Product", "Product")
-                        .WithMany("Images")
-                        .HasForeignKey("ProductId")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
-
-                    b.Navigation("Product");
-                });
-
             modelBuilder.Entity("Final.Domain.Entities.Review", b =>
                 {
                     b.HasOne("Final.Domain.Entities.Product", "Product")
@@ -720,8 +652,6 @@ namespace Final.Persistence.Migrations
 
             modelBuilder.Entity("Final.Domain.Entities.Product", b =>
                 {
-                    b.Navigation("Images");
-
                     b.Navigation("OrderItems");
 
                     b.Navigation("Reviews");

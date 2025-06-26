@@ -1,8 +1,8 @@
 ﻿namespace Final.ProductAPI.DTOs
 {
-    public class CategoryDTO
+    public class ProductImageDTO
     {
         public long Id { get; set; }
-        public string? Name { get; set; }
+        public string ImageUrl { get; set; } = null!;
     }
 }

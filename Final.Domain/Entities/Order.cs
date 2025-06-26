@@ -1,5 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Final.Domain.Enums;   
 
 namespace Final.Domain.Entities
 {
@@ -17,7 +18,7 @@ namespace Final.Domain.Entities
         [Column(TypeName = "decimal(18, 2)")]
         public decimal TotalAmount { get; set; }
 
-        public OrderStatus Status { get; set; }
+        public EOrderStatus Status { get; set; }
 
         [Required]
         public string ShippingAddress { get; set; } = null!;

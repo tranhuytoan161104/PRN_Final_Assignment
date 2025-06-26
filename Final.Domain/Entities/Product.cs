@@ -28,8 +28,6 @@ namespace Final.Domain.Entities
 
         public int StockQuantity { get; set; }
 
-        public string? ImagesJson { get; set; }
-
         public long CategoryId { get; set; }
 
         [ForeignKey("CategoryId")]
@@ -42,6 +40,9 @@ namespace Final.Domain.Entities
 
         public DateTime CreatedAt { get; set; }
 
+        public DateTime AddAt { get; set; }
+
+        public virtual ICollection<ProductImage>? Images { get; set; }
         public virtual ICollection<Review>? Reviews { get; set; }
         public virtual ICollection<OrderItem>? OrderItems { get; set; }
     }

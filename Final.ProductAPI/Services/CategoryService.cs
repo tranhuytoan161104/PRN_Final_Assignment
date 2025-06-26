@@ -20,7 +20,6 @@ namespace Final.ProductAPI.Services
             {
                 Id = c.Id,
                 Name = c.Name,
-                Slug = c.Slug
             }).ToList();
         }
     }

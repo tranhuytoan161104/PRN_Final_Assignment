@@ -11,5 +11,6 @@ namespace Final.ProductAPI.DTOs
         public int StockQuantity { get; set; }
         public string? CategoryName { get; set; }
         public List<ReviewDTO>? Reviews { get; set; }
+        public List<ProductImageDTO>? Images { get; set; }
     }
 }

@@ -22,8 +22,8 @@ namespace Final.ProductAPI.Controllers
             return Ok(products);
         }
 
-        [HttpGet("detail")]
-        public async Task<IActionResult> GetProductDetail([FromQuery] long productId)
+        [HttpGet("{productId}")]
+        public async Task<IActionResult> GetProductDetail(long productId)
         {
             var product = await _productService.GetProductDetailAsync(productId);
             if (product == null) return NotFound();

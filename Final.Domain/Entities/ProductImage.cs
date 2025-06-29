@@ -15,6 +15,8 @@ namespace Final.Domain.Entities
 
         public long ProductId { get; set; }
 
+
+
         [ForeignKey("ProductId")]
         public virtual Product Product { get; set; } = null!;
     }

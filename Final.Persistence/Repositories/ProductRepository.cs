@@ -36,7 +36,6 @@ namespace Final.Persistence.Repositories
                 products = products.Where(p => p.Price >= query.MinPrice.Value);
             if (query.MaxPrice.HasValue)
                 products = products.Where(p => p.Price <= query.MaxPrice.Value);
-
             // ...
             // Thêm các điều kiện lọc khác nếu cần
 
@@ -56,7 +55,6 @@ namespace Final.Persistence.Repositories
                     case "createdat":
                         products = desc ? products.OrderByDescending(p => p.CreatedAt) : products.OrderBy(p => p.CreatedAt);
                         break;
-
                     // ...
                     // Thêm các trường sắp xếp khác nếu cần
                     default:
@@ -93,6 +91,7 @@ namespace Final.Persistence.Repositories
                 .Include(p => p.Brand)
                 .Include(p => p.Reviews)
                     .ThenInclude(r => r.User)
+                .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == productId);
         }
     }

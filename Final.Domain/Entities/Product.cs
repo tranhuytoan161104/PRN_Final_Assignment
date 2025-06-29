@@ -14,12 +14,8 @@ namespace Final.Domain.Entities
         public long Id { get; set; }
 
         [Required]
-        [StringLength(255)]
-        public string? Name { get; set; }
-
-        [Required]
         [StringLength(100)]
-        public string? Sku { get; set; }
+        public string? Name { get; set; }
 
         public string? Description { get; set; }
 
@@ -28,22 +24,28 @@ namespace Final.Domain.Entities
 
         public int StockQuantity { get; set; }
 
-        public long CategoryId { get; set; }
-
-        [ForeignKey("CategoryId")]
-        public virtual Category? Category { get; set; }
-
-        public long BrandId { get; set; }
-
-        [ForeignKey("BrandId")]
-        public virtual Brand? Brand { get; set; }
-
         public DateTime CreatedAt { get; set; }
 
         public DateTime AddAt { get; set; }
 
+        public long BrandId { get; set; }
+
+        public long CategoryId { get; set; }
+
+
+
+        [ForeignKey("BrandId")]
+        public virtual Brand? Brand { get; set; }
+
+        [ForeignKey("CategoryId")]
+        public virtual Category? Category { get; set; }
+
+
+
         public virtual ICollection<ProductImage>? Images { get; set; }
-        public virtual ICollection<Review>? Reviews { get; set; }
+
+        public ICollection<Review> Reviews { get; set; } = new List<Review>();
+
         public virtual ICollection<OrderItem>? OrderItems { get; set; }
     }
 }

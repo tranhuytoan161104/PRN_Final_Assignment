@@ -42,20 +42,23 @@ namespace Final.ProductAPI.Services
             var product = await _productRepository.GetProductDetailAsync(productId);
             if (product == null) return null;
 
-            var productDto = new ProductDetailDTO
+            var productDetailDTOs = new ProductDetailDTO
             {
                 Id = product.Id,
                 Name = product.Name,
                 Price = product.Price,
                 Description = product.Description,
                 StockQuantity = product.StockQuantity,
+                BrandId = product.BrandId,
+                CategoryId = product.CategoryId,
+                BrandName = product.Brand?.Name,
                 CategoryName = product.Category?.Name,
                 Reviews = product.Reviews?.Select(r => new ReviewDTO
                 {
                     Rating = r.Rating,
                     Comment = r.Comment,
                     CreatedAt = r.CreatedAt,
-                    UserName = r.User?.FirstName 
+                    UserName = r.User?.FirstName
                 }).ToList(),
                 Images = product.Images?.Select(i => new ProductImageDTO
                 {
@@ -66,7 +69,59 @@ namespace Final.ProductAPI.Services
                 // Thêm các thuộc tính khác nếu cần
             };
 
-            return productDto;
+            return productDetailDTOs;
+        }
+
+        public async Task<ProductDetailDTO?> CreateProductAsync(ProductCreationDTO productCreationDto)
+        {
+            var product = new Product
+            {
+                Name = productCreationDto.Name,
+                Description = productCreationDto.Description,
+                Price = productCreationDto.Price,
+                StockQuantity = productCreationDto.StockQuantity,
+                BrandId = productCreationDto.BrandId,
+                CategoryId = productCreationDto.CategoryId,
+                Images = productCreationDto.Images?
+                    .Select(url => new ProductImage { ImageUrl = url })
+                    .ToList()
+            };
+
+            var createdProduct = await _productRepository.CreateProductAsync(product);
+
+            if (createdProduct == null)
+            {
+                return null;
+            }
+
+            return await GetProductDetailAsync(createdProduct.Id);
+        }
+
+        public async Task<ProductDetailDTO?> AddProductQuantityAsync(long productId, UpdateStockQuantityDTO updateStockQuantityDto)
+        {
+            var product = await _productRepository.GetProductDetailAsync(productId);
+            if (product == null) return null;
+            product.StockQuantity += updateStockQuantityDto.NewStockQuantity;
+            var updatedProduct = await _productRepository.UpdateProductQuantityAsync(product);
+            if (updatedProduct == null)
+            {
+                return null;
+            }
+            return await GetProductDetailAsync(updatedProduct.Id);
+
+        }
+
+        public async Task<ProductDetailDTO?> ReduceProductQuantityAsync(long productId, UpdateStockQuantityDTO updateStockQuantityDto)
+        {
+            var product = await _productRepository.GetProductDetailAsync(productId);
+            if (product == null) return null;
+            product.StockQuantity -= updateStockQuantityDto.NewStockQuantity;
+            var updatedProduct = await _productRepository.UpdateProductQuantityAsync(product);
+            if (updatedProduct == null)
+            {
+                return null;
+            }
+            return await GetProductDetailAsync(updatedProduct.Id);
         }
     }
 }

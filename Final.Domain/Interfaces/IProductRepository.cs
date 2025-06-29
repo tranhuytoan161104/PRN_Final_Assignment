@@ -13,5 +13,9 @@ namespace Final.Domain.Interfaces
     {
         Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery query);
         Task<Product?> GetProductDetailAsync(long productId);
+        Task<Product?> CreateProductAsync(Product product); 
+        Task<Product?> UpdateProductQuantityAsync(Product product);
+        //Task<Product?> UpdateProductStatusAsync(long productId);
+        //Task<Product?> UpdateProductDetailAsync(long productId);
     }
 }

@@ -23,7 +23,9 @@ namespace Final.Persistence.Repositories
 
         public async Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery query)
         {
-            var products = _context.Products.AsQueryable();
+            var products = _context.Products
+                .Where(p => !p.IsDeleted)
+                .AsQueryable();
 
             // Điều kiện lọc
             if (query.CategoryId.HasValue)
@@ -86,6 +88,7 @@ namespace Final.Persistence.Repositories
         public async Task<Product?> GetProductDetailAsync(long productId)
         {
             return await _context.Products
+                .Where(p => !p.IsDeleted)
                 .Include(p => p.Images)
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
@@ -93,6 +96,25 @@ namespace Final.Persistence.Repositories
                     .ThenInclude(r => r.User)
                 .AsSplitQuery()
                 .FirstOrDefaultAsync(p => p.Id == productId);
+        }
+
+        public async Task<Product?> CreateProductAsync(Product product)
+        {
+            product.CreatedAt = DateTime.UtcNow;
+            product.AddAt = DateTime.UtcNow;
+            _context.Products.Add(product);
+            await _context.SaveChangesAsync();
+            return product;
+        }
+
+        public async Task<Product?> UpdateProductQuantityAsync(Product product)
+        {
+            var existingProduct = await _context.Products.FindAsync(product.Id);
+            if (existingProduct == null) return null;
+            existingProduct.StockQuantity = product.StockQuantity;
+            _context.Products.Update(existingProduct);
+            await _context.SaveChangesAsync();
+            return existingProduct;
         }
     }
 }

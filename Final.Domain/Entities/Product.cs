@@ -28,6 +28,8 @@ namespace Final.Domain.Entities
 
         public DateTime AddAt { get; set; }
 
+        public bool IsDeleted { get; set; } = false;
+
         public long BrandId { get; set; }
 
         public long CategoryId { get; set; }

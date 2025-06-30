@@ -2,6 +2,7 @@
 using Final.Domain.Entities;
 using Final.Domain.Interfaces;
 using Final.Domain.Queries;
+using Final.Domain.Enums;
 using Final.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -24,7 +25,7 @@ namespace Final.Persistence.Repositories
         public async Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery query)
         {
             var products = _context.Products
-                .Where(p => !p.IsDeleted)
+                .Where(p => !p.Status.Equals("Archive"))
                 .AsQueryable();
 
             // Điều kiện lọc
@@ -38,8 +39,6 @@ namespace Final.Persistence.Repositories
                 products = products.Where(p => p.Price >= query.MinPrice.Value);
             if (query.MaxPrice.HasValue)
                 products = products.Where(p => p.Price <= query.MaxPrice.Value);
-            // ...
-            // Thêm các điều kiện lọc khác nếu cần
 
 
             // Điều kiện sắp xếp
@@ -57,8 +56,6 @@ namespace Final.Persistence.Repositories
                     case "createdat":
                         products = desc ? products.OrderByDescending(p => p.CreatedAt) : products.OrderBy(p => p.CreatedAt);
                         break;
-                    // ...
-                    // Thêm các trường sắp xếp khác nếu cần
                     default:
                         products = products.OrderBy(p => p.Id);
                         break;
@@ -88,7 +85,7 @@ namespace Final.Persistence.Repositories
         public async Task<Product?> GetProductDetailAsync(long productId)
         {
             return await _context.Products
-                .Where(p => !p.IsDeleted)
+                .Where(p => !p.Status.Equals("Archive"))
                 .Include(p => p.Images)
                 .Include(p => p.Category)
                 .Include(p => p.Brand)
@@ -112,9 +109,22 @@ namespace Final.Persistence.Repositories
             var existingProduct = await _context.Products.FindAsync(product.Id);
             if (existingProduct == null) return null;
             existingProduct.StockQuantity = product.StockQuantity;
+            if (product.StockQuantity <= 0)
+            {
+                existingProduct.Status = EProductStatus.OutOfStock;
+            }
+            else
+            {
+                existingProduct.Status = EProductStatus.Available;
+            }
             _context.Products.Update(existingProduct);
             await _context.SaveChangesAsync();
             return existingProduct;
+        }
+
+        public async Task UpdateProductAsync(Product product)
+        {
+            await _context.SaveChangesAsync();
         }
     }
 }

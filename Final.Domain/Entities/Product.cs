@@ -5,6 +5,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Final.Domain.Enums;
 
 namespace Final.Domain.Entities
 {
@@ -27,8 +28,9 @@ namespace Final.Domain.Entities
         public DateTime CreatedAt { get; set; }
 
         public DateTime AddAt { get; set; }
+        public DateTime? UpdatedAt { get; set; }
 
-        public bool IsDeleted { get; set; } = false;
+        public EProductStatus Status { get; set; } = EProductStatus.Available;
 
         public long BrandId { get; set; }
 

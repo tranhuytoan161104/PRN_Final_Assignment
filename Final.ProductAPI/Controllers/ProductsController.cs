@@ -1,4 +1,5 @@
-﻿using Final.Domain.Queries;
+﻿using Final.Domain.Entities;
+using Final.Domain.Queries;
 using Final.ProductAPI.DTOs;
 using Final.ProductAPI.Services;
 using Microsoft.AspNetCore.Mvc;
@@ -38,7 +39,7 @@ namespace Final.ProductAPI.Controllers
             return CreatedAtAction(nameof(GetProductDetail), new { productId = createdProduct.Id }, createdProduct);
         }
 
-        [HttpPatch("{productId}/add-stockquantity")] 
+        [HttpPatch("{productId}/add-stockquantity")]
         [ProducesResponseType(typeof(ProductDetailDTO), 200)]
         [ProducesResponseType(404)]
         [ProducesResponseType(400)]
@@ -48,7 +49,7 @@ namespace Final.ProductAPI.Controllers
 
             if (updatedProduct == null)
             {
-                return NotFound(); 
+                return NotFound();
             }
 
             return Ok(updatedProduct);
@@ -65,6 +66,36 @@ namespace Final.ProductAPI.Controllers
             if (updatedProduct == null)
             {
                 return NotFound();
+            }
+
+            return Ok(updatedProduct);
+        }
+
+        [HttpDelete("{productId}")]
+        [ProducesResponseType(typeof(ProductDetailDTO), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> ArchiveProductAsync(long productId)
+        {
+            var archivedProduct = await _productService.ArchiveProductAsync(productId);
+            if (archivedProduct == null)
+            {
+                return NotFound();
+            }
+            return Ok(archivedProduct);
+        }
+
+        [HttpPut("{productId}")]
+        [ProducesResponseType(typeof(ProductDetailDTO), 200)]
+        [ProducesResponseType(404)]
+        [ProducesResponseType(400)]
+        public async Task<IActionResult> UpdateProductAsync(long productId, [FromBody] ProductUpdateDTO productUpdateDto)
+        {
+            var updatedProduct = await _productService.UpdateProductAsync(productId, productUpdateDto);
+
+            if (updatedProduct == null)
+            {
+                return NotFound(); 
             }
 
             return Ok(updatedProduct);

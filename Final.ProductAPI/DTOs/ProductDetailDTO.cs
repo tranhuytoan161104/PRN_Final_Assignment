@@ -1,4 +1,5 @@
 ﻿using Final.Domain.Entities;
+using Final.Domain.Enums;
 
 namespace Final.ProductAPI.DTOs
 {
@@ -8,6 +9,9 @@ namespace Final.ProductAPI.DTOs
         public string? Name { get; set; }
         public decimal Price { get; set; }
         public string? Description { get; set; }
+        public DateTime CreatedAt { get; set; }
+        public DateTime AddAt { get; set; }
+        public EProductStatus Status { get; set; }
         public int StockQuantity { get; set; }
         public long BrandId { get; set; }
         public long CategoryId { get; set; }

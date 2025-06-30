@@ -2,6 +2,7 @@
 using Final.Domain.Entities;
 using Final.Domain.Interfaces;
 using Final.Domain.Queries;
+using Final.Domain.Enums;
 using Final.ProductAPI.DTOs;
 using Microsoft.EntityFrameworkCore;
 
@@ -49,6 +50,8 @@ namespace Final.ProductAPI.Services
                 Price = product.Price,
                 Description = product.Description,
                 StockQuantity = product.StockQuantity,
+                Status = product.Status,
+                CreatedAt = product.CreatedAt,
                 BrandId = product.BrandId,
                 CategoryId = product.CategoryId,
                 BrandName = product.Brand?.Name,
@@ -65,8 +68,6 @@ namespace Final.ProductAPI.Services
                     Id = i.Id,
                     ImageUrl = i.ImageUrl,
                 }).ToList()
-                // ...
-                // Thêm các thuộc tính khác nếu cần
             };
 
             return productDetailDTOs;
@@ -122,6 +123,68 @@ namespace Final.ProductAPI.Services
                 return null;
             }
             return await GetProductDetailAsync(updatedProduct.Id);
+        }
+
+        public async Task<ProductDetailDTO?> ArchiveProductAsync(long productId)
+        {
+            var product = await _productRepository.GetProductDetailAsync(productId);
+
+            if (product == null || product.Status == EProductStatus.Archived)
+            {
+                return null;
+            }
+
+            product.Status = EProductStatus.Archived;
+
+            await _productRepository.UpdateProductAsync(product);
+
+            var productDetailDto = new ProductDetailDTO
+            {
+                Id = product.Id,
+                Name = product.Name,
+                Description = product.Description,
+                Price = product.Price,
+                StockQuantity = product.StockQuantity,
+                BrandId = product.BrandId,
+                CategoryId = product.CategoryId,
+                BrandName = product.Brand?.Name,
+                CategoryName = product.Category?.Name,
+                Images = product.Images?
+                    .Select(i => new ProductImageDTO { Id = i.Id, ImageUrl = i.ImageUrl })
+                    .ToList(),
+                Reviews = product.Reviews?
+                    .Select(r => new ReviewDTO
+                    {
+                        Rating = r.Rating,
+                        Comment = r.Comment,
+                        CreatedAt = r.CreatedAt,
+                        UserName = r.User?.FirstName
+                    })
+                    .ToList()
+            };
+
+            return productDetailDto;
+        }
+
+        public async Task<ProductDetailDTO?> UpdateProductAsync(long productId, ProductUpdateDTO dto)
+        {
+            var product = await _productRepository.GetProductDetailAsync(productId);
+
+            if (product == null || product.Status == EProductStatus.Archived)
+            {
+                return null;
+            }
+
+            product.Name = dto.Name;
+            product.Description = dto.Description;
+            product.Price = dto.Price;
+            product.BrandId = dto.BrandId;
+            product.CategoryId = dto.CategoryId;
+            product.UpdatedAt = DateTime.UtcNow;
+
+            await _productRepository.UpdateProductAsync(product);
+
+            return await GetProductDetailAsync(productId);
         }
     }
 }

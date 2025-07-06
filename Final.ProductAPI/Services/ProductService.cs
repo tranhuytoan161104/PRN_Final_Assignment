@@ -67,6 +67,8 @@ namespace Final.ProductAPI.Services
                 StockQuantity = product.StockQuantity,
                 Status = product.Status,
                 CreatedAt = product.CreatedAt,
+                AddAt = product.AddAt,
+                UpdatedAt = product.UpdatedAt,
                 BrandId = product.BrandId,
                 CategoryId = product.CategoryId,
                 BrandName = product.Brand?.Name,
@@ -149,9 +151,16 @@ namespace Final.ProductAPI.Services
                 {
                     throw new InvalidOperationException($"Insufficient stock. Cannot reduce by {amountToReduce} when only {product.StockQuantity} are available.");
                 }
-                if (product.StockQuantity == 0)
+                if (product.StockQuantity - amountToReduce == 0 && product.Status != EProductStatus.Archived)
                 {
                     product.Status = EProductStatus.OutOfStock;
+                }
+            } 
+            else
+            {
+                if (product.StockQuantity + updateStockQuantityDto.ChangeQuantity > 0 && product.Status != EProductStatus.Archived)
+                {
+                    product.Status = EProductStatus.Available;
                 }
             }
 

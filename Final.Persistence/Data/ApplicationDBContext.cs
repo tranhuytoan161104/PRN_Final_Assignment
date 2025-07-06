@@ -27,23 +27,22 @@ namespace Final.Persistence.Data
         {
             base.OnModelCreating(modelBuilder);
 
+
+
             // === Fluent API Configurations ===
 
-            // Brand
             modelBuilder.Entity<Brand>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             });
 
-            // Category
             modelBuilder.Entity<Category>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Name).IsRequired().HasMaxLength(100);
             });
 
-            // User
             modelBuilder.Entity<User>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -55,7 +54,6 @@ namespace Final.Persistence.Data
                 entity.Property(e => e.CreatedAt).IsRequired();
             });
 
-            // Product
             modelBuilder.Entity<Product>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -64,7 +62,7 @@ namespace Final.Persistence.Data
                 entity.Property(e => e.StockQuantity).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
                 entity.Property(e => e.AddAt).IsRequired();
-                entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.Status).IsRequired().HasConversion<string>().HasMaxLength(50);
                 entity.HasOne(e => e.Brand)
                     .WithMany(b => b.Products)
                     .HasForeignKey(e => e.BrandId)
@@ -75,7 +73,6 @@ namespace Final.Persistence.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // ProductImage
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -86,7 +83,6 @@ namespace Final.Persistence.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Review
             modelBuilder.Entity<Review>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -104,7 +100,6 @@ namespace Final.Persistence.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // Order
             modelBuilder.Entity<Order>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -118,7 +113,6 @@ namespace Final.Persistence.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
-            // OrderItem
             modelBuilder.Entity<OrderItem>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -133,6 +127,8 @@ namespace Final.Persistence.Data
                     .HasForeignKey(e => e.ProductId)
                     .OnDelete(DeleteBehavior.Cascade);
             });
+
+
 
             // === Seed Data ===
 

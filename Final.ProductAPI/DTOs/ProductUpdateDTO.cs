@@ -13,5 +13,7 @@ namespace Final.ProductAPI.DTOs
         public long BrandId { get; set; }
 
         public long CategoryId { get; set; }
+
+        public List<string>? Images { get; set; }
     }
 }

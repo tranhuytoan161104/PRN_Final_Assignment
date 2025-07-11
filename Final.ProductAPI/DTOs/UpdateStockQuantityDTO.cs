@@ -1,6 +1,4 @@
-﻿using System.ComponentModel.DataAnnotations;
-
-namespace Final.ProductAPI.DTOs
+﻿namespace Final.ProductAPI.DTOs
 {
     public class UpdateStockQuantityDTO
     {

@@ -1,4 +1,5 @@
 ﻿using Final.Domain.Entities;
+using Final.Domain.Enums;
 
 namespace Final.UserAPI.DTOs
 {
@@ -10,6 +11,7 @@ namespace Final.UserAPI.DTOs
         public string Email { get; set; } = null!;
         public string Password { get; set; } = null!;
         public string Role { get; set; } = null!;
+        public EUserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
     }
 }

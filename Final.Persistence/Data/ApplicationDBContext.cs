@@ -22,6 +22,8 @@ namespace Final.Persistence.Data
         public DbSet<Review> Reviews { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderItem> OrderItems { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -128,6 +130,30 @@ namespace Final.Persistence.Data
                     .OnDelete(DeleteBehavior.Cascade);
             });
 
+            modelBuilder.Entity<ShoppingCart>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.User)
+                      .WithOne(u => u.ShoppingCart)
+                      .HasForeignKey<ShoppingCart>(e => e.UserId)
+                      .IsRequired();
+            });
+
+            modelBuilder.Entity<ShoppingCartItem>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+
+                entity.HasOne(e => e.ShoppingCart)
+                      .WithMany(sc => sc.Items)
+                      .HasForeignKey(e => e.ShoppingCartId)
+                      .IsRequired();
+
+                entity.HasOne(e => e.Product)
+                      .WithMany() 
+                      .HasForeignKey(e => e.ProductId)
+                      .IsRequired();
+            });
 
 
             // === Seed Data ===

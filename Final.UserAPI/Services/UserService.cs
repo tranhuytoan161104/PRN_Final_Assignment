@@ -3,6 +3,7 @@ using Final.Domain.Entities;
 using Final.Domain.Interfaces;
 using Final.Domain.Queries;
 using Final.UserAPI.DTOs;
+using Final.Domain.Enums;
 
 namespace Final.UserAPI.Services
 {
@@ -34,6 +35,7 @@ namespace Final.UserAPI.Services
                 Email = registerDto.Email,
                 PasswordHash = passwordHash,
                 Role = "Customer", 
+                Status = EUserStatus.Active,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -45,7 +47,9 @@ namespace Final.UserAPI.Services
                 FirstName = createdUser.FirstName,
                 LastName = createdUser.LastName,
                 Email = createdUser.Email,
-                Role = createdUser.Role
+                Role = createdUser.Role,
+                Status = createdUser.Status,
+                CreatedAt = createdUser.CreatedAt
             };
         }
 
@@ -55,6 +59,11 @@ namespace Final.UserAPI.Services
             if (user == null)
             {
                 throw new UnauthorizedAccessException("Invalid Email or Password.");
+            }
+
+            if (user.Status == EUserStatus.Inactive)
+            {
+                throw new UnauthorizedAccessException("Tài khoản của bạn đã bị khóa.");
             }
 
             var isPasswordValid = BCrypt.Net.BCrypt.Verify(loginDto.Password, user.PasswordHash);
@@ -83,6 +92,7 @@ namespace Final.UserAPI.Services
                 LastName = user.LastName,
                 Email = user.Email,
                 Role = user.Role,
+                Status = user.Status,
                 CreatedAt = user.CreatedAt
             };
         }
@@ -144,7 +154,9 @@ namespace Final.UserAPI.Services
                 FirstName = u.FirstName,
                 LastName = u.LastName,
                 Email = u.Email,
-                Role = u.Role
+                Role = u.Role,
+                Status = u.Status,
+                CreatedAt = u.CreatedAt
             }).ToList() ?? new List<UserDTO>();
 
             return new PagedResult<UserDTO>
@@ -176,6 +188,28 @@ namespace Final.UserAPI.Services
                 LastName = user.LastName,
                 Email = user.Email,
                 Role = user.Role
+            };
+        }
+
+        public async Task<UserDTO?> UpdateUserStatusAsync(long userId, UpdateUserStatusDTO updateUserStatusDto)
+        {
+            var user = await _userRepository.GetUserByIdAsync(userId);
+            if (user == null)
+            {
+                return null;
+            }
+
+            user.Status = updateUserStatusDto.Status;
+            await _userRepository.UpdateUserAsync(user);
+
+            return new UserDTO
+            {
+                Id = user.Id,
+                FirstName = user.FirstName,
+                LastName = user.LastName,
+                Email = user.Email,
+                Role = user.Role,
+                Status = user.Status,
             };
         }
     }

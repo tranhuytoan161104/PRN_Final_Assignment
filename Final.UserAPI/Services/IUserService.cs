@@ -13,5 +13,6 @@ namespace Final.UserAPI.Services
         Task<bool> ChangeUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto);
         Task<PagedResult<UserDTO>> GetAllUsersAsync(UserQuery query);
         Task<UserDTO?> UpdateUserRoleAsync(long userId, UserRoleDTO userRoleDto);
+        Task<UserDTO?> UpdateUserStatusAsync(long userId, UpdateUserStatusDTO updateUserStatusDto);
     }
 }

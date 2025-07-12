@@ -85,7 +85,7 @@ namespace Final.UserAPI.Controllers
         }
 
         [HttpPut("profile")]
-        [Authorize] 
+        [Authorize]
         public async Task<IActionResult> UpdateUserProfile([FromBody] UpdateProfileDTO updateDto)
         {
             var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
@@ -142,7 +142,7 @@ namespace Final.UserAPI.Controllers
         }
 
         [HttpGet]
-        [Authorize(Roles = "Admin")] 
+        [Authorize(Roles = "Admin")]
         public async Task<IActionResult> GetAllUsersAsync([FromQuery] UserQuery query)
         {
             var pagedResult = await _userService.GetAllUsersAsync(query);
@@ -150,7 +150,7 @@ namespace Final.UserAPI.Controllers
         }
 
         [HttpPatch("{userId}/role")]
-        [Authorize(Roles = "Owner")] 
+        [Authorize(Roles = "Owner")]
         public async Task<IActionResult> UpdateUserRole(long userId, [FromBody] UserRoleDTO userRoleDto)
         {
             try
@@ -166,6 +166,18 @@ namespace Final.UserAPI.Controllers
             {
                 return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
             }
+        }
+
+        [HttpPatch("{userId}/status")]
+        [Authorize(Roles = "Admin")] 
+        public async Task<IActionResult> UpdateUserStatus(long userId, [FromBody] UpdateUserStatusDTO updateUserStatusDto)
+        {
+            var updatedUser = await _userService.UpdateUserStatusAsync(userId, updateUserStatusDto);
+            if (updatedUser == null)
+            {
+                return NotFound($"Không tìm thấy người dùng với ID: {userId}");
+            }
+            return Ok(updatedUser);
         }
     }
 }

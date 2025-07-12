@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System;
+using Final.Domain.Enums;
 
 namespace Final.Domain.Entities
 {
@@ -11,8 +12,11 @@ namespace Final.Domain.Entities
         public string Email { get; set; } = null!;
         public string PasswordHash { get; set; } = null!;
         public string Role { get; set; } = null!;
+        public EUserStatus Status { get; set; } = EUserStatus.Active;
         public DateTime CreatedAt { get; set; }
         public virtual ICollection<Order>? Orders { get; set; }
         public virtual ICollection<Review>? Reviews { get; set; }
+
+        public virtual ShoppingCart? ShoppingCart { get; set; }
     }
 }

@@ -111,5 +111,23 @@ namespace Final.Persistence.Repositories
         {
             return await _context.SaveChangesAsync();
         }
+
+        public async Task RemoveItemsAsync(long userId, List<long> productIds)
+        {
+            var cart = await _context.ShoppingCarts
+                .Include(sc => sc.Items)
+                .FirstOrDefaultAsync(sc => sc.UserId == userId);
+
+            if (cart?.Items == null) return;
+
+            // Tìm tất cả các item trong giỏ hàng có ProductId nằm trong danh sách cần xóa
+            var itemsToRemove = cart.Items.Where(item => productIds.Contains(item.ProductId)).ToList();
+
+            if (itemsToRemove.Any())
+            {
+                _context.ShoppingCartItems.RemoveRange(itemsToRemove);
+                await _context.SaveChangesAsync();
+            }
+        }
     }
 }

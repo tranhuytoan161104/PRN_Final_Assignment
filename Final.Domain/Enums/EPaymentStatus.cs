@@ -8,13 +8,10 @@ using System.Threading.Tasks;
 namespace Final.Domain.Enums
 {
     [JsonConverter(typeof(JsonStringEnumConverter))]
-    public enum EOrderStatus
+    public enum EPaymentStatus
     {
         Pending,
-        Processing,
-        Shipped,
-        Delivered,
-        Cancelled,
+        Success,
         Failed
     }
 }

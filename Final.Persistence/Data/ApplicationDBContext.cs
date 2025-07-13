@@ -24,6 +24,8 @@ namespace Final.Persistence.Data
         public DbSet<OrderItem> OrderItems { get; set; }
         public DbSet<ShoppingCart> ShoppingCarts { get; set; }
         public DbSet<ShoppingCartItem> ShoppingCartItems { get; set; }
+        public DbSet<PaymentTransaction> PaymentTransactions { get; set; }
+        public DbSet<PaymentMethod> PaymentMethods { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -155,6 +157,26 @@ namespace Final.Persistence.Data
                       .IsRequired();
             });
 
+            modelBuilder.Entity<PaymentTransaction>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
+                entity.Property(e => e.PaymentMethod).IsRequired().HasMaxLength(50);
+                entity.Property(e => e.Status).IsRequired().HasConversion<string>().HasMaxLength(50);
+
+                entity.HasOne(e => e.Order)
+                      .WithMany(o => o.PaymentTransactions)
+                      .HasForeignKey(e => e.OrderId)
+                      .IsRequired();
+            });
+
+            modelBuilder.Entity<PaymentMethod>(entity =>
+            {
+                entity.HasKey(e => e.Id);
+                entity.Property(e => e.Code).IsRequired().HasMaxLength(20);
+                entity.HasIndex(e => e.Code).IsUnique(); // Đảm bảo mã là duy nhất
+            });
+
 
             // === Seed Data ===
 
@@ -235,6 +257,12 @@ namespace Final.Persistence.Data
                 new Review { Id = 5, ProductId = 9, UserId = 2, Rating = 5, Comment = "RAM chạy ổn định, cắm vào là nhận ngay, không gặp vấn đề gì.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 29), DateTimeKind.Utc) }
             );
             #endregion
+
+            modelBuilder.Entity<PaymentMethod>().HasData(
+                new PaymentMethod { Id = 1, Code = "TECHCOMBANK", IsActive = true },
+                new PaymentMethod { Id = 2, Code = "MOMO", IsActive = true },
+                new PaymentMethod { Id = 3, Code = "VNPAY", IsActive = false } 
+            );
         }
     }
 }

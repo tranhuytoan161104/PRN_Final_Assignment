@@ -10,5 +10,6 @@ namespace Final.Domain.Interfaces
         Task<bool> RemoveItemAsync(long userId, long productId);
         Task<bool> ClearCartAsync(long userId);
         Task<int> SaveChangesAsync();
+        Task RemoveItemsAsync(long userId, List<long> productIds);
     }
 }

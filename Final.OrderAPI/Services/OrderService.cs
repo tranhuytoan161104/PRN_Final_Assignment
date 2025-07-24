@@ -43,10 +43,7 @@ namespace Final.OrderAPI.Services
                         throw new InvalidOperationException($"Sản phẩm '{product.Name}' không đủ hàng trong kho.");
 
                     product.StockQuantity -= cartItem.Quantity;
-                    if (product.StockQuantity == 0)
-                    {
-                        product.Status = EProductStatus.OutOfStock;
-                    }
+                    if (product.StockQuantity == 0) product.Status = EProductStatus.OutOfStock;
 
                     var orderItem = new OrderItem { ProductId = cartItem.ProductId, Quantity = cartItem.Quantity, Price = product.Price };
                     orderItems.Add(orderItem);
@@ -60,19 +57,19 @@ namespace Final.OrderAPI.Services
                     ShippingAddress = createOrderDto.ShippingAddress,
                     PhoneNumber = createOrderDto.PhoneNumber,
                     TotalAmount = totalAmount,
-                    Status = EOrderStatus.Processing, 
+                    Status = EOrderStatus.Processing,
                     OrderItems = orderItems
                 };
 
                 await _orderRepository.CreateOrderAsync(order);
-                await _orderRepository.SaveChangesAsync(); 
+                await _orderRepository.SaveChangesAsync();
 
                 var paymentTransaction = new PaymentTransaction
                 {
                     OrderId = order.Id,
                     Amount = order.TotalAmount,
                     PaymentMethod = createOrderDto.PaymentMethod,
-                    Status = EPaymentStatus.Success, 
+                    Status = EPaymentStatus.Success,
                     TransactionDate = DateTime.UtcNow,
                     TransactionId = Guid.NewGuid().ToString()
                 };
@@ -110,7 +107,25 @@ namespace Final.OrderAPI.Services
             return MapOrderToDto(order);
         }
 
-        public async Task<OrderDto> CancelUserOrderAsync(long orderId, long userId)
+        public async Task<OrderDto> CancelOrderForCurrentUserAsync(long orderId, long userId)
+        {
+            var order = await _orderRepository.GetOrderByIdAndUserIdAsync(orderId, userId);
+            if (order == null)
+            {
+                throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId} hoặc bạn không có quyền hủy đơn hàng này.");
+            }
+            if (order.Status != EOrderStatus.Pending && order.Status != EOrderStatus.Processing)
+            {
+                throw new InvalidOperationException($"Không thể hủy đơn hàng ở trạng thái '{order.Status}'.");
+            }
+
+            await RollbackStockForOrder(order);
+            order.Status = EOrderStatus.Cancelled;
+            await _orderRepository.SaveChangesAsync();
+            return MapOrderToDto(order);
+        }
+
+        public async Task<OrderDto> CancelOrderForAdminAsync(long orderId)
         {
             var order = await _orderRepository.GetByIdAsync(orderId);
             if (order == null)
@@ -122,19 +137,7 @@ namespace Final.OrderAPI.Services
                 throw new InvalidOperationException($"Không thể hủy đơn hàng ở trạng thái '{order.Status}'.");
             }
 
-            foreach (var item in order.OrderItems)
-            {
-                var product = await _productRepository.GetByIdWithImagesAsync(item.ProductId);
-                if (product != null)
-                {
-                    product.StockQuantity += item.Quantity;
-                    if (product.Status == EProductStatus.OutOfStock && product.StockQuantity > 0)
-                    {
-                        product.Status = EProductStatus.Available;
-                    }
-                }
-            }
-
+            await RollbackStockForOrder(order);
             order.Status = EOrderStatus.Cancelled;
             await _orderRepository.SaveChangesAsync();
             return MapOrderToDto(order);
@@ -164,10 +167,25 @@ namespace Final.OrderAPI.Services
             {
                 throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId}");
             }
-
             order.Status = newStatus;
             await _orderRepository.UpdateAsync(order);
             return MapOrderToDto(order);
+        }
+
+        private async Task RollbackStockForOrder(Order order)
+        {
+            foreach (var item in order.OrderItems)
+            {
+                var product = await _productRepository.GetByIdWithImagesAsync(item.ProductId);
+                if (product != null)
+                {
+                    product.StockQuantity += item.Quantity;
+                    if (product.Status == EProductStatus.OutOfStock && product.StockQuantity > 0)
+                    {
+                        product.Status = EProductStatus.Available;
+                    }
+                }
+            }
         }
 
         private OrderDto MapOrderToDto(Order order)

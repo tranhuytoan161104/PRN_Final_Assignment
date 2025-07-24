@@ -9,10 +9,11 @@ namespace Final.OrderAPI.Services
     {
         Task<OrderDto> CreateOrderFromCartAsync(long userId, CreateOrderDto createOrderDto);
         Task<PagedResult<OrderDto>> GetUserOrdersAsync(long userId, OrderQuery query);
-        Task<OrderDto?> GetUserOrderDetailAsync(long orderId, long userId);
-        Task<OrderDto> CancelUserOrderAsync(long orderId, long userId);
+        Task<OrderDto> GetUserOrderDetailAsync(long orderId, long userId);
+        Task<OrderDto> CancelOrderForCurrentUserAsync(long orderId, long userId);
         Task<PagedResult<OrderDto>> GetAllOrdersAsync(OrderQuery query);
-        Task<OrderDto?> GetOrderDetailForAdminAsync(long orderId);
-        Task<OrderDto?> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus);
+        Task<OrderDto> GetOrderDetailForAdminAsync(long orderId);
+        Task<OrderDto> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus);
+        Task<OrderDto> CancelOrderForAdminAsync(long orderId);
     }
 }

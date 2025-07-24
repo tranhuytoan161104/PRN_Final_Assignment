@@ -31,7 +31,6 @@ namespace Final.UserAPI.Controllers
                 var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
                 if (string.IsNullOrEmpty(userIdString) || !long.TryParse(userIdString, out var userId))
                 {
-                    // Lỗi này không nên xảy ra nếu [Authorize] hoạt động đúng, nhưng vẫn là một lớp phòng thủ tốt.
                     throw new UnauthorizedAccessException("Token không hợp lệ hoặc không chứa ID người dùng.");
                 }
                 return userId;
@@ -138,7 +137,7 @@ namespace Final.UserAPI.Controllers
         /// <response code="401">Nếu người dùng chưa đăng nhập.</response>
         /// <response code="403">Nếu người dùng không có quyền Admin.</response>
         [HttpGet]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Owner")]
         [ProducesResponseType(typeof(PagedResult<UserDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
@@ -156,7 +155,7 @@ namespace Final.UserAPI.Controllers
         /// <response code="200">Trả về thông tin hồ sơ.</response>
         /// <response code="404">Nếu không tìm thấy người dùng.</response>
         [HttpGet("{userId:long}", Name = "GetUserProfileById")]
-        [Authorize(Roles = "Admin")]
+        [Authorize(Roles = "Admin, Owner")]
         [ProducesResponseType(typeof(UserProfileDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserProfileDTO>> GetUserProfileByIdAsync(long userId)

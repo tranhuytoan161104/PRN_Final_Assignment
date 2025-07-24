@@ -1,4 +1,4 @@
-﻿using Final.Domain.Entities;
+﻿using Final.Domain.Common;
 using Final.Domain.Queries;
 using Final.ProductAPI.DTOs;
 using Final.ProductAPI.Services;
@@ -8,6 +8,7 @@ namespace Final.ProductAPI.Controllers
 {
     [ApiController]
     [Route("api/[controller]")]
+    [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
         private readonly IProductService _productService;
@@ -17,159 +18,106 @@ namespace Final.ProductAPI.Controllers
             _productService = productService;
         }
 
-
         /// <summary>
-        /// Phuong thức này dùng để lấy danh sách sản phẩm với phân trang và lọc theo các tiêu chí.
+        /// Lấy danh sách sản phẩm với phân trang và lọc theo các tiêu chí.
         /// </summary>
-        /// <param name="query"> Truyền các thông tin phân trang và lọc sản phẩm từ request body </param>
-        /// <returns name="Ok"> Trả về danh sách sản phẩm đã được phân trang và lọc </returns>
+        /// <param name="query">Chứa các thông tin phân trang và lọc sản phẩm.</param>
+        /// <returns>Một danh sách sản phẩm đã được phân trang và lọc.</returns>
+        /// <response code="200">Trả về danh sách sản phẩm thành công.</response>
         [HttpGet]
-        public async Task<IActionResult> GetAllProductsAsync([FromQuery] ProductQuery query)
+        [ProducesResponseType(typeof(PagedResult<ProductDTO>), StatusCodes.Status200OK)]
+        public async Task<ActionResult<PagedResult<ProductDTO>>> GetAllProductsAsync([FromQuery] ProductQuery query)
         {
             var products = await _productService.GetAllProductsAsync(query);
             return Ok(products);
         }
 
-
         /// <summary>
-        /// Phương thức này dùng để lấy thông tin chi tiết của một sản phẩm dựa trên Id.
+        /// Lấy thông tin chi tiết của một sản phẩm dựa trên Id.
         /// </summary>
-        /// <param name="productId"> Xác định sản phẩm cần lấy thông tin bằng Id </param>
-        /// <returns name="Ok"> Trả về thông tin chi tiết của sản phẩm nếu tìm thấy </returns>
-        /// <returns name="NotFound"> Trả về 404 và thông báo khi không tìm thấy sản phẩm </returns>
-        /// <returns name="StatusCode"> Trả về 500 và thông báo khi có lỗi không mong muốn xảy ra </returns>
-        [HttpGet("{productId}")]
-        public async Task<IActionResult> GetProductDetail(long productId)
+        /// <param name="productId">ID của sản phẩm cần lấy thông tin.</param>
+        /// <returns>Thông tin chi tiết của sản phẩm nếu tìm thấy.</returns>
+        /// <response code="200">Trả về thông tin chi tiết của sản phẩm.</response>
+        /// <response code="404">Nếu không tìm thấy sản phẩm với ID tương ứng.</response>
+        [HttpGet("{productId:long}", Name = "GetProductDetailByIdAsync")]
+        [ProducesResponseType(typeof(ProductDetailDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ProductDetailDTO>> GetProductDetailByIdAsync(long productId)
         {
-            try
-            {
-                var product = await _productService.GetProductDetailAsync(productId);
-                return Ok(product);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-            }
+            var product = await _productService.GetProductDetailByIdAsync(productId);
+            return Ok(product);
         }
 
-
         /// <summary>
-        /// Phương thức này dùng để tạo một sản phẩm mới.
+        /// Tạo một sản phẩm mới.
         /// </summary>
-        /// <param name="productCreationDto"> Truyền vào thông tin sản phẩm mới từ request body </param>
-        /// <returns name="CreatedAtAction"> Trả về thông tin chi tiết của sản phẩm mới được tạo </returns>
-        /// <returns name="BadRequest"> Trả về 400 và thông báo khi có lỗi trong quá trình tạo sản phẩm </returns>
-        /// <returns name="StatusCode"> Trả về 500 và thông báo khi có lỗi không mong muốn xảy ra </returns>
+        /// <param name="productCreationDto">Thông tin sản phẩm cần tạo.</param>
+        /// <returns>Thông tin chi tiết của sản phẩm vừa được tạo.</returns>
+        /// <response code="201">Trả về sản phẩm vừa được tạo cùng với URL để truy cập.</response>
+        /// <response code="400">Nếu dữ liệu đầu vào không hợp lệ.</response>
         [HttpPost]
-        public async Task<IActionResult> CreateProductAsync([FromBody] ProductCreationDTO productCreationDto)
+        [ProducesResponseType(typeof(ProductDetailDTO), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<ProductDetailDTO>> CreateProductAsync([FromBody] ProductCreationDTO productCreationDto)
         {
-            try
-            {
-                var createdProduct = await _productService.CreateProductAsync(productCreationDto);
-                return CreatedAtAction(nameof(GetProductDetail), new { productId = createdProduct.Id }, createdProduct);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-            }
+            var createdProduct = await _productService.CreateProductAsync(productCreationDto);
+            return CreatedAtRoute("GetProductDetailByIdAsync", new { productId = createdProduct.Id }, createdProduct);
         }
 
-
         /// <summary>
-        /// Phương thức này dùng để cập nhật số lượng tồn kho của một sản phẩm.
+        /// Cập nhật toàn bộ thông tin chi tiết của một sản phẩm.
         /// </summary>
-        /// <param name="productId"> Xác định sản phẩm được cập nhật bằng Id </param>
-        /// <param name="updateStockQuantityDto"> Truyền vào số lượng thay đổi từ request body </param>
-        /// <returns name="Ok"> Trả về thông tin chi tiết của sản phẩm sau khi cập nhật thành công </returns>
-        /// <returns name="NotFound"> Trả về 404 và thông báo khi không tìm thấy sản phẩm </returns>
-        /// <returns name="BadRequest"> Trả về 400 và thông báo khi có lỗi trong quá trình cập nhật </returns>
-        /// <returns name="StatusCode"> Trả về 500 và thông báo khi có lỗi không mong muốn xảy ra </returns>
-        [HttpPatch("{productId}/update-stockquantity")]
-        public async Task<IActionResult> UpdateProductStockQuantityAsync(long productId, [FromBody] UpdateStockQuantityDTO updateStockQuantityDto)
+        /// <param name="productId">ID của sản phẩm cần cập nhật.</param>
+        /// <param name="productUpdateDto">Thông tin mới của sản phẩm.</param>
+        /// <returns>Thông tin sản phẩm sau khi cập nhật thành công.</returns>
+        /// <response code="200">Trả về thông tin sản phẩm đã được cập nhật.</response>
+        /// <response code="400">Nếu dữ liệu đầu vào không hợp lệ.</response>
+        /// <response code="404">Nếu không tìm thấy sản phẩm với ID tương ứng.</response>
+        [HttpPut("{productId:long}")]
+        [ProducesResponseType(typeof(ProductDetailDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ProductDetailDTO>> UpdateProductAsync(long productId, [FromBody] ProductUpdateDTO productUpdateDto)
         {
-            try
-            {
-                var updatedProduct = await _productService.UpdateProductStockQuantityAsync(productId, updateStockQuantityDto);
-                return Ok(updatedProduct);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-            }
+            var updatedProduct = await _productService.UpdateProductDetailAsync(productId, productUpdateDto);
+            return Ok(updatedProduct);
         }
 
-
         /// <summary>
-        /// Phương thức này dùng để lưu trữ một sản phẩm, đánh dấu nó là đã bị xóa nhưng vẫn giữ lại trong cơ sở dữ liệu.
+        /// Cập nhật số lượng tồn kho của một sản phẩm.
         /// </summary>
-        /// <param name="productId"> Xác định sản phẩm được lưu trữ bằng Id </param>
-        /// <returns name="Ok"> Trả về thông tin chi tiết của sản phẩm đã được lưu trữ </returns>
-        /// <returns name="NotFound"> Trả về 404 và thông báo khi không tìm thấy sản phẩm </returns>
-        /// <returns name="BadRequest"> Trả về 400 và thông báo khi có lỗi trong quá trình lưu trữ </returns>
-        /// <returns name="StatusCode"> Trả về 500 và thông báo khi có lỗi không mong muốn xảy ra </returns>
-        [HttpPatch("{productId}")]
-        public async Task<IActionResult> ArchiveProductAsync(long productId)
+        /// <param name="productId">ID của sản phẩm cần cập nhật.</param>
+        /// <param name="updateStockQuantityDto">Số lượng cần thay đổi.</param>
+        /// <returns>Thông tin sản phẩm sau khi cập nhật thành công.</returns>
+        /// <response code="200">Trả về thông tin sản phẩm đã được cập nhật.</response>
+        /// <response code="400">Nếu yêu cầu không hợp lệ (ví dụ: giảm số lượng nhiều hơn hiện có).</response>
+        /// <response code="404">Nếu không tìm thấy sản phẩm với ID tương ứng.</response>
+        [HttpPatch("{productId:long}/update-stockquantity")]
+        [ProducesResponseType(typeof(ProductDetailDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ProductDetailDTO>> UpdateProductStockQuantityAsync(long productId, [FromBody] StockQuantityUpdateDTO updateStockQuantityDto)
         {
-            try
-            {
-                var archivedProduct = await _productService.ArchiveProductAsync(productId);
-                return Ok(archivedProduct);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-            }
+            var updatedProduct = await _productService.UpdateProductStockQuantityAsync(productId, updateStockQuantityDto);
+            return Ok(updatedProduct);
         }
 
-
         /// <summary>
-        /// Phương thức này dùng để cập nhật thông tin bất kỳ của một sản phẩm.
+        /// Lưu trữ một sản phẩm (đánh dấu là đã xóa nhưng không xóa khỏi DB).
         /// </summary>
-        /// <param name="productId"> Xác định sản phẩm được cập nhật bằng Id </param>
-        /// <param name="productUpdateDto"> Truyền vào thông tin cập nhật sản phẩm từ request body </param>
-        /// <returns name="Ok"> Trả về thông tin chi tiết của sản phẩm sau khi cập nhật thành công </returns>
-        /// <returns name="NotFound"> Trả về 404 và thông báo khi không tìm thấy sản phẩm </returns>
-        /// <returns name="StatusCode"> Trả về 500 và thông báo khi có lỗi không mong muốn xảy ra </returns>
-        [HttpPut("{productId}")]
-        public async Task<IActionResult> UpdateProductAsync(long productId, [FromBody] ProductUpdateDTO productUpdateDto)
+        /// <param name="productId">ID của sản phẩm cần lưu trữ.</param>
+        /// <returns>Thông tin sản phẩm sau khi lưu trữ thành công.</returns>
+        /// <response code="200">Trả về thông tin sản phẩm đã được lưu trữ.</response>
+        /// <response code="400">Nếu sản phẩm đã được lưu trữ từ trước.</response>
+        /// <response code="404">Nếu không tìm thấy sản phẩm với ID tương ứng.</response>
+        [HttpPatch("{productId:long}/archive")]
+        [ProducesResponseType(typeof(ProductDetailDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<ProductDetailDTO>> ArchiveProductAsync(long productId)
         {
-            try
-            {
-                var updatedProduct = await _productService.UpdateProductDetailAsync(productId, productUpdateDto);
-                return Ok(updatedProduct);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (Exception ex)
-            {
-                return StatusCode(500, new { message = "An unexpected error occurred.", details = ex.Message });
-            }
+            var archivedProduct = await _productService.ArchiveProductAsync(productId);
+            return Ok(archivedProduct);
         }
     }
 }

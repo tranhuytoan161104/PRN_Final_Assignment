@@ -1,10 +1,8 @@
-﻿using Microsoft.EntityFrameworkCore;
-using Final.Domain.Entities;
+﻿using Final.Domain.Entities;
+using Final.Domain.Enums;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Final.Persistence.Data
 {
@@ -31,10 +29,7 @@ namespace Final.Persistence.Data
         {
             base.OnModelCreating(modelBuilder);
 
-
-
             // === Fluent API Configurations ===
-
             modelBuilder.Entity<Brand>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -53,6 +48,7 @@ namespace Final.Persistence.Data
                 entity.Property(e => e.FirstName).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.LastName).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Email).IsRequired().HasMaxLength(100);
+                entity.HasIndex(e => e.Email).IsUnique();
                 entity.Property(e => e.PasswordHash).IsRequired();
                 entity.Property(e => e.Role).IsRequired().HasMaxLength(20);
                 entity.Property(e => e.CreatedAt).IsRequired();
@@ -65,43 +61,26 @@ namespace Final.Persistence.Data
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.StockQuantity).IsRequired();
                 entity.Property(e => e.CreatedAt).IsRequired();
-                entity.Property(e => e.AddAt).IsRequired();
+                entity.Property(e => e.AddAt);
                 entity.Property(e => e.Status).IsRequired().HasConversion<string>().HasMaxLength(50);
-                entity.HasOne(e => e.Brand)
-                    .WithMany(b => b.Products)
-                    .HasForeignKey(e => e.BrandId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Category)
-                    .WithMany(c => c.Products)
-                    .HasForeignKey(e => e.CategoryId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Brand).WithMany(b => b.Products).HasForeignKey(e => e.BrandId).OnDelete(DeleteBehavior.Restrict);
+                entity.HasOne(e => e.Category).WithMany(c => c.Products).HasForeignKey(e => e.CategoryId).OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<ProductImage>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.ImageUrl).IsRequired();
-                entity.HasOne(e => e.Product)
-                    .WithMany(p => p.Images)
-                    .HasForeignKey(e => e.ProductId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Product).WithMany(p => p.Images).HasForeignKey(e => e.ProductId).OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Review>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Rating).IsRequired();
-                entity.Property(e => e.Rating).HasDefaultValue(1);
-                entity.Property(e => e.Comment);
                 entity.Property(e => e.CreatedAt).IsRequired();
-                entity.HasOne(e => e.Product)
-                    .WithMany(p => p.Reviews)
-                    .HasForeignKey(e => e.ProductId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.User)
-                    .WithMany(u => u.Reviews)
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Product).WithMany(p => p.Reviews).HasForeignKey(e => e.ProductId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.User).WithMany(u => u.Reviews).HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Cascade);
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -109,12 +88,9 @@ namespace Final.Persistence.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.TotalAmount).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.OrderDate).IsRequired();
-                entity.Property(e => e.Status).IsRequired();
+                entity.Property(e => e.Status).IsRequired().HasConversion<string>().HasMaxLength(50);
                 entity.Property(e => e.ShippingAddress).IsRequired();
-                entity.HasOne(e => e.User)
-                    .WithMany(u => u.Orders)
-                    .HasForeignKey(e => e.UserId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.User).WithMany(u => u.Orders).HasForeignKey(e => e.UserId).OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<OrderItem>(entity =>
@@ -122,39 +98,21 @@ namespace Final.Persistence.Data
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Price).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.Quantity).IsRequired();
-                entity.HasOne(e => e.Order)
-                    .WithMany(o => o.OrderItems)
-                    .HasForeignKey(e => e.OrderId)
-                    .OnDelete(DeleteBehavior.Cascade);
-                entity.HasOne(e => e.Product)
-                    .WithMany(p => p.OrderItems)
-                    .HasForeignKey(e => e.ProductId)
-                    .OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Order).WithMany(o => o.OrderItems).HasForeignKey(e => e.OrderId).OnDelete(DeleteBehavior.Cascade);
+                entity.HasOne(e => e.Product).WithMany(p => p.OrderItems).HasForeignKey(e => e.ProductId).OnDelete(DeleteBehavior.Restrict);
             });
 
             modelBuilder.Entity<ShoppingCart>(entity =>
             {
                 entity.HasKey(e => e.Id);
-
-                entity.HasOne(e => e.User)
-                      .WithOne(u => u.ShoppingCart)
-                      .HasForeignKey<ShoppingCart>(e => e.UserId)
-                      .IsRequired();
+                entity.HasOne(e => e.User).WithOne(u => u.ShoppingCart).HasForeignKey<ShoppingCart>(e => e.UserId).IsRequired();
             });
 
             modelBuilder.Entity<ShoppingCartItem>(entity =>
             {
                 entity.HasKey(e => e.Id);
-
-                entity.HasOne(e => e.ShoppingCart)
-                      .WithMany(sc => sc.Items)
-                      .HasForeignKey(e => e.ShoppingCartId)
-                      .IsRequired();
-
-                entity.HasOne(e => e.Product)
-                      .WithMany() 
-                      .HasForeignKey(e => e.ProductId)
-                      .IsRequired();
+                entity.HasOne(e => e.ShoppingCart).WithMany(sc => sc.Items).HasForeignKey(e => e.ShoppingCartId).IsRequired();
+                entity.HasOne(e => e.Product).WithMany().HasForeignKey(e => e.ProductId).IsRequired();
             });
 
             modelBuilder.Entity<PaymentTransaction>(entity =>
@@ -163,75 +121,69 @@ namespace Final.Persistence.Data
                 entity.Property(e => e.Amount).HasColumnType("decimal(18, 2)");
                 entity.Property(e => e.PaymentMethod).IsRequired().HasMaxLength(50);
                 entity.Property(e => e.Status).IsRequired().HasConversion<string>().HasMaxLength(50);
-
-                entity.HasOne(e => e.Order)
-                      .WithMany(o => o.PaymentTransactions)
-                      .HasForeignKey(e => e.OrderId)
-                      .IsRequired();
+                entity.HasOne(e => e.Order).WithMany(o => o.PaymentTransactions).HasForeignKey(e => e.OrderId).IsRequired();
             });
 
             modelBuilder.Entity<PaymentMethod>(entity =>
             {
                 entity.HasKey(e => e.Id);
                 entity.Property(e => e.Code).IsRequired().HasMaxLength(20);
-                entity.HasIndex(e => e.Code).IsUnique(); // Đảm bảo mã là duy nhất
+                entity.HasIndex(e => e.Code).IsUnique();
             });
 
 
-            // === Seed Data ===
-
-            #region === Category Seed Data ===
-            modelBuilder.Entity<Category>().HasData(
-                new Category { Id = 1, Name = "CPU" },
-                new Category { Id = 2, Name = "GPU" },
-                new Category { Id = 3, Name = "RAM" },
-                new Category { Id = 4, Name = "SSD" },
-                new Category { Id = 5, Name = "PSU" }
-            );
-            #endregion
-
-            #region === Brand Seed Data ===
-            modelBuilder.Entity<Brand>().HasData(
-                new Brand { Id = 1, Name = "Intel" },
-                new Brand { Id = 2, Name = "AMD" },
-                new Brand { Id = 3, Name = "NVIDIA" },
-                new Brand { Id = 4, Name = "Corsair" },
-                new Brand { Id = 5, Name = "Kingston" },
-                new Brand { Id = 6, Name = "Samsung" },
-                new Brand { Id = 7, Name = "Western Digital" },
-                new Brand { Id = 8, Name = "G.Skill" },
-                new Brand { Id = 9, Name = "Crucial" },
-                new Brand { Id = 10, Name = "Seasonic" },
-                new Brand { Id = 11, Name = "Cooler Master" },
-                new Brand { Id = 12, Name = "MSI" }
-            );
-            #endregion
+            // === SEED DATA (Phiên bản mở rộng và hoàn chỉnh) ===
+            const string universalPasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2";
 
             #region === User Seed Data ===
             modelBuilder.Entity<User>().HasData(
-                new User { Id = 1, FirstName = "Admin", LastName = "User", Email = "admin@example.com", PasswordHash = "$2a$11$9i.2nCqjA1DkC8B4lQ9C8uJ.Uj5GqXy.z/A7X2Q.Z9iB8qF.K/9W.", Role = "Admin", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 1), DateTimeKind.Utc) },
-                new User { Id = 2, FirstName = "An", LastName = "Nguyễn", Email = "customer1@example.com", PasswordHash = "$2a$11$gT/jKqC0Z.I7H.v2Uu4j6u8kK/gL7Xy.Z/Q5F/E9Z/A9qG.H/3e.", Role = "Customer", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 15), DateTimeKind.Utc) },
-                new User { Id = 3, FirstName = "Bình", LastName = "Trần", Email = "customer2@example.com", PasswordHash = "$2a$11$gT/jKqC0Z.I7H.v2Uu4j6u8kK/gL7Xy.Z/Q5F/E9Z/A9qG.H/3e.", Role = "Customer", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 20), DateTimeKind.Utc) }
+                new User { Id = 1, FirstName = "Văn", LastName = "Toàn", Email = "owner@final.com", PasswordHash = universalPasswordHash, Role = "Owner", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 1, 1), DateTimeKind.Utc) },
+                new User { Id = 2, FirstName = "Quốc", LastName = "Tuấn", Email = "admin@final.com", PasswordHash = universalPasswordHash, Role = "Admin", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 1, 1), DateTimeKind.Utc) },
+                new User { Id = 3, FirstName = "Thanh", LastName = "Bình", Email = "admin2@final.com", PasswordHash = universalPasswordHash, Role = "Admin", Status = EUserStatus.Inactive, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 1, 15), DateTimeKind.Utc) },
+                new User { Id = 4, FirstName = "Minh", LastName = "An", Email = "minhan@customer.com", PasswordHash = universalPasswordHash, Role = "Customer", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 2, 10), DateTimeKind.Utc) },
+                new User { Id = 5, FirstName = "Bảo", LastName = "Châu", Email = "baochau@customer.com", PasswordHash = universalPasswordHash, Role = "Customer", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 3, 20), DateTimeKind.Utc) },
+                new User { Id = 6, FirstName = "Gia", LastName = "Hân", Email = "giahan@customer.com", PasswordHash = universalPasswordHash, Role = "Customer", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 5, 1), DateTimeKind.Utc) },
+                new User { Id = 7, FirstName = "Đăng", LastName = "Khoa", Email = "dangkhoa@customer.com", PasswordHash = universalPasswordHash, Role = "Customer", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 6, 12), DateTimeKind.Utc) }
+            );
+            #endregion
+
+            #region === Category & Brand Seed Data ===
+            modelBuilder.Entity<Category>().HasData(
+                new Category { Id = 1, Name = "Vi xử lý (CPU)" },
+                new Category { Id = 2, Name = "Card đồ họa (GPU)" },
+                new Category { Id = 3, Name = "Bộ nhớ RAM" },
+                new Category { Id = 4, Name = "Ổ cứng SSD" },
+                new Category { Id = 5, Name = "Nguồn máy tính (PSU)" },
+                new Category { Id = 6, Name = "Bo mạch chủ (Mainboard)" },
+                new Category { Id = 7, Name = "Màn hình (Monitor)" }
+            );
+
+            modelBuilder.Entity<Brand>().HasData(
+                new Brand { Id = 1, Name = "Intel" }, new Brand { Id = 2, Name = "AMD" }, new Brand { Id = 3, Name = "NVIDIA" },
+                new Brand { Id = 4, Name = "Corsair" }, new Brand { Id = 5, Name = "Kingston" }, new Brand { Id = 6, Name = "Samsung" },
+                new Brand { Id = 7, Name = "Western Digital" }, new Brand { Id = 8, Name = "G.Skill" }, new Brand { Id = 9, Name = "Crucial" },
+                new Brand { Id = 10, Name = "Seasonic" }, new Brand { Id = 11, Name = "Cooler Master" }, new Brand { Id = 12, Name = "MSI" },
+                new Brand { Id = 13, Name = "ASUS" }, new Brand { Id = 14, Name = "Gigabyte" }, new Brand { Id = 15, Name = "LG" },
+                new Brand { Id = 16, Name = "Dell" }
             );
             #endregion
 
             #region === Product Seed Data ===
             modelBuilder.Entity<Product>().HasData(
-                new Product { Id = 1, CategoryId = 1, BrandId = 1, Name = "Intel Core i9-14900K", Price = 15500000m, Description = "Vi xử lý đầu bảng cho gaming và sáng tạo nội dung, 24 nhân 32 luồng, tốc độ tối đa 6.0 GHz.", StockQuantity = 50, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 10), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 2, CategoryId = 1, BrandId = 1, Name = "Intel Core i7-14700K", Price = 11200000m, Description = "Lựa chọn tuyệt vời cho gaming hiệu năng cao, 20 nhân 28 luồng.", StockQuantity = 80, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 10), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 3, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 9 7950X3D", Price = 14800000m, Description = "Vua gaming với công nghệ 3D V-Cache, 16 nhân 32 luồng.", StockQuantity = 45, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 5), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 4, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 7 7800X3D", Price = 9800000m, Description = "Hiệu năng gaming thuần túy tốt nhất phân khúc nhờ 3D V-Cache, 8 nhân 16 luồng.", StockQuantity = 120, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 5), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-
-                new Product { Id = 5, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4090", Price = 45000000m, Description = "Sức mạnh tối thượng cho gaming 4K và các tác vụ AI, Ray Tracing đỉnh cao.", StockQuantity = 25, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 15), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 6, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4080 Super", Price = 31000000m, Description = "Hiệu năng vượt trội cho gaming 1440p và 4K, phiên bản nâng cấp của RTX 4080.", StockQuantity = 40, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 20), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 7, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7900 XTX", Price = 28500000m, Description = "Card đồ họa đầu bảng của AMD, đối thủ cạnh tranh trực tiếp với RTX 4080.", StockQuantity = 35, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 25), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 8, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7800 XT", Price = 15000000m, Description = "Lựa chọn p/p tốt nhất cho gaming 1440p.", StockQuantity = 90, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 1), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-
-                new Product { Id = 9, CategoryId = 3, BrandId = 4, Name = "Corsair Vengeance DDR5 32GB (2x16GB) 6000MHz", Price = 3200000m, Description = "Kit RAM DDR5 hiệu năng cao, tản nhiệt nhôm, tương thích tốt với Intel XMP và AMD EXPO.", StockQuantity = 150, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 1, 5), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 10, CategoryId = 3, BrandId = 8, Name = "G.Skill Trident Z5 RGB DDR5 32GB (2x16GB) 6400MHz", Price = 3800000m, Description = "Thiết kế đẹp mắt với LED RGB, tốc độ bus cao dành cho người dùng chuyên nghiệp và game thủ.", StockQuantity = 110, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 12), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-
-                new Product { Id = 13, CategoryId = 4, BrandId = 6, Name = "Samsung 990 Pro NVMe M.2 SSD 2TB", Price = 4500000m, Description = "Ổ cứng NVMe Gen4 nhanh nhất thị trường, lý tưởng cho hệ điều hành, game và ứng dụng nặng.", StockQuantity = 70, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 2, 18), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available },
-                new Product { Id = 14, CategoryId = 4, BrandId = 7, Name = "WD Black SN850X NVMe M.2 SSD 2TB", Price = 4200000m, Description = "Tốc độ đọc ghi cực nhanh, lựa chọn hàng đầu của game thủ.", StockQuantity = 85, CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 3), DateTimeKind.Utc), AddAt = DateTime.SpecifyKind(new DateTime(2025, 1, 1), DateTimeKind.Utc), Status = Domain.Enums.EProductStatus.Available }
+                new Product { Id = 1, CategoryId = 1, BrandId = 1, Name = "Intel Core i9-14900K", Price = 15500000m, Description = "Vi xử lý đầu bảng cho gaming và sáng tạo nội dung.", StockQuantity = 50, CreatedAt = DateTime.UtcNow.AddDays(-100), Status = EProductStatus.Available },
+                new Product { Id = 2, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 7 7800X3D", Price = 9800000m, Description = "Hiệu năng gaming thuần túy tốt nhất phân khúc nhờ 3D V-Cache.", StockQuantity = 120, CreatedAt = DateTime.UtcNow.AddDays(-90), Status = EProductStatus.Available },
+                new Product { Id = 3, CategoryId = 1, BrandId = 1, Name = "Intel Core i5-14600K", Price = 8500000m, Description = "Vi xử lý tầm trung p/p tốt nhất cho gaming.", StockQuantity = 0, CreatedAt = DateTime.UtcNow.AddDays(-80), Status = EProductStatus.OutOfStock },
+                new Product { Id = 4, CategoryId = 2, BrandId = 3, Name = "NVIDIA GeForce RTX 4090", Price = 45000000m, Description = "Sức mạnh tối thượng cho gaming 4K và các tác vụ AI.", StockQuantity = 25, CreatedAt = DateTime.UtcNow.AddDays(-120), Status = EProductStatus.Available },
+                new Product { Id = 5, CategoryId = 2, BrandId = 2, Name = "AMD Radeon RX 7900 XTX", Price = 28500000m, Description = "Card đồ họa đầu bảng của AMD, đối thủ cạnh tranh trực tiếp với RTX 4080.", StockQuantity = 35, CreatedAt = DateTime.UtcNow.AddDays(-110), Status = EProductStatus.Available },
+                new Product { Id = 6, CategoryId = 2, BrandId = 14, Name = "Gigabyte RTX 3060 Gaming OC", Price = 8200000m, Description = "Card đồ họa quốc dân cho gaming Full HD.", StockQuantity = 200, CreatedAt = DateTime.UtcNow.AddDays(-200), Status = EProductStatus.Archived },
+                new Product { Id = 7, CategoryId = 3, BrandId = 4, Name = "Corsair Vengeance DDR5 32GB 6000MHz", Price = 3200000m, Description = "Kit RAM DDR5 hiệu năng cao, tản nhiệt nhôm.", StockQuantity = 150, CreatedAt = DateTime.UtcNow.AddDays(-150), Status = EProductStatus.Available },
+                new Product { Id = 8, CategoryId = 3, BrandId = 8, Name = "G.Skill Trident Z5 RGB DDR5 32GB 6400MHz", Price = 3800000m, Description = "Thiết kế đẹp mắt với LED RGB, tốc độ bus cao.", StockQuantity = 110, CreatedAt = DateTime.UtcNow.AddDays(-140), Status = EProductStatus.Available },
+                new Product { Id = 9, CategoryId = 4, BrandId = 6, Name = "Samsung 990 Pro NVMe M.2 SSD 2TB", Price = 4500000m, Description = "Ổ cứng NVMe Gen4 nhanh nhất thị trường.", StockQuantity = 70, CreatedAt = DateTime.UtcNow.AddDays(-180), Status = EProductStatus.Available },
+                new Product { Id = 10, CategoryId = 4, BrandId = 7, Name = "WD Black SN850X NVMe M.2 SSD 1TB", Price = 2600000m, Description = "Tốc độ đọc ghi cực nhanh, lựa chọn hàng đầu của game thủ.", StockQuantity = 95, CreatedAt = DateTime.UtcNow.AddDays(-170), Status = EProductStatus.Available },
+                new Product { Id = 11, CategoryId = 6, BrandId = 13, Name = "ASUS ROG STRIX Z790-E GAMING WIFI II", Price = 16000000m, Description = "Bo mạch chủ cao cấp cho CPU Intel thế hệ 14.", StockQuantity = 40, CreatedAt = DateTime.UtcNow.AddDays(-60), Status = EProductStatus.Available },
+                new Product { Id = 12, CategoryId = 6, BrandId = 12, Name = "MSI MAG B760M MORTAR WIFI DDR5", Price = 5300000m, Description = "Bo mạch chủ tầm trung tốt nhất cho nhu cầu gaming.", StockQuantity = 80, CreatedAt = DateTime.UtcNow.AddDays(-50), Status = EProductStatus.Available },
+                new Product { Id = 13, CategoryId = 7, BrandId = 15, Name = "LG UltraGear 27GR95QE-B 240Hz OLED", Price = 24500000m, Description = "Màn hình OLED 2K 240Hz cho trải nghiệm gaming đỉnh cao.", StockQuantity = 30, CreatedAt = DateTime.UtcNow.AddDays(-40), Status = EProductStatus.Available },
+                new Product { Id = 14, CategoryId = 7, BrandId = 16, Name = "Dell UltraSharp U2723QE 4K IPS", Price = 13800000m, Description = "Màn hình 4K chuyên đồ họa với tấm nền IPS Black.", StockQuantity = 60, CreatedAt = DateTime.UtcNow.AddDays(-30), Status = EProductStatus.Available }
             );
             #endregion
 
@@ -239,30 +191,69 @@ namespace Final.Persistence.Data
             modelBuilder.Entity<ProductImage>().HasData(
                 new ProductImage { Id = 1, ProductId = 1, ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i9-14900K-1" },
                 new ProductImage { Id = 2, ProductId = 1, ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i9-14900K-2" },
-
-                new ProductImage { Id = 3, ProductId = 2, ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i7-14700K" },
-
-                new ProductImage { Id = 4, ProductId = 5, ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090-main" },
-                new ProductImage { Id = 5, ProductId = 5, ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090-side" },
-                new ProductImage { Id = 6, ProductId = 5, ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090-box" }
+                new ProductImage { Id = 3, ProductId = 2, ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=7800X3D" },
+                new ProductImage { Id = 4, ProductId = 4, ImageUrl = "https://placehold.co/600x600/1B3C34/FFF?text=RTX+4090" },
+                new ProductImage { Id = 5, ProductId = 5, ImageUrl = "https://placehold.co/600x600/E83131/FFF?text=RX+7900XTX" },
+                new ProductImage { Id = 6, ProductId = 7, ImageUrl = "https://placehold.co/600x600/111/EEE?text=Corsair+RAM" },
+                new ProductImage { Id = 7, ProductId = 9, ImageUrl = "https://placehold.co/600x600/0078D4/FFF?text=Samsung+SSD" },
+                new ProductImage { Id = 8, ProductId = 11, ImageUrl = "https://placehold.co/600x600/D82727/FFF?text=ASUS+ROG" },
+                new ProductImage { Id = 9, ProductId = 13, ImageUrl = "https://placehold.co/600x600/333/FFF?text=LG+OLED" },
+                new ProductImage { Id = 10, ProductId = 13, ImageUrl = "https://placehold.co/600x600/333/FFF?text=LG+OLED-2" }
             );
             #endregion
 
             #region === Review Seed Data ===
             modelBuilder.Entity<Review>().HasData(
-                new Review { Id = 1, ProductId = 1, UserId = 2, Rating = 5, Comment = "CPU quá mạnh, chạy đa nhiệm và render video cực nhanh. Rất đáng tiền!", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 1), DateTimeKind.Utc) },
-                new Review { Id = 2, ProductId = 1, UserId = 3, Rating = 5, Comment = "Hiệu năng chơi game đỉnh cao, không có gì để chê.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 5), DateTimeKind.Utc) },
-                new Review { Id = 3, ProductId = 5, UserId = 2, Rating = 5, Comment = "Đúng là trùm cuối card đồ họa. Chơi Cyberpunk 2077 max setting 4K mượt mà. Đắt nhưng xắt ra miếng.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 10), DateTimeKind.Utc) },
-                new Review { Id = 4, ProductId = 8, UserId = 3, Rating = 4, Comment = "Hiệu năng chơi game 2K rất tốt trong tầm giá. Chỉ có điều card hơi nóng một chút.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 4, 12), DateTimeKind.Utc) },
-                new Review { Id = 5, ProductId = 9, UserId = 2, Rating = 5, Comment = "RAM chạy ổn định, cắm vào là nhận ngay, không gặp vấn đề gì.", CreatedAt = DateTime.SpecifyKind(new DateTime(2024, 3, 29), DateTimeKind.Utc) }
+                new Review { Id = 1, ProductId = 2, UserId = 4, Rating = 5, Comment = "CPU gaming tốt nhất hiện tại, không có gì để chê!", CreatedAt = DateTime.UtcNow.AddDays(-80) },
+                new Review { Id = 2, ProductId = 4, UserId = 5, Rating = 5, Comment = "Đắt nhưng xắt ra miếng. Cân mọi game 4K max setting.", CreatedAt = DateTime.UtcNow.AddDays(-70) },
+                new Review { Id = 3, ProductId = 10, UserId = 6, Rating = 4, Comment = "Tốc độ rất nhanh, nhưng giá hơi cao so với các hãng khác.", CreatedAt = DateTime.UtcNow.AddDays(-60) },
+                new Review { Id = 4, ProductId = 12, UserId = 4, Rating = 5, Comment = "Mainboard p/p quá tốt, đầy đủ cổng kết nối.", CreatedAt = DateTime.UtcNow.AddDays(-40) },
+                new Review { Id = 5, ProductId = 13, UserId = 7, Rating = 5, Comment = "Màu sắc và tần số quét của màn hình này thật sự tuyệt vời.", CreatedAt = DateTime.UtcNow.AddDays(-20) }
             );
             #endregion
 
-            modelBuilder.Entity<PaymentMethod>().HasData(
-                new PaymentMethod { Id = 1, Code = "TECHCOMBANK", IsActive = true },
-                new PaymentMethod { Id = 2, Code = "MOMO", IsActive = true },
-                new PaymentMethod { Id = 3, Code = "VNPAY", IsActive = false } 
+            #region === ShoppingCart & Items Seed Data ===
+            modelBuilder.Entity<ShoppingCart>().HasData(
+                new ShoppingCart { Id = 1, UserId = 5 },
+                new ShoppingCart { Id = 2, UserId = 6 }
             );
+
+            modelBuilder.Entity<ShoppingCartItem>().HasData(
+                new ShoppingCartItem { Id = 1, ShoppingCartId = 1, ProductId = 8, Quantity = 1 },
+                new ShoppingCartItem { Id = 2, ShoppingCartId = 1, ProductId = 10, Quantity = 1 },
+                new ShoppingCartItem { Id = 3, ShoppingCartId = 2, ProductId = 14, Quantity = 2 }
+            );
+            #endregion
+
+            #region === Order & OrderItems Seed Data ===
+            modelBuilder.Entity<Order>().HasData(
+                new Order { Id = 1, UserId = 4, TotalAmount = 15100000m, OrderDate = DateTime.UtcNow.AddDays(-45), Status = EOrderStatus.Delivered, ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM", PhoneNumber = "0901234567" },
+                new Order { Id = 2, UserId = 7, TotalAmount = 53000000m, OrderDate = DateTime.UtcNow.AddDays(-25), Status = EOrderStatus.Shipped, ShippingAddress = "456 Đường XYZ, Quận Hoàn Kiếm, Hà Nội", PhoneNumber = "0987654321" },
+                new Order { Id = 3, UserId = 4, TotalAmount = 3200000m, OrderDate = DateTime.UtcNow.AddDays(-10), Status = EOrderStatus.Cancelled, ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM", PhoneNumber = "0901234567" }
+            );
+            modelBuilder.Entity<OrderItem>().HasData(
+                new OrderItem { Id = 1, OrderId = 1, ProductId = 2, Quantity = 1, Price = 9800000m },
+                new OrderItem { Id = 2, OrderId = 1, ProductId = 12, Quantity = 1, Price = 5300000m },
+                new OrderItem { Id = 3, OrderId = 2, ProductId = 5, Quantity = 1, Price = 28500000m },
+                new OrderItem { Id = 4, OrderId = 2, ProductId = 13, Quantity = 1, Price = 24500000m },
+                new OrderItem { Id = 5, OrderId = 3, ProductId = 7, Quantity = 1, Price = 3200000m }
+            );
+            #endregion
+
+            #region === Payment Seed Data ===
+            modelBuilder.Entity<PaymentMethod>().HasData(
+                new PaymentMethod { Id = 1, Code = "COD", IsActive = true },
+                new PaymentMethod { Id = 2, Code = "MOMO", IsActive = true },
+                new PaymentMethod { Id = 3, Code = "VNPAY", IsActive = true },
+                new PaymentMethod { Id = 4, Code = "BANK_TRANSFER", IsActive = false }
+            );
+
+            modelBuilder.Entity<PaymentTransaction>().HasData(
+                new PaymentTransaction { Id = 1, OrderId = 1, Amount = 15100000m, TransactionDate = DateTime.UtcNow.AddDays(-45), Status = EPaymentStatus.Success, PaymentMethod = "MOMO", TransactionId = "MOMO123456789" },
+                new PaymentTransaction { Id = 2, OrderId = 2, Amount = 53000000m, TransactionDate = DateTime.UtcNow.AddDays(-25), Status = EPaymentStatus.Success, PaymentMethod = "VNPAY", TransactionId = "VNPAY987654321" },
+                new PaymentTransaction { Id = 3, OrderId = 3, Amount = 3200000m, TransactionDate = DateTime.UtcNow.AddDays(-10), Status = EPaymentStatus.Failed, PaymentMethod = "MOMO", TransactionId = "MOMOFAILED001" }
+            );
+            #endregion
         }
     }
 }

@@ -6,8 +6,8 @@ namespace Final.UserAPI.Services
 {
     public interface IUserService
     {
-        Task<UserDTO> RegisterUser(RegisterDTO registerDto);
-        Task<TokenDTO> LoginUser(LoginDTO loginDto);
+        Task<UserDTO> RegisterUserAsync(RegisterDTO registerDto);
+        Task<TokenDTO> LoginUserAsync(LoginDTO loginDto);
         Task<UserProfileDTO?> GetUserProfileAsync(long userId);
         Task<UserProfileDTO?> UpdateUserProfileAsync(long userId, UpdateProfileDTO updateDto);
         Task<bool> ChangeUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto);

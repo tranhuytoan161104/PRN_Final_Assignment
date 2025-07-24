@@ -11,10 +11,7 @@ namespace Final.OrderAPI.Services
         public async Task<List<PaymentMethodDto>> GetActiveMethodsAsync()
         {
             var methods = await _repository.GetActiveMethodsAsync();
-            return methods.Select(m => new PaymentMethodDto
-            {
-                Code = m.Code
-            }).ToList();
+            return methods.Select(m => new PaymentMethodDto { Code = m.Code }).ToList();
         }
     }
 }

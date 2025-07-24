@@ -9,7 +9,7 @@ namespace Final.Domain.Entities
         public long Id { get; set; }
         public decimal TotalAmount { get; set; }
         public DateTime OrderDate { get; set; }
-        public EOrderStatus Status { get; set; } = EOrderStatus.Pending;
+        public EOrderStatus Status { get; set; }
         public string ShippingAddress { get; set; } = null!;
         public string PhoneNumber { get; set; } = null!;
         public long UserId { get; set; }

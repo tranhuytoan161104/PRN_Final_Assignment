@@ -20,8 +20,8 @@ namespace Final.Persistence.Repositories
         {
             var cart = await _context.ShoppingCarts
                 .Include(sc => sc.Items)
-                    .ThenInclude(item => item.Product) 
-                        .ThenInclude(p => p.Images)   
+                    .ThenInclude(item => item.Product)
+                        .ThenInclude(p => p.Images)
                 .FirstOrDefaultAsync(sc => sc.UserId == userId);
 
             if (cart == null)
@@ -36,16 +36,7 @@ namespace Final.Persistence.Repositories
 
         public async Task<ShoppingCart> AddOrUpdateItemAsync(long userId, long productId, int quantity)
         {
-            var cart = await _context.ShoppingCarts
-                .Include(sc => sc.Items)
-                .FirstOrDefaultAsync(sc => sc.UserId == userId);
-
-            if (cart == null)
-            {
-                cart = new ShoppingCart { UserId = userId };
-                _context.ShoppingCarts.Add(cart);
-            }
-
+            var cart = await GetOrCreateCartByUserIdAsync(userId);
             var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
 
             if (cartItem != null)
@@ -58,7 +49,7 @@ namespace Final.Persistence.Repositories
                 {
                     ProductId = productId,
                     Quantity = quantity,
-                    ShoppingCartId = cart.Id 
+                    ShoppingCartId = cart.Id
                 };
                 cart.Items.Add(cartItem);
             }
@@ -73,17 +64,10 @@ namespace Final.Persistence.Repositories
                 .Include(sc => sc.Items)
                 .FirstOrDefaultAsync(sc => sc.UserId == userId);
 
-            if (cart == null)
-            {
-                return false; // Không có giỏ hàng để xóa
-            }
+            if (cart == null) return false;
 
             var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
-
-            if (cartItem == null)
-            {
-                return false; // Sản phẩm không có trong giỏ hàng
-            }
+            if (cartItem == null) return false;
 
             _context.ShoppingCartItems.Remove(cartItem);
             await _context.SaveChangesAsync();
@@ -96,20 +80,11 @@ namespace Final.Persistence.Repositories
                 .Include(sc => sc.Items)
                 .FirstOrDefaultAsync(sc => sc.UserId == userId);
 
-            if (cart == null || !cart.Items.Any())
-            {
-                return false; // Không có giỏ hàng hoặc giỏ hàng đã trống
-            }
+            if (cart == null || !cart.Items.Any()) return false;
 
-            // Xóa tất cả các item trong giỏ hàng
             _context.ShoppingCartItems.RemoveRange(cart.Items);
             await _context.SaveChangesAsync();
             return true;
-        }
-
-        public async Task<int> SaveChangesAsync()
-        {
-            return await _context.SaveChangesAsync();
         }
 
         public async Task RemoveItemsAsync(long userId, List<long> productIds)
@@ -120,14 +95,17 @@ namespace Final.Persistence.Repositories
 
             if (cart?.Items == null) return;
 
-            // Tìm tất cả các item trong giỏ hàng có ProductId nằm trong danh sách cần xóa
             var itemsToRemove = cart.Items.Where(item => productIds.Contains(item.ProductId)).ToList();
-
             if (itemsToRemove.Any())
             {
                 _context.ShoppingCartItems.RemoveRange(itemsToRemove);
                 await _context.SaveChangesAsync();
             }
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
     }
 }

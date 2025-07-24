@@ -1,9 +1,10 @@
 ﻿using Final.Domain.Common;
 using Final.Domain.Entities;
 using Final.Domain.Interfaces;
+using Final.Domain.Queries;
 using Final.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
-using Final.Domain.Queries;
+using Microsoft.EntityFrameworkCore.Storage;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -92,6 +93,21 @@ namespace Final.Persistence.Repositories
                 .ThenInclude(oi => oi.Product)
                 .Include(o => o.User)
                 .FirstOrDefaultAsync(o => o.Id == orderId);
+        }
+
+        public async Task<IDbContextTransaction> BeginTransactionAsync()
+        {
+            return await _context.Database.BeginTransactionAsync();
+        }
+
+        public async Task AddPaymentTransactionAsync(PaymentTransaction transaction)
+        {
+            await _context.PaymentTransactions.AddAsync(transaction);
+        }
+
+        public async Task<int> SaveChangesAsync()
+        {
+            return await _context.SaveChangesAsync();
         }
     }
 }

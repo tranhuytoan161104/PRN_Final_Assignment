@@ -19,7 +19,7 @@ namespace Final.ProductAPI.DTOs
         public long CategoryId { get; set; }
         public string? BrandName { get; set; }
         public string? CategoryName { get; set; }
-        public List<ReviewDTO>? Reviews { get; set; }
+        public List<ProductReviewDTO>? Reviews { get; set; }
         public List<ProductImageDTO>? Images { get; set; }
     }
 }

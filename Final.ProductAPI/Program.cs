@@ -1,6 +1,7 @@
 using Final.Domain.Interfaces;
 using Final.Persistence.Data;
 using Final.Persistence.Repositories;
+using Final.ProductAPI.Middleware;
 using Final.ProductAPI.Services;
 using Microsoft.EntityFrameworkCore;
 
@@ -22,6 +23,8 @@ builder.Services.AddControllers();
 builder.Services.AddEndpointsApiExplorer();
 
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

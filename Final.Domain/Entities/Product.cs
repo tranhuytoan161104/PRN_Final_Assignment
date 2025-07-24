@@ -19,7 +19,7 @@ namespace Final.Domain.Entities
         public DateTime AddAt { get; set; }
         public DateTime? UpdatedAt { get; set; }
 
-        public EProductStatus Status { get; set; } = EProductStatus.Available;
+        public EProductStatus Status { get; set; }
 
         public long BrandId { get; set; }
         public long CategoryId { get; set; }

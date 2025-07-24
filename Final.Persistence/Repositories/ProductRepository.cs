@@ -2,14 +2,8 @@
 using Final.Domain.Entities;
 using Final.Domain.Interfaces;
 using Final.Domain.Queries;
-using Final.Domain.Enums;
 using Final.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Final.Persistence.Repositories
 {
@@ -89,7 +83,7 @@ namespace Final.Persistence.Repositories
         /// </summary>
         /// <param name="productId"> Xác định sản phẩm cần lấy thông tin bằng Id </param>
         /// <returns name="Product"> Trả về thông tin chi tiết của sản phẩm nếu tìm thấy, hoặc null nếu không tìm thấy </returns>
-        public async Task<Product?> GetProductDetailAsync(long productId)
+        public async Task<Product?> GetProductDetailByIdAsync(long productId)
         {
             return await _context.Products
                 .Include(p => p.Images)

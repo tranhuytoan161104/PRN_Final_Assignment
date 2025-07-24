@@ -1,7 +1,8 @@
 ﻿using Final.Domain.Interfaces;
 using Final.Persistence.Data;
 using Final.Persistence.Repositories;
-using Final.UserAPI.Services; 
+using Final.UserAPI.Services;
+using Final.UserAPI.Middleware;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
@@ -45,6 +46,8 @@ builder.Services.AddAuthentication(options =>
 });
 
 var app = builder.Build();
+
+app.UseMiddleware<ErrorHandlingMiddleware>();
 
 app.UseHttpsRedirection();
 

@@ -12,7 +12,7 @@ namespace Final.Domain.Interfaces
     public interface IProductRepository
     {
         Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery query);
-        Task<Product?> GetProductDetailAsync(long productId);
+        Task<Product?> GetProductDetailByIdAsync(long productId);
         Task<Product?> CreateProductAsync(Product product); 
         Task UpdateProductAsync(Product product);
         Task<Product?> GetByIdWithImagesAsync(long productId);

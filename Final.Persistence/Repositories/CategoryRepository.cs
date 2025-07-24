@@ -2,11 +2,6 @@
 using Final.Domain.Interfaces;
 using Final.Persistence.Data;
 using Microsoft.EntityFrameworkCore;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Final.Persistence.Repositories
 {
@@ -19,6 +14,10 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
+        /// <summary>
+        /// Phương thức này lấy tất cả các danh mục từ cơ sở dữ liệu.
+        /// </summary> 
+        /// <returns></returns>
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
             return await _context.Categories.ToListAsync();

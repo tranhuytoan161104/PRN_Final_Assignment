@@ -1,11 +1,7 @@
 ﻿using Final.Domain.Common;
 using Final.Domain.Entities;
 using Final.Domain.Queries;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore.Storage;
 
 namespace Final.Domain.Interfaces
 {
@@ -17,5 +13,9 @@ namespace Final.Domain.Interfaces
         Task UpdateAsync(Order order);
         Task<PagedResult<Order>> GetAllOrdersAsync(OrderQuery query);
         Task<Order?> GetByIdAsync(long orderId);
+
+        Task<IDbContextTransaction> BeginTransactionAsync();
+        Task AddPaymentTransactionAsync(PaymentTransaction transaction);
+        Task<int> SaveChangesAsync();
     }
 }

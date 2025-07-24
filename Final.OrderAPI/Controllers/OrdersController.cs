@@ -1,7 +1,7 @@
-﻿using Final.OrderAPI.DTOs;
+﻿using Final.Domain.Enums;
+using Final.OrderAPI.DTOs;
 using Final.OrderAPI.Services;
 using Microsoft.AspNetCore.Authorization;
-using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -10,92 +10,61 @@ namespace Final.OrderAPI.Controllers
     [ApiController]
     [Route("api/orders")]
     [Authorize]
+    [Produces("application/json")]
     public class OrdersController : ControllerBase
     {
         private readonly IOrderService _orderService;
+        private long CurrentUserId => long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
+
         public OrdersController(IOrderService orderService) { _orderService = orderService; }
 
         [HttpPost]
-        public async Task<IActionResult> CreateOrder([FromBody] CreateOrderDto createOrderDto)
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status201Created)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async Task<ActionResult<OrderDto>> CreateOrderAsync([FromBody] CreateOrderDto createOrderDto)
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!long.TryParse(userIdString, out var userId))
-                return Unauthorized("Token không hợp lệ.");
-
-            try
-            {
-                var order = await _orderService.CreateOrderFromCartAsync(userId, createOrderDto);
-                return CreatedAtAction(nameof(GetOrderById), new { id = order.Id }, order);
-            }
-            catch (InvalidOperationException ex)
-            {
-                return BadRequest(new { message = ex.Message });
-            }
+            var order = await _orderService.CreateOrderFromCartAsync(CurrentUserId, createOrderDto);
+            return CreatedAtRoute("GetUserOrderById", new { id = order.Id }, order);
         }
 
-        [HttpGet("{id}", Name = "GetOrderById")]
-        public async Task<IActionResult> GetOrderById(long id)
+        [HttpGet("{id:long}", Name = "GetUserOrderById")]
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderDto>> GetOrderById(long id) 
         {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!long.TryParse(userIdString, out var userId))
-                return Unauthorized("Token không hợp lệ.");
-
-            var orderDetail = await _orderService.GetUserOrderDetailAsync(id, userId);
-
-            if (orderDetail == null)
-            {
-                // Trả về 404 Not Found là best practice.
-                // Không nên trả về 403 Forbidden để tránh lộ thông tin đơn hàng tồn tại.
-                return NotFound($"Không tìm thấy đơn hàng với ID: {id}");
-            }
-
+            var orderDetail = await _orderService.GetUserOrderDetailAsync(id, CurrentUserId);
             return Ok(orderDetail);
         }
 
-        [HttpPatch("{id}/cancel")]
-        [Authorize (Roles = "Admin")]
-        public async Task<IActionResult> CancelOrder(long id)
-        {
-            var userIdString = User.FindFirstValue(ClaimTypes.NameIdentifier);
-            if (!long.TryParse(userIdString, out var userId))
-                return Unauthorized("Token không hợp lệ.");
-
-            try
-            {
-                var cancelledOrder = await _orderService.CancelUserOrderAsync(id, userId);
-                return Ok(cancelledOrder);
-            }
-            catch (KeyNotFoundException ex)
-            {
-                return NotFound(new { message = ex.Message });
-            }
-            catch (InvalidOperationException ex)
-            {
-                // Bắt lỗi khi đơn hàng không ở trạng thái 'Pending'
-                return BadRequest(new { message = ex.Message });
-            }
-        }
-
-        [HttpGet("{id}")]
+        [HttpGet("admin/{id:long}", Name = "GetOrderForAdminById")]
         [Authorize(Roles = "Admin")]
-        public async Task<IActionResult> GetOrderDetail(long id)
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderDto>> GetOrderDetail(long id) 
         {
             var order = await _orderService.GetOrderDetailForAdminAsync(id);
-            if (order == null)
-            {
-                return NotFound($"Không tìm thấy đơn hàng với ID: {id}");
-            }
             return Ok(order);
         }
 
+        [HttpPatch("{id}/cancel")]
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderDto>> CancelOrder(long id) 
+        {
+            var cancelledOrder = await _orderService.CancelUserOrderAsync(id, CurrentUserId);
+            return Ok(cancelledOrder);
+        }
+
         [HttpPatch("{id}/status")]
-        public async Task<IActionResult> UpdateOrderStatus(long id, [FromBody] UpdateOrderStatusDto statusDto)
+        [Authorize(Roles = "Admin")]
+        [ProducesResponseType(typeof(OrderDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async Task<ActionResult<OrderDto>> UpdateOrderStatus(long id, [FromBody] UpdateOrderStatusDto statusDto) 
         {
             var updatedOrder = await _orderService.UpdateOrderStatusAsync(id, statusDto.Status);
-            if (updatedOrder == null)
-            {
-                return NotFound($"Không tìm thấy đơn hàng với ID: {id}");
-            }
             return Ok(updatedOrder);
         }
     }

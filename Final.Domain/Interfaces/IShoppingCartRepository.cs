@@ -9,7 +9,7 @@ namespace Final.Domain.Interfaces
         Task<ShoppingCart> AddOrUpdateItemAsync(long userId, long productId, int quantity);
         Task<bool> RemoveItemAsync(long userId, long productId);
         Task<bool> ClearCartAsync(long userId);
-        Task<int> SaveChangesAsync();
         Task RemoveItemsAsync(long userId, List<long> productIds);
+        Task<int> SaveChangesAsync();
     }
 }

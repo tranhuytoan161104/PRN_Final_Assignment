@@ -7,9 +7,9 @@ namespace Final.ProductAPI.Services
     public interface IProductService
     {
         Task<PagedResult<ProductDTO>> GetAllProductsAsync(ProductQuery query);
-        Task<ProductDetailDTO?> GetProductDetailAsync(long productId);
+        Task<ProductDetailDTO?> GetProductDetailByIdAsync(long productId);
         Task<ProductDetailDTO?> CreateProductAsync(ProductCreationDTO productCreationDto);
-        Task<ProductDetailDTO?> UpdateProductStockQuantityAsync(long productId, UpdateStockQuantityDTO updateStockQuantityDto);
+        Task<ProductDetailDTO?> UpdateProductStockQuantityAsync(long productId, StockQuantityUpdateDTO updateStockQuantityDto);
         Task<ProductDetailDTO?> ArchiveProductAsync(long productId);
         Task<ProductDetailDTO?> UpdateProductDetailAsync(long productId, ProductUpdateDTO productUpdateDto);
     }

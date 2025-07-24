@@ -1,6 +1,6 @@
 ﻿namespace Final.ProductAPI.DTOs
 {
-    public class ReviewDTO
+    public class ProductReviewDTO
     {
         public int Rating { get; set; }
         public string? Comment { get; set; }

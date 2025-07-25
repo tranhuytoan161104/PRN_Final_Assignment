@@ -9,7 +9,7 @@ using System.Security.Claims;
 namespace Final.UserAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/users")]
     [Produces("application/json")]
     public class UsersController : ControllerBase
     {
@@ -22,6 +22,7 @@ namespace Final.UserAPI.Controllers
 
         /// <summary>
         /// Lấy ID của người dùng đã được xác thực từ token.
+        /// Cho phép truy cập ID người dùng hiện tại trong các phương thức khác.
         /// </summary>
         /// <exception cref="UnauthorizedAccessException">Ném ngoại lệ nếu không tìm thấy thông tin người dùng trong token.</exception>
         private long CurrentUserId
@@ -39,6 +40,7 @@ namespace Final.UserAPI.Controllers
 
         /// <summary>
         /// Đăng ký một tài khoản người dùng mới.
+        /// Cho phép người dùng cung cấp thông tin cần thiết để tạo tài khoản mới.
         /// </summary>
         /// <param name="registerDto">Thông tin cần thiết để đăng ký.</param>
         /// <returns>Thông tin của người dùng vừa được tạo.</returns>
@@ -50,12 +52,12 @@ namespace Final.UserAPI.Controllers
         public async Task<IActionResult> RegisterUserAsync([FromBody] RegisterDTO registerDto)
         {
             var user = await _userService.RegisterUserAsync(registerDto);
-            // Sử dụng CreatedAtRoute để trả về URL của endpoint lấy thông tin người dùng theo ID
-            return CreatedAtRoute("GetUserProfileById", new { userId = user.Id }, user);
+            return CreatedAtRoute("GetUserProfileByUserIdAsync", new { userId = user.Id }, user);
         }
 
         /// <summary>
         /// Đăng nhập vào hệ thống.
+        /// Cho phép người dùng đăng nhập bằng email và mật khẩu để nhận token xác thực.
         /// </summary>
         /// <param name="loginDto">Thông tin đăng nhập (email và mật khẩu).</param>
         /// <returns>Một token JWT để xác thực các yêu cầu sau này.</returns>
@@ -64,7 +66,7 @@ namespace Final.UserAPI.Controllers
         [HttpPost("login")]
         [ProducesResponseType(typeof(TokenDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<TokenDTO>> LoginAsync([FromBody] LoginDTO loginDto)
+        public async Task<ActionResult<TokenDTO>> LoginUserAsync([FromBody] LoginDTO loginDto)
         {
             var tokenDto = await _userService.LoginUserAsync(loginDto);
             return Ok(tokenDto);
@@ -72,6 +74,7 @@ namespace Final.UserAPI.Controllers
 
         /// <summary>
         /// Lấy thông tin hồ sơ của người dùng hiện tại (đã đăng nhập).
+        /// Cho phép người dùng xem thông tin cá nhân của mình như tên, họ, email, v.v.
         /// </summary>
         /// <returns>Thông tin hồ sơ của người dùng.</returns>
         /// <response code="200">Trả về thông tin hồ sơ thành công.</response>
@@ -82,7 +85,7 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(typeof(UserProfileDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserProfileDTO>> GetUserProfileAsync()
+        public async Task<ActionResult<UserProfileDTO>> GetCurrentUserProfileAsync()
         {
             var userProfile = await _userService.GetUserProfileAsync(CurrentUserId);
             return Ok(userProfile);
@@ -90,6 +93,7 @@ namespace Final.UserAPI.Controllers
 
         /// <summary>
         /// Cập nhật thông tin hồ sơ (tên, họ) của người dùng hiện tại.
+        /// Cho phép người dùng cập nhật thông tin cá nhân của mình.
         /// </summary>
         /// <param name="updateDto">Thông tin cần cập nhật.</param>
         /// <returns>Thông tin hồ sơ sau khi đã cập nhật.</returns>
@@ -103,14 +107,15 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserProfileDTO>> UpdateUserProfileAsync([FromBody] UpdateProfileDTO updateDto)
+        public async Task<ActionResult<UserProfileDTO>> UpdateCurrentUserProfileAsync([FromBody] UpdateProfileDTO updateDto)
         {
-            var updatedProfile = await _userService.UpdateUserProfileAsync(CurrentUserId, updateDto);
+            var updatedProfile = await _userService.UpdateCurrentUserProfileAsync(CurrentUserId, updateDto);
             return Ok(updatedProfile);
         }
 
         /// <summary>
         /// Thay đổi mật khẩu của người dùng hiện tại.
+        /// Cho phép người dùng cập nhật mật khẩu của mình bằng cách cung cấp mật khẩu cũ và mật khẩu mới.
         /// </summary>
         /// <param name="changePasswordDto">Thông tin mật khẩu cũ và mới.</param>
         /// <returns>Một thông báo thành công.</returns>
@@ -122,16 +127,17 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<IActionResult> ChangePasswordAsync([FromBody] ChangePasswordDTO changePasswordDto)
+        public async Task<IActionResult> ChangeCurrentUserPasswordAsync([FromBody] ChangePasswordDTO changePasswordDto)
         {
-            await _userService.ChangeUserPasswordAsync(CurrentUserId, changePasswordDto);
+            await _userService.ChangeCurrentUserPasswordAsync(CurrentUserId, changePasswordDto);
             return Ok(new { message = "Đổi mật khẩu thành công." });
         }
 
         /// <summary>
         /// [Admin] Lấy danh sách tất cả người dùng với phân trang.
+        /// Cho phép quản trị viên xem danh sách người dùng trong hệ thống với các tham số truy vấn để phân trang và lọc.
         /// </summary>
-        /// <param name="query">Các tham số truy vấn và phân trang.</param>
+        /// <param name="queries">Các tham số truy vấn và phân trang.</param>
         /// <returns>Danh sách người dùng đã được phân trang.</returns>
         /// <response code="200">Trả về danh sách người dùng.</response>
         /// <response code="401">Nếu người dùng chưa đăng nhập.</response>
@@ -141,9 +147,9 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(typeof(PagedResult<UserDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<PagedResult<UserDTO>>> GetAllUsersAsync([FromQuery] UserQuery query)
+        public async Task<ActionResult<PagedResult<UserDTO>>> GetAllUsersAsync([FromQuery] UserQuery queries)
         {
-            var pagedResult = await _userService.GetAllUsersAsync(query);
+            var pagedResult = await _userService.GetAllUsersAsync(queries);
             return Ok(pagedResult);
         }
 
@@ -154,11 +160,11 @@ namespace Final.UserAPI.Controllers
         /// <returns>Thông tin hồ sơ của người dùng.</returns>
         /// <response code="200">Trả về thông tin hồ sơ.</response>
         /// <response code="404">Nếu không tìm thấy người dùng.</response>
-        [HttpGet("{userId:long}", Name = "GetUserProfileById")]
+        [HttpGet("{userId:long}", Name = "GetUserProfileByUserIdAsync")]
         [Authorize(Roles = "Admin, Owner")]
         [ProducesResponseType(typeof(UserProfileDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<UserProfileDTO>> GetUserProfileByIdAsync(long userId)
+        public async Task<ActionResult<UserProfileDTO>> GetUserProfileByUserIdAsync(long userId)
         {
             var userProfile = await _userService.GetUserProfileAsync(userId);
             return Ok(userProfile);
@@ -178,9 +184,9 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<UserDTO>> UpdateUserRoleAsync(long userId, [FromBody] UserRoleDTO userRoleDto)
+        public async Task<ActionResult<UserDTO>> UpdateUserRoleByUserIdAsync(long userId, [FromBody] UserRoleDTO userRoleDto)
         {
-            var updatedUser = await _userService.UpdateUserRoleAsync(userId, userRoleDto);
+            var updatedUser = await _userService.UpdateUserRoleByUserIdAsync(userId, userRoleDto);
             return Ok(updatedUser);
         }
 
@@ -198,9 +204,9 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         [ProducesResponseType(StatusCodes.Status403Forbidden)]
-        public async Task<ActionResult<UserDTO>> UpdateUserStatusAsync(long userId, [FromBody] UpdateUserStatusDTO updateUserStatusDto)
+        public async Task<ActionResult<UserDTO>> UpdateUserStatusByUserIdAsync(long userId, [FromBody] UpdateUserStatusDTO updateUserStatusDto)
         {
-            var updatedUser = await _userService.UpdateUserStatusAsync(userId, updateUserStatusDto);
+            var updatedUser = await _userService.UpdateUserStatusByUserIdAsync(userId, updateUserStatusDto);
             return Ok(updatedUser);
         }
     }

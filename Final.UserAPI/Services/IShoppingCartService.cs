@@ -5,10 +5,10 @@ namespace Final.UserAPI.Services
 {
     public interface IShoppingCartService
     {
-        Task<CartDTO> GetCartForUserAsync(long userId);
-        Task<CartDTO> AddItemToCartAsync(long userId, AddCartItemDTO itemDto);
-        Task<CartDTO> RemoveItemFromCartAsync(long userId, long productId);
-        Task ClearCartAsync(long userId);
-        Task<CartDTO> UpdateItemQuantityAsync(long userId, long productId, int newQuantity);
+        Task<CartDTO> GetCartByUserIdAsync(long userId);
+        Task<CartDTO> AddItemToUserCartAsync(long userId, AddCartItemDTO itemDto);
+        Task<CartDTO> RemoveItemFromUserCartAsync(long userId, long productId);
+        Task ClearUserCartAsync(long userId);
+        Task<CartDTO> UpdateItemQuantityInUserCartAsync(long userId, long productId, int newQuantity);
     }
 }

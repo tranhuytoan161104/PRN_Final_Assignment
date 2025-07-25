@@ -13,7 +13,7 @@ namespace Final.Domain.Interfaces
     {
         Task<User?> GetUserByEmailAsync(string email);
         Task<User> CreateUser(User user);
-        Task<User?> GetUserByIdAsync(long id);
+        Task<User?> GetUserByUserIdAsync(long userId);
         Task UpdateUserAsync(User user);
         Task<PagedResult<User>> GetAllUserAsync(UserQuery query);
     }

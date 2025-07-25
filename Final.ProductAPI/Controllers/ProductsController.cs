@@ -7,7 +7,7 @@ using Microsoft.AspNetCore.Mvc;
 namespace Final.ProductAPI.Controllers
 {
     [ApiController]
-    [Route("api/[controller]")]
+    [Route("api/products")]
     [Produces("application/json")]
     public class ProductsController : ControllerBase
     {
@@ -19,21 +19,23 @@ namespace Final.ProductAPI.Controllers
         }
 
         /// <summary>
-        /// Lấy danh sách sản phẩm với phân trang và lọc theo các tiêu chí.
+        /// Lấy danh sách sản phẩm với phân trang và lọc theo nhiều tiêu chí.
+        /// Cho phép người dùng lọc sản phẩm theo danh mục, thương hiệu, tên, giá và sắp xếp theo các trường khác nhau.
         /// </summary>
         /// <param name="query">Chứa các thông tin phân trang và lọc sản phẩm.</param>
         /// <returns>Một danh sách sản phẩm đã được phân trang và lọc.</returns>
         /// <response code="200">Trả về danh sách sản phẩm thành công.</response>
         [HttpGet]
         [ProducesResponseType(typeof(PagedResult<ProductDTO>), StatusCodes.Status200OK)]
-        public async Task<ActionResult<PagedResult<ProductDTO>>> GetAllProductsAsync([FromQuery] ProductQuery query)
+        public async Task<ActionResult<PagedResult<ProductDTO>>> GetAllProductsAsync([FromQuery] ProductQuery queries)
         {
-            var products = await _productService.GetAllProductsAsync(query);
+            var products = await _productService.GetAllProductsAsync(queries);
             return Ok(products);
         }
 
         /// <summary>
         /// Lấy thông tin chi tiết của một sản phẩm dựa trên Id.
+        /// Cho phép người dùng xem thông tin chi tiết của sản phẩm bao gồm mô tả, giá, hình ảnh và các thuộc tính khác.
         /// </summary>
         /// <param name="productId">ID của sản phẩm cần lấy thông tin.</param>
         /// <returns>Thông tin chi tiết của sản phẩm nếu tìm thấy.</returns>
@@ -50,6 +52,7 @@ namespace Final.ProductAPI.Controllers
 
         /// <summary>
         /// Tạo một sản phẩm mới.
+        /// Cho phép người dùng thêm sản phẩm mới vào hệ thống với các thông tin như tên, mô tả, giá, hình ảnh và các thuộc tính khác.
         /// </summary>
         /// <param name="productCreationDto">Thông tin sản phẩm cần tạo.</param>
         /// <returns>Thông tin chi tiết của sản phẩm vừa được tạo.</returns>
@@ -66,6 +69,7 @@ namespace Final.ProductAPI.Controllers
 
         /// <summary>
         /// Cập nhật toàn bộ thông tin chi tiết của một sản phẩm.
+        /// Cho phép người dùng cập nhật các thông tin như tên, mô tả, giá, hình ảnh và các thuộc tính khác của sản phẩm.
         /// </summary>
         /// <param name="productId">ID của sản phẩm cần cập nhật.</param>
         /// <param name="productUpdateDto">Thông tin mới của sản phẩm.</param>

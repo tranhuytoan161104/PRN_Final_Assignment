@@ -14,6 +14,7 @@ namespace Final.Domain.Entities
         public string Role { get; set; } = null!;
         public EUserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
+
         public virtual ICollection<Order>? Orders { get; set; }
         public virtual ICollection<Review>? Reviews { get; set; }
 

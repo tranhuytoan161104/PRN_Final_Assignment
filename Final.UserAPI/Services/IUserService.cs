@@ -9,10 +9,10 @@ namespace Final.UserAPI.Services
         Task<UserDTO> RegisterUserAsync(RegisterDTO registerDto);
         Task<TokenDTO> LoginUserAsync(LoginDTO loginDto);
         Task<UserProfileDTO?> GetUserProfileAsync(long userId);
-        Task<UserProfileDTO?> UpdateUserProfileAsync(long userId, UpdateProfileDTO updateDto);
-        Task<bool> ChangeUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto);
+        Task<UserProfileDTO?> UpdateCurrentUserProfileAsync(long userId, UpdateProfileDTO updateDto);
+        Task<bool> ChangeCurrentUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto);
         Task<PagedResult<UserDTO>> GetAllUsersAsync(UserQuery query);
-        Task<UserDTO?> UpdateUserRoleAsync(long userId, UserRoleDTO userRoleDto);
-        Task<UserDTO?> UpdateUserStatusAsync(long userId, UpdateUserStatusDTO updateUserStatusDto);
+        Task<UserDTO?> UpdateUserRoleByUserIdAsync(long userId, UserRoleDTO userRoleDto);
+        Task<UserDTO?> UpdateUserStatusByUserIdAsync(long userId, UpdateUserStatusDTO updateUserStatusDto);
     }
 }

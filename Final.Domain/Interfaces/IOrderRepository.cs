@@ -12,7 +12,7 @@ namespace Final.Domain.Interfaces
         Task<Order?> GetOrderByIdAndUserIdAsync(long orderId, long userId);
         Task UpdateAsync(Order order);
         Task<PagedResult<Order>> GetAllOrdersAsync(OrderQuery query);
-        Task<Order?> GetByIdAsync(long orderId);
+        Task<Order?> GetOrderByOrderIdAsync(long orderId);
 
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task AddPaymentTransactionAsync(PaymentTransaction transaction);

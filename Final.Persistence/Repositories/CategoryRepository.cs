@@ -15,9 +15,9 @@ namespace Final.Persistence.Repositories
         }
 
         /// <summary>
-        /// Phương thức này lấy tất cả các danh mục từ cơ sở dữ liệu.
+        /// Lấy tất cả các danh mục từ cơ sở dữ liệu.
         /// </summary> 
-        /// <returns></returns>
+        /// <returns>Danh sách các danh mục.</returns>
         public async Task<List<Category>> GetAllCategoriesAsync()
         {
             return await _context.Categories.ToListAsync();

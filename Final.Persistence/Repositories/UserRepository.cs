@@ -21,11 +21,21 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
+        /// <summary>
+        /// Lấy thông tin người dùng theo địa chỉ email.
+        /// </summary>
+        /// <param name="email">Địa chỉ email của người dùng cần tìm.</param>
+        /// <returns>Trả về đối tượng người dùng nếu tìm thấy, ngược lại trả về null.</returns>
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
+        /// <summary>
+        /// Tạo một người dùng mới trong cơ sở dữ liệu.
+        /// </summary>
+        /// <param name="user">Đối tượng người dùng cần tạo.</param>
+        /// <returns>Trả về đối tượng người dùng đã được tạo.</returns>
         public async Task<User> CreateUser(User user)
         {
             _context.Users.Add(user);
@@ -33,16 +43,31 @@ namespace Final.Persistence.Repositories
             return user;
         }
 
-        public async Task<User?> GetUserByIdAsync(long id)
+        /// <summary>
+        /// Lấy thông tin người dùng theo ID người dùng.
+        /// </summary>
+        /// <param name="userId">ID của người dùng cần lấy thông tin.</param>
+        /// <returns>Trả về đối tượng người dùng nếu tìm thấy, ngược lại trả về null.</returns>
+        public async Task<User?> GetUserByUserIdAsync(long userId)
         {
-            return await _context.Users.FindAsync(id);
+            return await _context.Users.FindAsync(userId);
         }
 
+        /// <summary>
+        /// Cập nhật thông tin người dùng trong cơ sở dữ liệu.
+        /// </summary>
+        /// <param name="user">Đối tượng người dùng cần cập nhật.</param>
+        /// <returns>Trả về một tác vụ bất đồng bộ.</returns>
         public async Task UpdateUserAsync(User user)
         {
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Lấy danh sách người dùng với phân trang và sắp xếp. 
+        /// </summary>
+        /// <param name="query">Thông tin phân trang và lọc.</param>
+        /// <returns>Kết quả phân trang chứa danh sách người dùng.</returns>
         public async Task<PagedResult<User>> GetAllUserAsync(UserQuery query)
         {
             var usersQuery = _context.Users.AsQueryable();

@@ -7,7 +7,7 @@ namespace Final.ProductAPI.DTOs
     public class ProductDetailDTO
     {
         public long Id { get; set; }
-        public string? Name { get; set; }
+        public string Name { get; set; } = null!;
         public decimal Price { get; set; }
         public string? Description { get; set; }
         public DateTime CreatedAt { get; set; }

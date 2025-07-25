@@ -23,13 +23,19 @@ namespace Final.Persistence.Repositories
             return order;
         }
 
+        /// <summary>
+        /// Lấy danh sách đơn hàng của người dùng theo ID.
+        /// </summary>
+        /// <param name="userId">ID của người dùng</param>
+        /// <param name="query">Thông tin truy vấn để phân trang và lọc đơn hàng</param>
+        /// <returns></returns>
         public async Task<PagedResult<Order>> GetOrdersByUserIdAsync(long userId, OrderQuery query)
         {
             var queryable = _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
-                .Where(o => o.UserId == userId) // Lọc theo đúng ID của người dùng
-                .OrderByDescending(o => o.OrderDate); // Sắp xếp đơn hàng mới nhất lên đầu
+                .Where(o => o.UserId == userId) 
+                .OrderByDescending(o => o.OrderDate); 
 
             var totalItems = await queryable.CountAsync();
             var items = await queryable
@@ -47,28 +53,42 @@ namespace Final.Persistence.Repositories
             };
         }
 
+        /// <summary>
+        /// Lấy đơn hàng theo ID và ID người dùng.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng</param>
+        /// <param name="userId">ID của người dùng</param>
+        /// <returns>Trả về đơn hàng nếu tìm thấy, ngược lại trả về null</returns>
         public async Task<Order?> GetOrderByIdAndUserIdAsync(long orderId, long userId)
         {
             return await _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
-                .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId); // <-- Điều kiện kép quan trọng
+                .FirstOrDefaultAsync(o => o.Id == orderId && o.UserId == userId);
         }
 
+        /// <summary>
+        /// Cập nhật thông tin đơn hàng.
+        /// </summary>
+        /// <param name="order">Đơn hàng cần cập nhật</param>
+        /// <returns>Trả về Task khi cập nhật hoàn tất</returns>
         public async Task UpdateAsync(Order order)
         {
-            // EF Core sẽ tự động theo dõi các thay đổi trên 'order' entity
-            // khi nó được lấy ra từ context. Chúng ta chỉ cần lưu lại.
             await _context.SaveChangesAsync();
         }
 
+        /// <summary>
+        /// Lấy tất cả đơn hàng với phân trang.
+        /// </summary>
+        /// <param name="query">Thông tin truy vấn để phân trang và lọc đơn hàng</param>
+        /// <returns>Trả về danh sách đơn hàng đã phân trang</returns>
         public async Task<PagedResult<Order>> GetAllOrdersAsync(OrderQuery query)
         {
             var queryable = _context.Orders
                 .Include(o => o.OrderItems)
                 .ThenInclude(oi => oi.Product)
-                .Include(o => o.User) // Include thông tin người dùng để hiển thị
-                .OrderByDescending(o => o.OrderDate); // Sắp xếp đơn hàng mới nhất lên đầu
+                .Include(o => o.User) 
+                .OrderByDescending(o => o.OrderDate); 
 
             var totalItems = await queryable.CountAsync();
             var items = await queryable
@@ -86,7 +106,12 @@ namespace Final.Persistence.Repositories
             };
         }
 
-        public async Task<Order?> GetByIdAsync(long orderId)
+        /// <summary>
+        /// Lấy đơn hàng theo ID đơn hàng.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng</param>
+        /// <returns>Trả về đơn hàng nếu tìm thấy, ngược lại trả về null</returns>
+        public async Task<Order?> GetOrderByOrderIdAsync(long orderId)
         {
             return await _context.Orders
                 .Include(o => o.OrderItems)
@@ -95,16 +120,29 @@ namespace Final.Persistence.Repositories
                 .FirstOrDefaultAsync(o => o.Id == orderId);
         }
 
+        /// <summary>
+        /// Bắt đầu một giao dịch cơ sở dữ liệu.
+        /// </summary>
+        /// <returns>Trả về một đối tượng giao dịch cơ sở dữ liệu</returns>
         public async Task<IDbContextTransaction> BeginTransactionAsync()
         {
             return await _context.Database.BeginTransactionAsync();
         }
 
+        /// <summary>
+        /// Thêm một giao dịch thanh toán vào cơ sở dữ liệu.
+        /// </summary>
+        /// <param name="transaction">Giao dịch thanh toán cần thêm</param>
+        /// <returns>Trả về Task khi thêm giao dịch hoàn tất</returns>
         public async Task AddPaymentTransactionAsync(PaymentTransaction transaction)
         {
             await _context.PaymentTransactions.AddAsync(transaction);
         }
 
+        /// <summary>
+        /// Lưu các thay đổi vào cơ sở dữ liệu.
+        /// </summary>
+        /// <returns>Trả về số lượng bản ghi đã được lưu</returns>
         public async Task<int> SaveChangesAsync()
         {
             return await _context.SaveChangesAsync();

@@ -20,7 +20,14 @@ namespace Final.OrderAPI.Services
             _shoppingCartRepository = shoppingCartRepository;
         }
 
-        public async Task<OrderDto> CreateOrderFromCartAsync(long userId, CreateOrderDto createOrderDto)
+        /// <summary>
+        /// Phương thức tạo đơn hàng từ giỏ hàng của người dùng.
+        /// </summary>
+        /// <param name="userId">ID của người dùng.</param>
+        /// <param name="createOrderDto">Thông tin đơn hàng cần tạo.</param> 
+        /// <returns>Trả về đơn hàng đã được tạo.</returns>
+        /// <exception cref="InvalidOperationException">Nếu không có sản phẩm nào được chọn để thanh toán hoặc nếu sản phẩm không đủ hàng trong kho.</exception>
+        public async Task<OrderDto> CreateOrderFromUserCartAsync(long userId, CreateOrderDto createOrderDto)
         {
             await using var transaction = await _orderRepository.BeginTransactionAsync();
             try
@@ -80,7 +87,7 @@ namespace Final.OrderAPI.Services
                 await _orderRepository.SaveChangesAsync();
                 await transaction.CommitAsync();
 
-                var finalOrder = await _orderRepository.GetByIdAsync(order.Id);
+                var finalOrder = await _orderRepository.GetOrderByOrderIdAsync(order.Id);
                 return MapOrderToDto(finalOrder!);
             }
             catch (Exception)
@@ -90,14 +97,27 @@ namespace Final.OrderAPI.Services
             }
         }
 
-        public async Task<PagedResult<OrderDto>> GetUserOrdersAsync(long userId, OrderQuery query)
+        /// <summary>
+        /// Phương thức lấy danh sách đơn hàng của người dùng theo ID.
+        /// </summary>
+        /// <param name="userId">ID của người dùng.</param>
+        /// <param name="query">Thông tin truy vấn để phân trang và lọc đơn hàng.</param>
+        /// <returns>Trả về danh sách đơn hàng đã phân trang.</returns>
+        public async Task<PagedResult<OrderDto>> GetOrdersbyUserIdAsync(long userId, OrderQuery query)
         {
             var pagedOrders = await _orderRepository.GetOrdersByUserIdAsync(userId, query);
-            var orderDtos = pagedOrders.Items.Select(MapOrderToDto).ToList();
+            var orderDtos = pagedOrders.Items?.Select(MapOrderToDto).ToList();
             return new PagedResult<OrderDto> { Items = orderDtos, TotalItems = pagedOrders.TotalItems, PageNumber = pagedOrders.PageNumber, PageSize = pagedOrders.PageSize, TotalPages = pagedOrders.TotalPages };
         }
 
-        public async Task<OrderDto> GetUserOrderDetailAsync(long orderId, long userId)
+        /// <summary>
+        /// Phương thức lấy chi tiết đơn hàng của người dùng theo ID đơn hàng.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng cần lấy chi tiết.</param>
+        /// <param name="userId">ID của người dùng để xác thực quyền truy cập.</param>
+        /// <returns>Trả về chi tiết đơn hàng.</returns>
+        /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID hoặc người dùng không có quyền truy cập.</exception>
+        public async Task<OrderDto> GetOrderDetailByOrderIdIdAsync(long orderId, long userId)
         {
             var order = await _orderRepository.GetOrderByIdAndUserIdAsync(orderId, userId);
             if (order == null)
@@ -107,7 +127,15 @@ namespace Final.OrderAPI.Services
             return MapOrderToDto(order);
         }
 
-        public async Task<OrderDto> CancelOrderForCurrentUserAsync(long orderId, long userId)
+        /// <summary>
+        /// Phương thức hủy đơn hàng của người dùng theo ID đơn hàng.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng cần hủy.</param>
+        /// <param name="userId">ID của người dùng để xác thực quyền truy cập.</param>
+        /// <returns></returns>
+        /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID hoặc người dùng không có quyền truy cập.</exception>
+        /// <exception cref="InvalidOperationException">Nếu đơn hàng không ở trạng thái có thể hủy (Pending hoặc Processing).</exception>
+        public async Task<OrderDto> CancelUserOrderByOrderIdAsync(long orderId, long userId)
         {
             var order = await _orderRepository.GetOrderByIdAndUserIdAsync(orderId, userId);
             if (order == null)
@@ -125,9 +153,16 @@ namespace Final.OrderAPI.Services
             return MapOrderToDto(order);
         }
 
+        /// <summary>
+        /// Phương thức hủy đơn hàng cho quản trị viên theo ID đơn hàng.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng cần hủy.</param>
+        /// <returns>Trả về đơn hàng đã được hủy.</returns>
+        /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID.</exception>
+        /// <exception cref="InvalidOperationException">Nếu đơn hàng không ở trạng thái có thể hủy (Pending hoặc Processing).</exception>
         public async Task<OrderDto> CancelOrderForAdminAsync(long orderId)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
+            var order = await _orderRepository.GetOrderByOrderIdAsync(orderId);
             if (order == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId}");
@@ -143,16 +178,27 @@ namespace Final.OrderAPI.Services
             return MapOrderToDto(order);
         }
 
+        /// <summary>
+        /// Phương thức lấy tất cả đơn hàng cho quản trị viên.
+        /// </summary>
+        /// <param name="query">Thông tin truy vấn để phân trang và lọc đơn hàng.</param>
+        /// <returns>Trả về danh sách đơn hàng đã phân trang.</returns>
         public async Task<PagedResult<OrderDto>> GetAllOrdersAsync(OrderQuery query)
         {
             var pagedOrders = await _orderRepository.GetAllOrdersAsync(query);
-            var orderDtos = pagedOrders.Items.Select(MapOrderToDto).ToList();
+            var orderDtos = pagedOrders.Items?.Select(MapOrderToDto).ToList();
             return new PagedResult<OrderDto> { Items = orderDtos, TotalItems = pagedOrders.TotalItems, PageNumber = pagedOrders.PageNumber, PageSize = pagedOrders.PageSize, TotalPages = pagedOrders.TotalPages };
         }
 
+        /// <summary>
+        /// Phương thức lấy chi tiết đơn hàng cho quản trị viên theo ID đơn hàng.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng cần lấy chi tiết.</param>
+        /// <returns>Trả về chi tiết đơn hàng.</returns>
+        /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID.</exception>
         public async Task<OrderDto> GetOrderDetailForAdminAsync(long orderId)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
+            var order = await _orderRepository.GetOrderByOrderIdAsync(orderId);
             if (order == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId}");
@@ -160,9 +206,16 @@ namespace Final.OrderAPI.Services
             return MapOrderToDto(order);
         }
 
+        /// <summary>
+        /// Phương thức cập nhật trạng thái đơn hàng cho quản trị viên.
+        /// </summary>
+        /// <param name="orderId">ID của đơn hàng cần cập nhật.</param>
+        /// <param name="newStatus">Trạng thái mới của đơn hàng.</param>
+        /// <returns>Trả về đơn hàng đã được cập nhật.</returns>
+        /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID.</exception>
         public async Task<OrderDto> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus)
         {
-            var order = await _orderRepository.GetByIdAsync(orderId);
+            var order = await _orderRepository.GetOrderByOrderIdAsync(orderId);
             if (order == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId}");
@@ -172,6 +225,11 @@ namespace Final.OrderAPI.Services
             return MapOrderToDto(order);
         }
 
+        /// <summary>
+        /// Phương thức hoàn lại hàng tồn kho cho đơn hàng đã hủy.
+        /// </summary>
+        /// <param name="order">Đơn hàng cần hoàn lại hàng tồn kho.</param>
+        /// <returns>Trả về một tác vụ bất đồng bộ.</returns>
         private async Task RollbackStockForOrder(Order order)
         {
             foreach (var item in order.OrderItems)
@@ -188,6 +246,11 @@ namespace Final.OrderAPI.Services
             }
         }
 
+        /// <summary>
+        /// Phương thức ánh xạ đơn hàng sang DTO.
+        /// </summary>
+        /// <param name="order">Đơn hàng cần ánh xạ.</param>
+        /// <returns>Trả về DTO của đơn hàng.</returns>
         private OrderDto MapOrderToDto(Order order)
         {
             return new OrderDto

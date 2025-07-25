@@ -37,8 +37,8 @@ namespace Final.UserAPI.Services
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                Role = "Customer", // Mặc định vai trò là Customer
-                Status = EUserStatus.Active, // Mặc định trạng thái là Active
+                Role = "Customer", 
+                Status = EUserStatus.Active, 
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -78,7 +78,7 @@ namespace Final.UserAPI.Services
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         public async Task<UserProfileDTO?> GetUserProfileAsync(long userId)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng với ID {userId}.");
@@ -103,9 +103,9 @@ namespace Final.UserAPI.Services
         /// <param name="updateDto">Thông tin cần cập nhật.</param>
         /// <returns>Thông tin hồ sơ sau khi đã cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
-        public async Task<UserProfileDTO> UpdateUserProfileAsync(long userId, UpdateProfileDTO updateDto)
+        public async Task<UserProfileDTO?> UpdateCurrentUserProfileAsync(long userId, UpdateProfileDTO updateDto)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng với ID {userId}.");
@@ -126,9 +126,9 @@ namespace Final.UserAPI.Services
         /// <returns>Trả về true nếu đổi mật khẩu thành công.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu mật khẩu cũ không chính xác.</exception>
-        public async Task<bool> ChangeUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto)
+        public async Task<bool> ChangeCurrentUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng với ID {userId}.");
@@ -171,9 +171,9 @@ namespace Final.UserAPI.Services
         /// <param name="userRoleDto">Vai trò mới của người dùng.</param>
         /// <returns>Thông tin người dùng sau khi cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
-        public async Task<UserDTO?> UpdateUserRoleAsync(long userId, UserRoleDTO userRoleDto)
+        public async Task<UserDTO?> UpdateUserRoleByUserIdAsync(long userId, UserRoleDTO userRoleDto)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng với ID {userId}.");
@@ -191,9 +191,9 @@ namespace Final.UserAPI.Services
         /// <param name="updateUserStatusDto">Trạng thái mới của người dùng.</param>
         /// <returns>Thông tin người dùng sau khi cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
-        public async Task<UserDTO?> UpdateUserStatusAsync(long userId, UpdateUserStatusDTO updateUserStatusDto)
+        public async Task<UserDTO?> UpdateUserStatusByUserIdAsync(long userId, UpdateUserStatusDTO updateUserStatusDto)
         {
-            var user = await _userRepository.GetUserByIdAsync(userId);
+            var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy người dùng với ID {userId}.");

@@ -6,12 +6,9 @@ using System.Security.Claims;
 
 namespace Final.UserAPI.Controllers
 {
-    /// <summary>
-    /// Cung cấp các endpoint API để quản lý giỏ hàng của người dùng.
-    /// </summary>
     [ApiController]
     [Route("api/cart")]
-    [Authorize] // Yêu cầu tất cả các action trong controller này phải được xác thực
+    [Authorize]
     [Produces("application/json")]
     public class ShoppingCartController : ControllerBase
     {
@@ -22,9 +19,6 @@ namespace Final.UserAPI.Controllers
             _shoppingCartService = shoppingCartService;
         }
 
-        /// <summary>
-        /// Lấy ID của người dùng đã được xác thực từ token.
-        /// </summary>
         private long CurrentUserId => long.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)!);
 
         /// <summary>
@@ -36,9 +30,9 @@ namespace Final.UserAPI.Controllers
         [HttpGet]
         [ProducesResponseType(typeof(CartDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-        public async Task<ActionResult<CartDTO>> GetCartAsync()
+        public async Task<ActionResult<CartDTO>> GetCurrentUserCartAsync()
         {
-            var cart = await _shoppingCartService.GetCartForUserAsync(CurrentUserId);
+            var cart = await _shoppingCartService.GetCartByUserIdAsync(CurrentUserId);
             return Ok(cart);
         }
 
@@ -54,9 +48,9 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(typeof(CartDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CartDTO>> AddItemToCartAsync([FromBody] AddCartItemDTO itemDto)
+        public async Task<ActionResult<CartDTO>> AddItemToCurrentUserCartAsync([FromBody] AddCartItemDTO itemDto)
         {
-            var updatedCart = await _shoppingCartService.AddItemToCartAsync(CurrentUserId, itemDto);
+            var updatedCart = await _shoppingCartService.AddItemToUserCartAsync(CurrentUserId, itemDto);
             return Ok(updatedCart);
         }
 
@@ -73,9 +67,9 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(typeof(CartDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CartDTO>> UpdateItemQuantityAsync(long productId, [FromBody] UpdateCartItemDTO updateDto)
+        public async Task<ActionResult<CartDTO>> UpdateItemQuantityInCurrentUserCartAsync(long productId, [FromBody] UpdateCartItemDTO updateDto)
         {
-            var updatedCart = await _shoppingCartService.UpdateItemQuantityAsync(CurrentUserId, productId, updateDto.Quantity);
+            var updatedCart = await _shoppingCartService.UpdateItemQuantityInUserCartAsync(CurrentUserId, productId, updateDto.Quantity);
             return Ok(updatedCart);
         }
 
@@ -89,9 +83,9 @@ namespace Final.UserAPI.Controllers
         [HttpDelete("items/{productId:long}")]
         [ProducesResponseType(typeof(CartDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<ActionResult<CartDTO>> RemoveItemFromCartAsync(long productId)
+        public async Task<ActionResult<CartDTO>> RemoveItemFromCurrentUserCartAsync(long productId)
         {
-            var updatedCart = await _shoppingCartService.RemoveItemFromCartAsync(CurrentUserId, productId);
+            var updatedCart = await _shoppingCartService.RemoveItemFromUserCartAsync(CurrentUserId, productId);
             return Ok(updatedCart);
         }
 
@@ -102,9 +96,9 @@ namespace Final.UserAPI.Controllers
         /// <response code="204">Xóa giỏ hàng thành công.</response>
         [HttpDelete]
         [ProducesResponseType(StatusCodes.Status204NoContent)]
-        public async Task<IActionResult> ClearCartAsync()
+        public async Task<IActionResult> ClearCurrentUserCartAsync()
         {
-            await _shoppingCartService.ClearCartAsync(CurrentUserId);
+            await _shoppingCartService.ClearUserCartAsync(CurrentUserId);
             return NoContent();
         }
     }

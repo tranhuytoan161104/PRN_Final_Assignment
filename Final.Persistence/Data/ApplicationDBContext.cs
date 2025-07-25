@@ -228,7 +228,7 @@ namespace Final.Persistence.Data
             #region === Order & OrderItems Seed Data ===
             modelBuilder.Entity<Order>().HasData(
                 new Order { Id = 1, UserId = 4, TotalAmount = 15100000m, OrderDate = DateTime.UtcNow.AddDays(-45), Status = EOrderStatus.Delivered, ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM", PhoneNumber = "0901234567" },
-                new Order { Id = 2, UserId = 7, TotalAmount = 53000000m, OrderDate = DateTime.UtcNow.AddDays(-25), Status = EOrderStatus.Shipped, ShippingAddress = "456 Đường XYZ, Quận Hoàn Kiếm, Hà Nội", PhoneNumber = "0987654321" },
+                new Order { Id = 2, UserId = 7, TotalAmount = 53000000m, OrderDate = DateTime.UtcNow.AddDays(-25), Status = EOrderStatus.Processing, ShippingAddress = "456 Đường XYZ, Quận Hoàn Kiếm, Hà Nội", PhoneNumber = "0987654321" },
                 new Order { Id = 3, UserId = 4, TotalAmount = 3200000m, OrderDate = DateTime.UtcNow.AddDays(-10), Status = EOrderStatus.Cancelled, ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM", PhoneNumber = "0901234567" }
             );
             modelBuilder.Entity<OrderItem>().HasData(

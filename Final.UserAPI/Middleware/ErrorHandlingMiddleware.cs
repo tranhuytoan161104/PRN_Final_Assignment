@@ -3,10 +3,6 @@ using System.Text.Json;
 
 namespace Final.UserAPI.Middleware
 {
-    /// <summary>
-    /// Middleware để bắt và xử lý các exception một cách tập trung, 
-    /// chuyển đổi chúng thành các HTTP response phù hợp.
-    /// </summary>
     public class ErrorHandlingMiddleware
     {
         private readonly RequestDelegate _next;

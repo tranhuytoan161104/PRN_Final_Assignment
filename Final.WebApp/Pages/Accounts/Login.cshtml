@@ -1,0 +1,38 @@
+﻿@page
+@model Final.WebApp.Pages.Accounts.LoginModel
+@{
+    ViewData["Title"] = "Đăng nhập";
+}
+
+<div class="row justify-content-center">
+    <div class="col-md-5">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-center mb-4">Đăng nhập</h2>
+                <form method="post" asp-route-returnUrl="@Model.ReturnUrl">
+
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                    <div class="mb-3">
+                        <label asp-for="LoginInput.Email" class="form-label"></label>
+                        <input asp-for="LoginInput.Email" class="form-control" placeholder="vidu@email.com" />
+                        <span asp-validation-for="LoginInput.Email" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="LoginInput.Password" class="form-label"></label>
+                        <input asp-for="LoginInput.Password" class="form-control" />
+                        <span asp-validation-for="LoginInput.Password" class="text-danger"></span>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Đăng nhập</button>
+                    </div>
+
+                    <div class="d-flex justify-content-between mt-3">
+                        <a asp-page="/Accounts/ForgotPassword">Quên mật khẩu?</a>
+                        <a asp-page="/Accounts/Register">Chưa có tài khoản?</a>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

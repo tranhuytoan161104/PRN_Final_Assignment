@@ -9,7 +9,7 @@ namespace Final.Domain.Entities
     public class PaymentMethod
     {
         public long Id { get; set; }
-        public string Code { get; set; }
+        public string Code { get; set; } = null!;
         public bool IsActive { get; set; }
     }
 }

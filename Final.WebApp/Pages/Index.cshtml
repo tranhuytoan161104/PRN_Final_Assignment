@@ -1,10 +1,122 @@
 ﻿@page
-@model IndexModel
+@model Final.WebApp.Pages.IndexModel
 @{
-    ViewData["Title"] = "Home page";
+    ViewData["Title"] = "Trang chủ";
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-lg-3">
+            <h4 class="mb-3">Tìm kiếm & Lọc</h4>
+            <form method="get">
+                <input type="hidden" name="SortOrder" value="@Model.SortOrder" />
+
+                <div class="mb-3">
+                    <label asp-for="Query.Name" class="form-label">Tên sản phẩm</label>
+                    <input asp-for="Query.Name" class="form-control" placeholder="Nhập tên SP..." />
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Query.CategoryId" class="form-label">Danh mục</label>
+                    <select asp-for="Query.CategoryId" asp-items="Model.Categories" class="form-select">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="Query.BrandId" class="form-label">Thương hiệu</label>
+                    <select asp-for="Query.BrandId" asp-items="Model.Brands" class="form-select">
+                        <option value="">Tất cả</option>
+                    </select>
+                </div>
+                <div class="mb-3">
+                    <label class="form-label">Khoảng giá</label>
+                    <div class="input-group">
+                        <input type="number" asp-for="Query.MinPrice" class="form-control" placeholder="Từ" />
+                        <input type="number" asp-for="Query.MaxPrice" class="form-control" placeholder="Đến" />
+                    </div>
+                </div>
+                <button type="submit" class="btn btn-primary w-100">Áp dụng</button>
+            </form>
+        </div>
+
+        <div class="col-lg-9">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h2 class="m-0">Danh sách sản phẩm</h2>
+                <form method="get" id="sortForm" class="d-flex align-items-center">
+                    <input type="hidden" name="Name" value="@Model.Query.Name" />
+                    <input type="hidden" name="CategoryId" value="@Model.Query.CategoryId" />
+                    <input type="hidden" name="BrandId" value="@Model.Query.BrandId" />
+                    <input type="hidden" name="MinPrice" value="@Model.Query.MinPrice" />
+                    <input type="hidden" name="MaxPrice" value="@Model.Query.MaxPrice" />
+
+                    <label for="sortOrderSelect" class="form-label me-2 mb-0">Sắp xếp:</label>
+                    <select name="SortOrder" id="sortOrderSelect" class="form-select w-auto" onchange="this.form.submit()">
+                        <option value="">Mặc định</option>
+                        <option value="price_asc" selected="@(Model.SortOrder == "price_asc")">Giá: Thấp đến Cao</option>
+                        <option value="price_desc" selected="@(Model.SortOrder == "price_desc")">Giá: Cao đến Thấp</option>
+                        <option value="name_asc" selected="@(Model.SortOrder == "name_asc")">Tên: A-Z</option>
+                        <option value="name_desc" selected="@(Model.SortOrder == "name_desc")">Tên: Z-A</option>
+                    </select>
+                </form>
+            </div>
+
+            @if (!string.IsNullOrEmpty(Model.ErrorMessage))
+            {
+                <div class="alert alert-danger"><strong>Lỗi:</strong> @Model.ErrorMessage</div>
+            }
+            else if (Model.Products.Items.Any())
+            {
+                <div class="row row-cols-1 row-cols-md-2 row-cols-xl-3 g-4">
+                    @foreach (var product in Model.Products.Items)
+                    {
+                        <div class="col">
+                            <div class="card h-100 shadow-sm">
+                                <img src="https://placehold.co/600x400/EFEFEF/333?text=Product" class="card-img-top" alt="@product.Name">
+                                <div class="card-body">
+                                    <h5 class="card-title">@product.Name</h5>
+                                    <p class="card-text fw-bold text-danger">@product.Price.ToString("N0") ₫</p>
+                                    <a asp-page="/Products/Detail" asp-route-id="@product.Id" class="btn btn-outline-primary stretched-link">Xem chi tiết</a>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+
+                <nav aria-label="Page navigation" class="mt-5">
+                    <ul class="pagination justify-content-center">
+                        @{
+                            var prevDisabled = Model.Products.PageNumber <= 1 ? "disabled" : "";
+                            <li class="page-item @prevDisabled">
+                                <a class="page-link" asp-page="/Index"
+                                   asp-all-route-data="@HttpContext.Request.Query.ToDictionary(q => q.Key, q => q.Value.ToString())"
+                                   asp-route-pageNumber="@(Model.Products.PageNumber - 1)">Trước</a>
+                            </li>
+                        }
+
+                        @for (int i = 1; i <= Model.Products.TotalPages; i++)
+                        {
+                            var activeClass = (i == Model.Products.PageNumber) ? "active" : "";
+                            <li class="page-item @activeClass">
+                                <a class="page-link" asp-page="/Index"
+                                   asp-all-route-data="@HttpContext.Request.Query.ToDictionary(q => q.Key, q => q.Value.ToString())"
+                                   asp-route-pageNumber="@i">@i</a>
+                            </li>
+                        }
+
+                        @{
+                            var nextDisabled = Model.Products.PageNumber >= Model.Products.TotalPages ? "disabled" : "";
+                            <li class="page-item @nextDisabled">
+                                <a class="page-link" asp-page="/Index"
+                                   asp-all-route-data="@HttpContext.Request.Query.ToDictionary(q => q.Key, q => q.Value.ToString())"
+                                   asp-route-pageNumber="@(Model.Products.PageNumber + 1)">Sau</a>
+                            </li>
+                        }
+                    </ul>
+                </nav>
+            }
+            else
+            {
+                <div class="alert alert-info">Không tìm thấy sản phẩm nào phù hợp với tiêu chí của bạn.</div>
+            }
+        </div>
+    </div>
 </div>

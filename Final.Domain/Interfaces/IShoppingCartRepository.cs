@@ -5,11 +5,11 @@ namespace Final.Domain.Interfaces
 {
     public interface IShoppingCartRepository
     {
-        Task<ShoppingCart> GetOrCreateCartByUserIdAsync(long userId);
-        Task<ShoppingCart> AddOrUpdateItemAsync(long userId, long productId, int quantity);
-        Task<bool> RemoveItemAsync(long userId, long productId);
-        Task<bool> ClearCartAsync(long userId);
-        Task RemoveItemsAsync(long userId, List<long> productIds);
-        Task<int> SaveChangesAsync();
+        Task<ShoppingCart> GetOrCreateCartForUserAsync(long userId);
+        Task<ShoppingCart> AddOrUpdateItemToUserCartAsync(long userId, long productId, int quantity);
+        Task<bool> RemoveItemFromUserCartAsync(long userId, long productId);
+        Task<bool> ClearUserCartAsync(long userId);
+        Task RemoveItemsFromUserCartAsync(long userId, List<long> productIds);
+        Task<int> UpdateUserCartAsync();
     }
 }

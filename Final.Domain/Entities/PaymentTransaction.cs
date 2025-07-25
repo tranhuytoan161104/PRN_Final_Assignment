@@ -13,10 +13,10 @@ namespace Final.Domain.Entities
         public decimal Amount { get; set; }
         public DateTime TransactionDate { get; set; }
         public EPaymentStatus Status { get; set; }
-        public string PaymentMethod { get; set; }
-        public string? TransactionId { get; set; }
+        public string PaymentMethod { get; set; } = null!;
+        public string TransactionId { get; set; } = null!;
 
         public long OrderId { get; set; }
-        public virtual Order Order { get; set; }
+        public virtual Order Order { get; set; } = null!;
     }
 }

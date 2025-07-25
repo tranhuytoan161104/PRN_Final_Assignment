@@ -1,7 +1,7 @@
 ﻿namespace Final.OrderAPI.DTOs
 {
-    public class PaymentMethodDto
+    public class PaymentMethodDTO
     {
-        public string Code { get; set; }
+        public string Code { get; set; } = null!;
     }
 }

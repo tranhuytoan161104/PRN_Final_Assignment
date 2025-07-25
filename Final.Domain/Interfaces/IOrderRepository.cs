@@ -9,13 +9,13 @@ namespace Final.Domain.Interfaces
     {
         Task<Order> CreateOrderAsync(Order order);
         Task<PagedResult<Order>> GetOrdersByUserIdAsync(long userId, OrderQuery query);
-        Task<Order?> GetOrderByIdAndUserIdAsync(long orderId, long userId);
+        Task<Order?> GetOrderByOrderIdAndUserIdAsync(long orderId, long userId);
         Task UpdateAsync(Order order);
         Task<PagedResult<Order>> GetAllOrdersAsync(OrderQuery query);
         Task<Order?> GetOrderByOrderIdAsync(long orderId);
 
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task AddPaymentTransactionAsync(PaymentTransaction transaction);
-        Task<int> SaveChangesAsync();
+        Task<int> UpdateOrderAsync();
     }
 }

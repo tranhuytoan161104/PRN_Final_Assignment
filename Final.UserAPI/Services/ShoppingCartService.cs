@@ -23,7 +23,7 @@ namespace Final.UserAPI.Services
         /// <returns>Thông tin chi tiết giỏ hàng.</returns>
         public async Task<CartDTO> GetCartByUserIdAsync(long userId)
         {
-            var cartEntity = await _shoppingCartRepository.GetOrCreateCartByUserIdAsync(userId);
+            var cartEntity = await _shoppingCartRepository.GetOrCreateCartForUserAsync(userId);
             var cartDto = new CartDTO
             {
                 Id = cartEntity.Id,
@@ -51,13 +51,13 @@ namespace Final.UserAPI.Services
         /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu số lượng tồn kho không đủ.</exception>
         public async Task<CartDTO> AddItemToUserCartAsync(long userId, AddCartItemDTO itemDto)
         {
-            var product = await _productRepository.GetByIdWithImagesAsync(itemDto.ProductId);
+            var product = await _productRepository.GetProductByProductIdWithImagesAsync(itemDto.ProductId);
             if (product == null)
             {
                 throw new KeyNotFoundException("Sản phẩm không tồn tại.");
             }
 
-            var cart = await _shoppingCartRepository.GetOrCreateCartByUserIdAsync(userId);
+            var cart = await _shoppingCartRepository.GetOrCreateCartForUserAsync(userId);
             var existingItem = cart.Items.FirstOrDefault(i => i.ProductId == itemDto.ProductId);
             var quantityInCart = existingItem?.Quantity ?? 0;
 
@@ -66,7 +66,7 @@ namespace Final.UserAPI.Services
                 throw new InvalidOperationException($"Không đủ số lượng tồn kho. Chỉ còn {product.StockQuantity} sản phẩm.");
             }
 
-            await _shoppingCartRepository.AddOrUpdateItemAsync(userId, itemDto.ProductId, itemDto.Quantity);
+            await _shoppingCartRepository.AddOrUpdateItemToUserCartAsync(userId, itemDto.ProductId, itemDto.Quantity);
             return await GetCartByUserIdAsync(userId);
         }
 
@@ -79,7 +79,7 @@ namespace Final.UserAPI.Services
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu sản phẩm không có trong giỏ hàng.</exception>
         public async Task<CartDTO> RemoveItemFromUserCartAsync(long userId, long productId)
         {
-            var success = await _shoppingCartRepository.RemoveItemAsync(userId, productId);
+            var success = await _shoppingCartRepository.RemoveItemFromUserCartAsync(userId, productId);
             if (!success)
             {
                 throw new KeyNotFoundException("Sản phẩm không tìm thấy trong giỏ hàng.");
@@ -93,7 +93,7 @@ namespace Final.UserAPI.Services
         /// <param name="userId">ID của người dùng.</param>
         public async Task ClearUserCartAsync(long userId)
         {
-            await _shoppingCartRepository.ClearCartAsync(userId);
+            await _shoppingCartRepository.ClearUserCartAsync(userId);
         }
 
         /// <summary>
@@ -112,7 +112,7 @@ namespace Final.UserAPI.Services
                 return await RemoveItemFromUserCartAsync(userId, productId);
             }
 
-            var product = await _productRepository.GetByIdWithImagesAsync(productId);
+            var product = await _productRepository.GetProductByProductIdWithImagesAsync(productId);
             if (product == null)
             {
                 throw new KeyNotFoundException("Sản phẩm không tồn tại.");
@@ -122,7 +122,7 @@ namespace Final.UserAPI.Services
                 throw new InvalidOperationException($"Không đủ số lượng tồn kho. Chỉ còn {product.StockQuantity} sản phẩm.");
             }
 
-            var cart = await _shoppingCartRepository.GetOrCreateCartByUserIdAsync(userId);
+            var cart = await _shoppingCartRepository.GetOrCreateCartForUserAsync(userId);
             var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
 
             if (cartItem == null)
@@ -131,7 +131,7 @@ namespace Final.UserAPI.Services
             }
 
             cartItem.Quantity = newQuantity;
-            await _shoppingCartRepository.SaveChangesAsync();
+            await _shoppingCartRepository.UpdateUserCartAsync();
 
             return await GetCartByUserIdAsync(userId);
         }

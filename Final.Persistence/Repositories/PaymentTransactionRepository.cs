@@ -21,14 +21,24 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
-        public async Task<PaymentTransaction?> GetByIdAsync(long id)
+        /// <summary>
+        /// Lấy giao dịch thanh toán theo ID.
+        /// </summary>
+        /// <param name="transactionId">ID của giao dịch thanh toán.</param>
+        /// <returns>Giao dịch thanh toán nếu tìm thấy, ngược lại trả về null.</returns>
+        public async Task<PaymentTransaction?> GetTransactionByTransactionIdAsync(long transactionId)
         {
             return await _context.PaymentTransactions
-                .Include(t => t.Order) // Lấy kèm thông tin đơn hàng
-                .FirstOrDefaultAsync(t => t.Id == id);
+                .Include(t => t.Order) 
+                .FirstOrDefaultAsync(t => t.Id == transactionId);
         }
 
-        public async Task<PagedResult<PaymentTransaction>> GetAllAsync(PaymentTransactionQuery query)
+        /// <summary>
+        /// Lấy tất cả giao dịch thanh toán với phân trang.
+        /// </summary>
+        /// <param name="queries">Thông tin phân trang và lọc.</param>
+        /// <returns>Kết quả phân trang chứa danh sách giao dịch thanh toán.</returns>
+        public async Task<PagedResult<PaymentTransaction>> GetAllTransactionsAsync(PaymentTransactionQuery queries)
         {
             var queryable = _context.PaymentTransactions
                 .Include(t => t.Order)
@@ -36,17 +46,17 @@ namespace Final.Persistence.Repositories
 
             var totalItems = await queryable.CountAsync();
             var items = await queryable
-                .Skip((query.PageNumber - 1) * query.PageSize)
-                .Take(query.PageSize)
+                .Skip((queries.PageNumber - 1) * queries.PageSize)
+                .Take(queries.PageSize)
                 .ToListAsync();
 
             return new PagedResult<PaymentTransaction>
             {
                 Items = items,
-                PageNumber = query.PageNumber,
-                PageSize = query.PageSize,
+                PageNumber = queries.PageNumber,
+                PageSize = queries.PageSize,
                 TotalItems = totalItems,
-                TotalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize)
+                TotalPages = (int)Math.Ceiling(totalItems / (double)queries.PageSize)
             };
         }
     }

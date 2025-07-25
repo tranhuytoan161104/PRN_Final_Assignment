@@ -76,7 +76,7 @@ namespace Final.UserAPI.Services
         /// <param name="userId">ID của người dùng cần lấy thông tin.</param>
         /// <returns>Thông tin hồ sơ của người dùng.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
-        public async Task<UserProfileDTO?> GetUserProfileAsync(long userId)
+        public async Task<UserProfileDTO?> GetUserProfileByUserIdAsync(long userId)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
@@ -103,7 +103,7 @@ namespace Final.UserAPI.Services
         /// <param name="updateDto">Thông tin cần cập nhật.</param>
         /// <returns>Thông tin hồ sơ sau khi đã cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
-        public async Task<UserProfileDTO?> UpdateCurrentUserProfileAsync(long userId, UpdateProfileDTO updateDto)
+        public async Task<UserProfileDTO?> UpdateUserProfileByUserIdAsync(long userId, UpdateProfileDTO updateDto)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)
@@ -115,7 +115,7 @@ namespace Final.UserAPI.Services
             user.LastName = updateDto.LastName;
             await _userRepository.UpdateUserAsync(user);
 
-            return await GetUserProfileAsync(userId);
+            return await GetUserProfileByUserIdAsync(userId);
         }
 
         /// <summary>
@@ -126,7 +126,7 @@ namespace Final.UserAPI.Services
         /// <returns>Trả về true nếu đổi mật khẩu thành công.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu mật khẩu cũ không chính xác.</exception>
-        public async Task<bool> ChangeCurrentUserPasswordAsync(long userId, ChangePasswordDTO changePasswordDto)
+        public async Task<bool> ChangeUserPasswordByUserIdAsync(long userId, ChangePasswordDTO changePasswordDto)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
             if (user == null)

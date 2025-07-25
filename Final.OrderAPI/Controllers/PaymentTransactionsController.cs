@@ -18,19 +18,19 @@ namespace Final.OrderAPI.Controllers
         public PaymentTransactionsController(IPaymentTransactionService service) { _service = service; }
 
         [HttpGet]
-        [ProducesResponseType(typeof(PagedResult<PaymentTransactionDto>), StatusCodes.Status200OK)]
-        public async Task<IActionResult> GetAllTransactions([FromQuery] PaymentTransactionQuery query) 
+        [ProducesResponseType(typeof(PagedResult<PaymentTransactionDTO>), StatusCodes.Status200OK)]
+        public async Task<IActionResult> GetAllTransactionsAsync([FromQuery] PaymentTransactionQuery query) 
         {
-            var transactions = await _service.GetAllAsync(query);
+            var transactions = await _service.GetAllTransactionsAsync(query);
             return Ok(transactions);
         }
 
         [HttpGet("{id}")]
-        [ProducesResponseType(typeof(PaymentTransactionDto), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PaymentTransactionDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetTransactionById(long id) 
+        public async Task<IActionResult> GetTransactionByIdAsync(long id) 
         {
-            var transaction = await _service.GetByIdAsync(id);
+            var transaction = await _service.GetTransactionByTransactionIdAsync(id);
             return Ok(transaction);
         }
     }

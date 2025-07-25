@@ -15,32 +15,32 @@ namespace Final.Persistence.Repositories
         {
             _context = context;
         }
-        
+
 
         /// <summary>
         /// Phuong thức này dùng để lấy danh sách sản phẩm với phân trang và lọc theo các tiêu chí.
         /// </summary>
-        /// <param name="query"> Truyền các thông tin phân trang và lọc sản phẩm </param>
+        /// <param name="queries"> Truyền các thông tin phân trang và lọc sản phẩm </param>
         /// <returns name="PagedResult<Product>"> Trả về danh sách sản phẩm đã được phân trang và lọc </returns>
-        public async Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery query)
+        public async Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery queries)
         {
             var products = _context.Products.AsQueryable();
 
-            if (query.CategoryId.HasValue)
-                products = products.Where(p => p.CategoryId == query.CategoryId.Value);
-            if (query.BrandId.HasValue)
-                products = products.Where(p => p.BrandId == query.BrandId.Value);
-            if (!string.IsNullOrEmpty(query.Name))
-                products = products.Where(p => p.Name.Contains(query.Name));
-            if (query.MinPrice.HasValue)
-                products = products.Where(p => p.Price >= query.MinPrice.Value);
-            if (query.MaxPrice.HasValue)
-                products = products.Where(p => p.Price <= query.MaxPrice.Value);
+            if (queries.CategoryId.HasValue)
+                products = products.Where(p => p.CategoryId == queries.CategoryId.Value);
+            if (queries.BrandId.HasValue)
+                products = products.Where(p => p.BrandId == queries.BrandId.Value);
+            if (!string.IsNullOrEmpty(queries.Name))
+                products = products.Where(p => p.Name.Contains(queries.Name));
+            if (queries.MinPrice.HasValue)
+                products = products.Where(p => p.Price >= queries.MinPrice.Value);
+            if (queries.MaxPrice.HasValue)
+                products = products.Where(p => p.Price <= queries.MaxPrice.Value);
 
-            if (!string.IsNullOrEmpty(query.SortBy))
+            if (!string.IsNullOrEmpty(queries.SortBy))
             {
-                bool desc = string.Equals(query.SortDirection, "desc", StringComparison.OrdinalIgnoreCase);
-                switch (query.SortBy.ToLower())
+                bool desc = string.Equals(queries.SortDirection, "desc", StringComparison.OrdinalIgnoreCase);
+                switch (queries.SortBy.ToLower())
                 {
                     case "name":
                         products = desc ? products.OrderByDescending(p => p.Name) : products.OrderBy(p => p.Name);
@@ -63,17 +63,17 @@ namespace Final.Persistence.Repositories
 
             var totalItems = await products.CountAsync();
             var items = await products
-                .Skip((query.PageNumber - 1) * query.PageSize)
-                .Take(query.PageSize)
+                .Skip((queries.PageNumber - 1) * queries.PageSize)
+                .Take(queries.PageSize)
                 .ToListAsync();
 
             return new PagedResult<Product>
             {
                 Items = items,
-                PageNumber = query.PageNumber,
-                PageSize = query.PageSize,
+                PageNumber = queries.PageNumber,
+                PageSize = queries.PageSize,
                 TotalItems = totalItems,
-                TotalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize)
+                TotalPages = (int)Math.Ceiling(totalItems / (double)queries.PageSize)
             };
         }
 
@@ -83,7 +83,7 @@ namespace Final.Persistence.Repositories
         /// </summary>
         /// <param name="productId"> Xác định sản phẩm cần lấy thông tin bằng Id </param>
         /// <returns name="Product"> Trả về thông tin chi tiết của sản phẩm nếu tìm thấy, hoặc null nếu không tìm thấy </returns>
-        public async Task<Product?> GetProductDetailByIdAsync(long productId)
+        public async Task<Product?> GetProductByProductIdAsync(long productId)
         {
             return await _context.Products
                 .Include(p => p.Images)
@@ -127,7 +127,7 @@ namespace Final.Persistence.Repositories
         /// </summary>
         /// <param name="productId"> Xác định sản phẩm cần lấy thông tin bằng Id </param>
         /// <returns name="Product"> Trả về sản phẩm bao gồm các hình ảnh của nó nếu tìm thấy, hoặc null nếu không tìm thấy </returns>
-        public async Task<Product?> GetByIdWithImagesAsync(long productId)
+        public async Task<Product?> GetProductByProductIdWithImagesAsync(long productId)
         {
             return await _context.Products
                 .Include(p => p.Images) 

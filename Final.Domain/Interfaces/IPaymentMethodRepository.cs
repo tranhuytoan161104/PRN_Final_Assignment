@@ -9,6 +9,6 @@ namespace Final.Domain.Interfaces
 {
     public interface IPaymentMethodRepository
     {
-        Task<List<PaymentMethod>> GetActiveMethodsAsync();
+        Task<List<PaymentMethod>> GetAllActiveMethodsAsync();
     }
 }

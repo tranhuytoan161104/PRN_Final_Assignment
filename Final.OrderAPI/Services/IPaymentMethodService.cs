@@ -4,6 +4,6 @@ namespace Final.OrderAPI.Services
 {
     public interface IPaymentMethodService
     {
-        Task<List<PaymentMethodDto>> GetActiveMethodsAsync();
+        Task<List<PaymentMethodDTO>> GetAllActiveMethodsAsync();
     }
 }

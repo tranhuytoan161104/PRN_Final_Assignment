@@ -21,7 +21,7 @@ namespace Final.Persistence.Repositories
         /// </summary>
         /// <param name="userId">ID của người dùng.</param>
         /// <returns>Giỏ hàng của người dùng.</returns>
-        public async Task<ShoppingCart> GetOrCreateCartByUserIdAsync(long userId)
+        public async Task<ShoppingCart> GetOrCreateCartForUserAsync(long userId)
         {
             var cart = await _context.ShoppingCarts
                 .Include(sc => sc.Items)
@@ -46,9 +46,9 @@ namespace Final.Persistence.Repositories
         /// <param name="productId">ID của sản phẩm.</param>
         /// <param name="quantity">Số lượng sản phẩm cần thêm hoặc cập nhật.</param>
         /// <returns>Giỏ hàng đã được cập nhật.</returns>
-        public async Task<ShoppingCart> AddOrUpdateItemAsync(long userId, long productId, int quantity)
+        public async Task<ShoppingCart> AddOrUpdateItemToUserCartAsync(long userId, long productId, int quantity)
         {
-            var cart = await GetOrCreateCartByUserIdAsync(userId);
+            var cart = await GetOrCreateCartForUserAsync(userId);
             var cartItem = cart.Items.FirstOrDefault(i => i.ProductId == productId);
 
             if (cartItem != null)
@@ -76,7 +76,7 @@ namespace Final.Persistence.Repositories
         /// <param name="userId">ID của người dùng.</param>
         /// <param name="productId">ID của sản phẩm cần xóa.</param>
         /// <returns>Trả về true nếu xóa thành công, false nếu không tìm thấy giỏ hàng hoặc sản phẩm.</returns>
-        public async Task<bool> RemoveItemAsync(long userId, long productId)
+        public async Task<bool> RemoveItemFromUserCartAsync(long userId, long productId)
         {
             var cart = await _context.ShoppingCarts
                 .Include(sc => sc.Items)
@@ -97,7 +97,7 @@ namespace Final.Persistence.Repositories
         /// </summary>
         /// <param name="userId">ID của người dùng.</param>
         /// <returns>Trả về true nếu giỏ hàng có sản phẩm và đã xóa thành công, false nếu không có sản phẩm để xóa.</returns>
-        public async Task<bool> ClearCartAsync(long userId)
+        public async Task<bool> ClearUserCartAsync(long userId)
         {
             var cart = await _context.ShoppingCarts
                 .Include(sc => sc.Items)
@@ -116,7 +116,7 @@ namespace Final.Persistence.Repositories
         /// <param name="userId">ID của người dùng.</param> 
         /// <param name="productIds">Danh sách ID sản phẩm cần xóa.</param>
         /// <returns>Trả về một tác vụ không đồng bộ.</returns>
-        public async Task RemoveItemsAsync(long userId, List<long> productIds)
+        public async Task RemoveItemsFromUserCartAsync(long userId, List<long> productIds)
         {
             var cart = await _context.ShoppingCarts
                 .Include(sc => sc.Items)
@@ -136,7 +136,7 @@ namespace Final.Persistence.Repositories
         /// Lưu các thay đổi vào cơ sở dữ liệu.
         /// </summary>
         /// <returns>Số lượng bản ghi đã được lưu.</returns>
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> UpdateUserCartAsync()
         {
             return await _context.SaveChangesAsync();
         }

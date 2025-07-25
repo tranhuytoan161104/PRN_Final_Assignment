@@ -27,12 +27,12 @@ namespace Final.OrderAPI.Services
         /// <param name="createOrderDto">Thông tin đơn hàng cần tạo.</param> 
         /// <returns>Trả về đơn hàng đã được tạo.</returns>
         /// <exception cref="InvalidOperationException">Nếu không có sản phẩm nào được chọn để thanh toán hoặc nếu sản phẩm không đủ hàng trong kho.</exception>
-        public async Task<OrderDto> CreateOrderFromUserCartAsync(long userId, CreateOrderDto createOrderDto)
+        public async Task<OrderDTO> CreateOrderFromUserCartAsync(long userId, CreateOrderDTO createOrderDto)
         {
             await using var transaction = await _orderRepository.BeginTransactionAsync();
             try
             {
-                var cart = await _shoppingCartRepository.GetOrCreateCartByUserIdAsync(userId);
+                var cart = await _shoppingCartRepository.GetOrCreateCartForUserAsync(userId);
                 var itemsToCheckout = cart.Items.Where(ci => createOrderDto.ProductIds.Contains(ci.ProductId)).ToList();
 
                 if (!itemsToCheckout.Any())
@@ -69,7 +69,7 @@ namespace Final.OrderAPI.Services
                 };
 
                 await _orderRepository.CreateOrderAsync(order);
-                await _orderRepository.SaveChangesAsync();
+                await _orderRepository.UpdateOrderAsync();
 
                 var paymentTransaction = new PaymentTransaction
                 {
@@ -82,9 +82,9 @@ namespace Final.OrderAPI.Services
                 };
                 await _orderRepository.AddPaymentTransactionAsync(paymentTransaction);
 
-                await _shoppingCartRepository.RemoveItemsAsync(userId, createOrderDto.ProductIds);
+                await _shoppingCartRepository.RemoveItemsFromUserCartAsync(userId, createOrderDto.ProductIds);
 
-                await _orderRepository.SaveChangesAsync();
+                await _orderRepository.UpdateOrderAsync();
                 await transaction.CommitAsync();
 
                 var finalOrder = await _orderRepository.GetOrderByOrderIdAsync(order.Id);
@@ -103,11 +103,11 @@ namespace Final.OrderAPI.Services
         /// <param name="userId">ID của người dùng.</param>
         /// <param name="query">Thông tin truy vấn để phân trang và lọc đơn hàng.</param>
         /// <returns>Trả về danh sách đơn hàng đã phân trang.</returns>
-        public async Task<PagedResult<OrderDto>> GetOrdersbyUserIdAsync(long userId, OrderQuery query)
+        public async Task<PagedResult<OrderDTO>> GetOrdersbyUserIdAsync(long userId, OrderQuery query)
         {
             var pagedOrders = await _orderRepository.GetOrdersByUserIdAsync(userId, query);
             var orderDtos = pagedOrders.Items?.Select(MapOrderToDto).ToList();
-            return new PagedResult<OrderDto> { Items = orderDtos, TotalItems = pagedOrders.TotalItems, PageNumber = pagedOrders.PageNumber, PageSize = pagedOrders.PageSize, TotalPages = pagedOrders.TotalPages };
+            return new PagedResult<OrderDTO> { Items = orderDtos, TotalItems = pagedOrders.TotalItems, PageNumber = pagedOrders.PageNumber, PageSize = pagedOrders.PageSize, TotalPages = pagedOrders.TotalPages };
         }
 
         /// <summary>
@@ -117,9 +117,9 @@ namespace Final.OrderAPI.Services
         /// <param name="userId">ID của người dùng để xác thực quyền truy cập.</param>
         /// <returns>Trả về chi tiết đơn hàng.</returns>
         /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID hoặc người dùng không có quyền truy cập.</exception>
-        public async Task<OrderDto> GetOrderDetailByOrderIdIdAsync(long orderId, long userId)
+        public async Task<OrderDTO> GetOrderDetailByOrderIdAsync(long orderId, long userId)
         {
-            var order = await _orderRepository.GetOrderByIdAndUserIdAsync(orderId, userId);
+            var order = await _orderRepository.GetOrderByOrderIdAndUserIdAsync(orderId, userId);
             if (order == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId} hoặc bạn không có quyền truy cập.");
@@ -135,9 +135,9 @@ namespace Final.OrderAPI.Services
         /// <returns></returns>
         /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID hoặc người dùng không có quyền truy cập.</exception>
         /// <exception cref="InvalidOperationException">Nếu đơn hàng không ở trạng thái có thể hủy (Pending hoặc Processing).</exception>
-        public async Task<OrderDto> CancelUserOrderByOrderIdAsync(long orderId, long userId)
+        public async Task<OrderDTO> CancelUserOrderByOrderIdAsync(long orderId, long userId)
         {
-            var order = await _orderRepository.GetOrderByIdAndUserIdAsync(orderId, userId);
+            var order = await _orderRepository.GetOrderByOrderIdAndUserIdAsync(orderId, userId);
             if (order == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy đơn hàng với ID: {orderId} hoặc bạn không có quyền hủy đơn hàng này.");
@@ -149,7 +149,7 @@ namespace Final.OrderAPI.Services
 
             await RollbackStockForOrder(order);
             order.Status = EOrderStatus.Cancelled;
-            await _orderRepository.SaveChangesAsync();
+            await _orderRepository.UpdateOrderAsync();
             return MapOrderToDto(order);
         }
 
@@ -160,7 +160,7 @@ namespace Final.OrderAPI.Services
         /// <returns>Trả về đơn hàng đã được hủy.</returns>
         /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID.</exception>
         /// <exception cref="InvalidOperationException">Nếu đơn hàng không ở trạng thái có thể hủy (Pending hoặc Processing).</exception>
-        public async Task<OrderDto> CancelOrderForAdminAsync(long orderId)
+        public async Task<OrderDTO> CancelOrderForAdminAsync(long orderId)
         {
             var order = await _orderRepository.GetOrderByOrderIdAsync(orderId);
             if (order == null)
@@ -174,7 +174,7 @@ namespace Final.OrderAPI.Services
 
             await RollbackStockForOrder(order);
             order.Status = EOrderStatus.Cancelled;
-            await _orderRepository.SaveChangesAsync();
+            await _orderRepository.UpdateOrderAsync();
             return MapOrderToDto(order);
         }
 
@@ -183,11 +183,11 @@ namespace Final.OrderAPI.Services
         /// </summary>
         /// <param name="query">Thông tin truy vấn để phân trang và lọc đơn hàng.</param>
         /// <returns>Trả về danh sách đơn hàng đã phân trang.</returns>
-        public async Task<PagedResult<OrderDto>> GetAllOrdersAsync(OrderQuery query)
+        public async Task<PagedResult<OrderDTO>> GetAllOrdersAsync(OrderQuery query)
         {
             var pagedOrders = await _orderRepository.GetAllOrdersAsync(query);
             var orderDtos = pagedOrders.Items?.Select(MapOrderToDto).ToList();
-            return new PagedResult<OrderDto> { Items = orderDtos, TotalItems = pagedOrders.TotalItems, PageNumber = pagedOrders.PageNumber, PageSize = pagedOrders.PageSize, TotalPages = pagedOrders.TotalPages };
+            return new PagedResult<OrderDTO> { Items = orderDtos, TotalItems = pagedOrders.TotalItems, PageNumber = pagedOrders.PageNumber, PageSize = pagedOrders.PageSize, TotalPages = pagedOrders.TotalPages };
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace Final.OrderAPI.Services
         /// <param name="orderId">ID của đơn hàng cần lấy chi tiết.</param>
         /// <returns>Trả về chi tiết đơn hàng.</returns>
         /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID.</exception>
-        public async Task<OrderDto> GetOrderDetailForAdminAsync(long orderId)
+        public async Task<OrderDTO> GetOrderDetailForAdminAsync(long orderId)
         {
             var order = await _orderRepository.GetOrderByOrderIdAsync(orderId);
             if (order == null)
@@ -213,7 +213,7 @@ namespace Final.OrderAPI.Services
         /// <param name="newStatus">Trạng thái mới của đơn hàng.</param>
         /// <returns>Trả về đơn hàng đã được cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Nếu không tìm thấy đơn hàng với ID.</exception>
-        public async Task<OrderDto> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus)
+        public async Task<OrderDTO> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus)
         {
             var order = await _orderRepository.GetOrderByOrderIdAsync(orderId);
             if (order == null)
@@ -234,7 +234,7 @@ namespace Final.OrderAPI.Services
         {
             foreach (var item in order.OrderItems)
             {
-                var product = await _productRepository.GetByIdWithImagesAsync(item.ProductId);
+                var product = await _productRepository.GetProductByProductIdWithImagesAsync(item.ProductId);
                 if (product != null)
                 {
                     product.StockQuantity += item.Quantity;
@@ -251,9 +251,9 @@ namespace Final.OrderAPI.Services
         /// </summary>
         /// <param name="order">Đơn hàng cần ánh xạ.</param>
         /// <returns>Trả về DTO của đơn hàng.</returns>
-        private OrderDto MapOrderToDto(Order order)
+        private OrderDTO MapOrderToDto(Order order)
         {
-            return new OrderDto
+            return new OrderDTO
             {
                 Id = order.Id,
                 OrderDate = order.OrderDate,
@@ -261,13 +261,13 @@ namespace Final.OrderAPI.Services
                 ShippingAddress = order.ShippingAddress,
                 PhoneNumber = order.PhoneNumber,
                 TotalAmount = order.TotalAmount,
-                OrderItems = order.OrderItems?.Select(oi => new OrderItemDto
+                OrderItems = order.OrderItems?.Select(oi => new OrderItemDTO
                 {
                     ProductId = oi.ProductId,
-                    ProductName = oi.Product?.Name,
+                    ProductName = oi.Product.Name,
                     Quantity = oi.Quantity,
                     Price = oi.Price
-                }).ToList() ?? new List<OrderItemDto>()
+                }).ToList() ?? new List<OrderItemDTO>()
             };
         }
     }

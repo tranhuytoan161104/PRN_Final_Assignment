@@ -87,7 +87,7 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserProfileDTO>> GetCurrentUserProfileAsync()
         {
-            var userProfile = await _userService.GetUserProfileAsync(CurrentUserId);
+            var userProfile = await _userService.GetUserProfileByUserIdAsync(CurrentUserId);
             return Ok(userProfile);
         }
 
@@ -109,7 +109,7 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserProfileDTO>> UpdateCurrentUserProfileAsync([FromBody] UpdateProfileDTO updateDto)
         {
-            var updatedProfile = await _userService.UpdateCurrentUserProfileAsync(CurrentUserId, updateDto);
+            var updatedProfile = await _userService.UpdateUserProfileByUserIdAsync(CurrentUserId, updateDto);
             return Ok(updatedProfile);
         }
 
@@ -129,7 +129,7 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
         public async Task<IActionResult> ChangeCurrentUserPasswordAsync([FromBody] ChangePasswordDTO changePasswordDto)
         {
-            await _userService.ChangeCurrentUserPasswordAsync(CurrentUserId, changePasswordDto);
+            await _userService.ChangeUserPasswordByUserIdAsync(CurrentUserId, changePasswordDto);
             return Ok(new { message = "Đổi mật khẩu thành công." });
         }
 
@@ -166,10 +166,10 @@ namespace Final.UserAPI.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async Task<ActionResult<UserProfileDTO>> GetUserProfileByUserIdAsync(long userId)
         {
-            var userProfile = await _userService.GetUserProfileAsync(userId);
+            var userProfile = await _userService.GetUserProfileByUserIdAsync(userId);
             return Ok(userProfile);
         }
-
+            
         /// <summary>
         /// [Owner] Cập nhật vai trò của một người dùng.
         /// </summary>

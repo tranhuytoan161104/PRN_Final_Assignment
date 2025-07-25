@@ -49,9 +49,9 @@ namespace Final.ProductAPI.Services
         /// <param name="productId">ID của sản phẩm cần lấy thông tin.</param>
         /// <returns>Thông tin chi tiết của sản phẩm dưới dạng DTO.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy sản phẩm.</exception>
-        public async Task<ProductDetailDTO?> GetProductDetailByIdAsync(long productId)
+        public async Task<ProductDetailDTO?> GetProductDetailByProductIdAsync(long productId)
         {
-            var product = await _productRepository.GetProductDetailByIdAsync(productId);
+            var product = await _productRepository.GetProductByProductIdAsync(productId);
             if (product == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {productId}.");
@@ -66,7 +66,7 @@ namespace Final.ProductAPI.Services
         /// <param name="productCreationDto">Thông tin sản phẩm mới.</param>
         /// <returns>Thông tin chi tiết của sản phẩm vừa được tạo.</returns>
         /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu quá trình tạo thất bại.</exception>
-        public async Task<ProductDetailDTO> CreateProductAsync(ProductCreationDTO productCreationDto)
+        public async Task<ProductDetailDTO?> CreateProductAsync(ProductCreationDTO productCreationDto)
         {
             var product = new Product
             {
@@ -89,7 +89,7 @@ namespace Final.ProductAPI.Services
                 throw new InvalidOperationException("Tạo sản phẩm mới thất bại.");
             }
 
-            var detailedProduct = await _productRepository.GetProductDetailByIdAsync(createdProduct.Id);
+            var detailedProduct = await _productRepository.GetProductByProductIdAsync(createdProduct.Id);
             return MapToProductDetailDTO(detailedProduct!);
         }
 
@@ -100,9 +100,9 @@ namespace Final.ProductAPI.Services
         /// <param name="productUpdateDto">Thông tin mới của sản phẩm.</param>
         /// <returns>Thông tin chi tiết của sản phẩm sau khi cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy sản phẩm.</exception>
-        public async Task<ProductDetailDTO> UpdateProductDetailAsync(long productId, ProductUpdateDTO productUpdateDto)
+        public async Task<ProductDetailDTO?> UpdateProductDetailAsync(long productId, ProductUpdateDTO productUpdateDto)
         {
-            var product = await _productRepository.GetByIdWithImagesAsync(productId);
+            var product = await _productRepository.GetProductByProductIdWithImagesAsync(productId);
             if (product == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {productId} để cập nhật.");
@@ -126,7 +126,7 @@ namespace Final.ProductAPI.Services
 
             await _productRepository.UpdateProductAsync(product);
 
-            var detailedProduct = await _productRepository.GetProductDetailByIdAsync(productId);
+            var detailedProduct = await _productRepository.GetProductByProductIdAsync(productId);
             return MapToProductDetailDTO(detailedProduct!);
         }
 
@@ -138,9 +138,9 @@ namespace Final.ProductAPI.Services
         /// <returns>Thông tin chi tiết của sản phẩm sau khi cập nhật.</returns>
         /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy sản phẩm.</exception>
         /// <exception cref="InvalidOperationException">Ném ngoại lệ khi vi phạm quy tắc nghiệp vụ.</exception>
-        public async Task<ProductDetailDTO> UpdateProductStockQuantityAsync(long productId, StockQuantityUpdateDTO updateStockQuantityDto)
+        public async Task<ProductDetailDTO?> UpdateProductStockQuantityAsync(long productId, StockQuantityUpdateDTO updateStockQuantityDto)
         {
-            var product = await _productRepository.GetProductDetailByIdAsync(productId);
+            var product = await _productRepository.GetProductByProductIdAsync(productId);
             if (product == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {productId}.");
@@ -174,7 +174,7 @@ namespace Final.ProductAPI.Services
         /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu sản phẩm đã được lưu trữ từ trước.</exception>
         public async Task<ProductDetailDTO?> ArchiveProductAsync(long productId)
         {
-            var product = await _productRepository.GetProductDetailByIdAsync(productId);
+            var product = await _productRepository.GetProductByProductIdAsync(productId);
             if (product == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy sản phẩm với ID {productId}.");

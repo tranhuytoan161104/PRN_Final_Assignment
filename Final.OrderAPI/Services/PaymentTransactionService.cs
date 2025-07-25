@@ -11,9 +11,9 @@ namespace Final.PaymentAPI.Services
         private readonly IPaymentTransactionRepository _repository;
         public PaymentTransactionService(IPaymentTransactionRepository repository) { _repository = repository; }
 
-        public async Task<PaymentTransactionDto> GetByIdAsync(long id)
+        public async Task<PaymentTransactionDTO?> GetTransactionByTransactionIdAsync(long id)
         {
-            var transaction = await _repository.GetByIdAsync(id);
+            var transaction = await _repository.GetTransactionByTransactionIdAsync(id);
             if (transaction == null)
             {
                 throw new KeyNotFoundException($"Không tìm thấy giao dịch với ID: {id}");
@@ -21,16 +21,16 @@ namespace Final.PaymentAPI.Services
             return MapToDto(transaction);
         }
 
-        public async Task<PagedResult<PaymentTransactionDto>> GetAllAsync(PaymentTransactionQuery query)
+        public async Task<PagedResult<PaymentTransactionDTO>> GetAllTransactionsAsync(PaymentTransactionQuery queries)
         {
-            var pagedResult = await _repository.GetAllAsync(query);
+            var pagedResult = await _repository.GetAllTransactionsAsync(queries);
             var dtos = pagedResult.Items.Select(MapToDto).ToList();
-            return new PagedResult<PaymentTransactionDto> { Items = dtos, TotalItems = pagedResult.TotalItems, PageNumber = pagedResult.PageNumber, PageSize = pagedResult.PageSize, TotalPages = pagedResult.TotalPages };
+            return new PagedResult<PaymentTransactionDTO> { Items = dtos, TotalItems = pagedResult.TotalItems, PageNumber = pagedResult.PageNumber, PageSize = pagedResult.PageSize, TotalPages = pagedResult.TotalPages };
         }
 
-        private PaymentTransactionDto MapToDto(Final.Domain.Entities.PaymentTransaction t)
+        private PaymentTransactionDTO MapToDto(Final.Domain.Entities.PaymentTransaction t)
         {
-            return new PaymentTransactionDto { Id = t.Id, Amount = t.Amount, TransactionDate = t.TransactionDate, Status = t.Status, PaymentMethod = t.PaymentMethod, TransactionId = t.TransactionId, OrderId = t.OrderId };
+            return new PaymentTransactionDTO { Id = t.Id, Amount = t.Amount, TransactionDate = t.TransactionDate, Status = t.Status, PaymentMethod = t.PaymentMethod, TransactionId = t.TransactionId, OrderId = t.OrderId };
         }
     }
 }

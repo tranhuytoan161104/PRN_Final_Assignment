@@ -59,7 +59,7 @@ namespace Final.Persistence.Repositories
         /// <param name="orderId">ID của đơn hàng</param>
         /// <param name="userId">ID của người dùng</param>
         /// <returns>Trả về đơn hàng nếu tìm thấy, ngược lại trả về null</returns>
-        public async Task<Order?> GetOrderByIdAndUserIdAsync(long orderId, long userId)
+        public async Task<Order?> GetOrderByOrderIdAndUserIdAsync(long orderId, long userId)
         {
             return await _context.Orders
                 .Include(o => o.OrderItems)
@@ -143,7 +143,7 @@ namespace Final.Persistence.Repositories
         /// Lưu các thay đổi vào cơ sở dữ liệu.
         /// </summary>
         /// <returns>Trả về số lượng bản ghi đã được lưu</returns>
-        public async Task<int> SaveChangesAsync()
+        public async Task<int> UpdateOrderAsync()
         {
             return await _context.SaveChangesAsync();
         }

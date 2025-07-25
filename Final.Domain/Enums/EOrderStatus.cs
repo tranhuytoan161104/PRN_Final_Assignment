@@ -12,7 +12,6 @@ namespace Final.Domain.Enums
     {
         Pending,
         Processing,
-        Shipped,
         Delivered,
         Cancelled,
         Failed

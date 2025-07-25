@@ -11,7 +11,7 @@ namespace Final.Domain.Interfaces
 {
     public interface IPaymentTransactionRepository
     {
-        Task<PaymentTransaction?> GetByIdAsync(long id);
-        Task<PagedResult<PaymentTransaction>> GetAllAsync(PaymentTransactionQuery query);
+        Task<PaymentTransaction?> GetTransactionByTransactionIdAsync(long transactionId);
+        Task<PagedResult<PaymentTransaction>> GetAllTransactionsAsync(PaymentTransactionQuery queries);
     }
 }

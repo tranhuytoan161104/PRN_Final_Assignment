@@ -72,10 +72,51 @@ namespace Final.Persistence.Repositories
         {
             var usersQuery = _context.Users.AsQueryable();
 
-            // Logic lọc và sắp xếp có thể thêm ở đây sau này
+            // 1. Lọc (Filtering)
+            if (!string.IsNullOrWhiteSpace(query.SearchTerm))
+            {
+                var searchTermLower = query.SearchTerm.ToLower().Trim();
+                usersQuery = usersQuery.Where(u =>
+                    (u.FirstName + " " + u.LastName).ToLower().Contains(searchTermLower) ||
+                    u.Email.ToLower().Contains(searchTermLower));
+            }
 
-            usersQuery = usersQuery.OrderBy(u => u.Id);
+            if (!string.IsNullOrWhiteSpace(query.Role))
+            {
+                usersQuery = usersQuery.Where(u => u.Role == query.Role);
+            }
 
+            if (query.Status.HasValue)
+            {
+                usersQuery = usersQuery.Where(u => u.Status == query.Status.Value);
+            }
+
+            // 2. Sắp xếp (Sorting)
+            if (!string.IsNullOrWhiteSpace(query.SortBy))
+            {
+                bool isDescending = query.SortDirection?.ToLower() == "desc";
+                switch (query.SortBy.ToLower())
+                {
+                    case "email":
+                        usersQuery = isDescending ? usersQuery.OrderByDescending(u => u.Email) : usersQuery.OrderBy(u => u.Email);
+                        break;
+                    case "name":
+                        usersQuery = isDescending ? usersQuery.OrderByDescending(u => u.FirstName).ThenByDescending(u => u.LastName) : usersQuery.OrderBy(u => u.FirstName).ThenBy(u => u.LastName);
+                        break;
+                    case "createdat":
+                        usersQuery = isDescending ? usersQuery.OrderByDescending(u => u.CreatedAt) : usersQuery.OrderBy(u => u.CreatedAt);
+                        break;
+                    default:
+                        usersQuery = usersQuery.OrderBy(u => u.Id);
+                        break;
+                }
+            }
+            else
+            {
+                usersQuery = usersQuery.OrderBy(u => u.Id);
+            }
+
+            // 3. Phân trang (Pagination)
             var totalItems = await usersQuery.CountAsync();
             var items = await usersQuery
                 .Skip((query.PageNumber - 1) * query.PageSize)

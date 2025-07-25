@@ -13,10 +13,10 @@ public class PaymentMethodsController : ControllerBase
 
     [HttpGet]
     [AllowAnonymous]
-    [ProducesResponseType(typeof(List<PaymentMethodDto>), StatusCodes.Status200OK)]
-    public async Task<IActionResult> GetActiveMethods() 
+    [ProducesResponseType(typeof(List<PaymentMethodDTO>), StatusCodes.Status200OK)]
+    public async Task<IActionResult> GetAllActiveMethodsAsync() 
     {
-        var methods = await _service.GetActiveMethodsAsync();
+        var methods = await _service.GetAllActiveMethodsAsync();
         return Ok(methods);
     }
 }

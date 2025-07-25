@@ -7,13 +7,13 @@ namespace Final.OrderAPI.Services
 {
     public interface IOrderService
     {
-        Task<OrderDto> CreateOrderFromUserCartAsync(long userId, CreateOrderDto createOrderDto);
-        Task<PagedResult<OrderDto>> GetOrdersbyUserIdAsync(long userId, OrderQuery query);
-        Task<OrderDto> GetOrderDetailByOrderIdIdAsync(long orderId, long userId);
-        Task<OrderDto> CancelUserOrderByOrderIdAsync(long orderId, long userId);
-        Task<PagedResult<OrderDto>> GetAllOrdersAsync(OrderQuery query);
-        Task<OrderDto> GetOrderDetailForAdminAsync(long orderId);
-        Task<OrderDto> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus);
-        Task<OrderDto> CancelOrderForAdminAsync(long orderId);
+        Task<OrderDTO> CreateOrderFromUserCartAsync(long userId, CreateOrderDTO createOrderDto);
+        Task<PagedResult<OrderDTO>> GetOrdersbyUserIdAsync(long userId, OrderQuery query);
+        Task<OrderDTO> GetOrderDetailByOrderIdAsync(long orderId, long userId);
+        Task<OrderDTO> CancelUserOrderByOrderIdAsync(long orderId, long userId);
+        Task<PagedResult<OrderDTO>> GetAllOrdersAsync(OrderQuery query);
+        Task<OrderDTO> GetOrderDetailForAdminAsync(long orderId);
+        Task<OrderDTO> UpdateOrderStatusAsync(long orderId, EOrderStatus newStatus);
+        Task<OrderDTO> CancelOrderForAdminAsync(long orderId);
     }
 }

@@ -13,7 +13,11 @@ namespace Final.Persistence.Repositories
         private readonly ApplicationDbContext _context;
         public PaymentMethodRepository(ApplicationDbContext context) { _context = context; }
 
-        public async Task<List<PaymentMethod>> GetActiveMethodsAsync()
+        /// <summary>
+        /// Lấy các phương thức thanh toán đang hoạt động.
+        /// </summary>
+        /// <returns>Danh sách các phương thức thanh toán đang hoạt động.</returns>
+        public async Task<List<PaymentMethod>> GetAllActiveMethodsAsync()
         {
             return await _context.PaymentMethods.Where(p => p.IsActive).ToListAsync();
         }

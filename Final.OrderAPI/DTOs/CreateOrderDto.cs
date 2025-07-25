@@ -2,7 +2,7 @@
 
 namespace Final.OrderAPI.DTOs
 {
-    public class CreateOrderDto
+    public class CreateOrderDTO
     {
         [Required(ErrorMessage = "Địa chỉ giao hàng không được để trống.")]
         [StringLength(255, ErrorMessage = "Địa chỉ giao hàng không được vượt quá 255 ký tự.")]

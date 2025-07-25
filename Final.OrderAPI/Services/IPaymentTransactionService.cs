@@ -6,7 +6,7 @@ namespace Final.OrderAPI.Services
 {
     public interface IPaymentTransactionService
     {
-        Task<PaymentTransactionDto?> GetByIdAsync(long id);
-        Task<PagedResult<PaymentTransactionDto>> GetAllAsync(PaymentTransactionQuery query);
+        Task<PaymentTransactionDTO?> GetTransactionByTransactionIdAsync(long id);
+        Task<PagedResult<PaymentTransactionDTO>> GetAllTransactionsAsync(PaymentTransactionQuery queries);
     }
 }

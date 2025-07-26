@@ -1,9 +1,10 @@
 ﻿using Final.WebApp.DTOs.Common;
-using Final.WebApp.DTOs.Users;
 using Final.WebApp.DTOs.PasswordReset;
+using Final.WebApp.DTOs.Users;
 using System.Net;
 using System.Text;
 using System.Text.Json;
+using System.Web;
 
 namespace Final.WebApp.Services
 {
@@ -93,16 +94,13 @@ namespace Final.WebApp.Services
                 throw new HttpRequestException("Phiên đăng nhập hết hạn hoặc không hợp lệ.", null, response.StatusCode);
             }
 
-            // Đọc nội dung lỗi MỘT LẦN DUY NHẤT và lưu vào biến
             var errorJsonString = await response.Content.ReadAsStringAsync();
 
-            // Nếu không có nội dung, ném lỗi chung chung
             if (string.IsNullOrEmpty(errorJsonString))
             {
                 throw new HttpRequestException($"Yêu cầu không thành công. Mã trạng thái: {response.StatusCode}", null, response.StatusCode);
             }
 
-            // Nếu là lỗi 400 Bad Request, rất có thể là lỗi validation
             if (response.StatusCode == HttpStatusCode.BadRequest)
             {
                 try
@@ -114,7 +112,7 @@ namespace Final.WebApp.Services
                         throw new HttpRequestException(string.Join("\n", errorMessages), null, response.StatusCode);
                     }
                 }
-                catch (JsonException) { /* Bỏ qua nếu không phải định dạng validation */ }
+                catch (JsonException) { }
             }
 
             try
@@ -176,6 +174,43 @@ namespace Final.WebApp.Services
         {
             var response = await _httpClient.PostAsJsonAsync("api/users/profile/link-recovery-email", dto);
             if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
+        }
+
+        public async Task<PagedResult<UserDTO>> GetAllUsersAsync(UserQuery query)
+        {
+            var queryString = HttpUtility.ParseQueryString(string.Empty);
+            queryString["pageNumber"] = query.PageNumber.ToString();
+            queryString["pageSize"] = query.PageSize.ToString();
+            if (!string.IsNullOrEmpty(query.SearchTerm)) queryString["searchTerm"] = query.SearchTerm;
+            if (!string.IsNullOrEmpty(query.Role)) queryString["role"] = query.Role;
+            if (!string.IsNullOrEmpty(query.Status)) queryString["status"] = query.Status;
+
+            var response = await _httpClient.GetAsync($"api/users?{queryString}");
+            response.EnsureSuccessStatusCode();
+            return await response.Content.ReadFromJsonAsync<PagedResult<UserDTO>>() ?? new();
+        }
+
+        public async Task<UserProfileDTO> GetUserByIdAsync(long userId)
+        {
+            return await _httpClient.GetFromJsonAsync<UserProfileDTO>($"api/users/{userId}")
+                ?? throw new KeyNotFoundException("Không tìm thấy người dùng.");
+        }
+
+        public async Task UpdateUserStatusAsync(long userId, UpdateUserStatusDTO dto)
+        {
+            var response = await _httpClient.PatchAsJsonAsync($"api/users/{userId}/status", dto);
+            if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
+        }
+
+        public async Task UpdateUserRoleAsync(long userId, UserRoleDTO dto)
+        {
+            var response = await _httpClient.PatchAsJsonAsync($"api/users/{userId}/role", dto);
+            if (!response.IsSuccessStatusCode) await HandleErrorResponse(response);
+        }
+
+        public async Task<List<RecentUserDTO>> GetRecentUsersAsync()
+        {
+            return await _httpClient.GetFromJsonAsync<List<RecentUserDTO>>("api/users/recent") ?? [];
         }
     }
 }

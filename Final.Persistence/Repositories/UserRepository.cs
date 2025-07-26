@@ -21,21 +21,11 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Lấy thông tin người dùng theo địa chỉ email.
-        /// </summary>
-        /// <param name="email">Địa chỉ email của người dùng cần tìm.</param>
-        /// <returns>Trả về đối tượng người dùng nếu tìm thấy, ngược lại trả về null.</returns>
         public async Task<User?> GetUserByEmailAsync(string email)
         {
             return await _context.Users.FirstOrDefaultAsync(u => u.Email == email);
         }
 
-        /// <summary>
-        /// Tạo một người dùng mới trong cơ sở dữ liệu.
-        /// </summary>
-        /// <param name="user">Đối tượng người dùng cần tạo.</param>
-        /// <returns>Trả về đối tượng người dùng đã được tạo.</returns>
         public async Task<User> CreateUser(User user)
         {
             _context.Users.Add(user);
@@ -43,36 +33,20 @@ namespace Final.Persistence.Repositories
             return user;
         }
 
-        /// <summary>
-        /// Lấy thông tin người dùng theo ID người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần lấy thông tin.</param>
-        /// <returns>Trả về đối tượng người dùng nếu tìm thấy, ngược lại trả về null.</returns>
         public async Task<User?> GetUserByUserIdAsync(long userId)
         {
             return await _context.Users.FindAsync(userId);
         }
 
-        /// <summary>
-        /// Cập nhật thông tin người dùng trong cơ sở dữ liệu.
-        /// </summary>
-        /// <param name="user">Đối tượng người dùng cần cập nhật.</param>
-        /// <returns>Trả về một tác vụ bất đồng bộ.</returns>
         public async Task UpdateUserAsync(User user)
         {
             await _context.SaveChangesAsync();
         }
 
-        /// <summary>
-        /// Lấy danh sách người dùng với phân trang và sắp xếp. 
-        /// </summary>
-        /// <param name="query">Thông tin phân trang và lọc.</param>
-        /// <returns>Kết quả phân trang chứa danh sách người dùng.</returns>
         public async Task<PagedResult<User>> GetAllUserAsync(UserQuery query)
         {
             var usersQuery = _context.Users.AsQueryable();
 
-            // 1. Lọc (Filtering)
             if (!string.IsNullOrWhiteSpace(query.SearchTerm))
             {
                 var searchTermLower = query.SearchTerm.ToLower().Trim();
@@ -91,7 +65,6 @@ namespace Final.Persistence.Repositories
                 usersQuery = usersQuery.Where(u => u.Status == query.Status.Value);
             }
 
-            // 2. Sắp xếp (Sorting)
             if (!string.IsNullOrWhiteSpace(query.SortBy))
             {
                 bool isDescending = query.SortDirection?.ToLower() == "desc";
@@ -116,7 +89,6 @@ namespace Final.Persistence.Repositories
                 usersQuery = usersQuery.OrderBy(u => u.Id);
             }
 
-            // 3. Phân trang (Pagination)
             var totalItems = await usersQuery.CountAsync();
             var items = await usersQuery
                 .Skip((query.PageNumber - 1) * query.PageSize)
@@ -131,6 +103,20 @@ namespace Final.Persistence.Repositories
                 TotalItems = totalItems,
                 TotalPages = (int)Math.Ceiling(totalItems / (double)query.PageSize)
             };
+        }
+
+        public async Task<int> CountUsersInDateRange(DateTime startDate, DateTime endDate)
+        {
+            return await _context.Users
+                .CountAsync(u => u.CreatedAt >= startDate && u.CreatedAt < endDate);
+        }
+
+        public async Task<List<User>> GetRecentUsersAsync(int count)
+        {
+            return await _context.Users
+                .OrderByDescending(u => u.CreatedAt)
+                .Take(count)
+                .ToListAsync();
         }
     }
 }

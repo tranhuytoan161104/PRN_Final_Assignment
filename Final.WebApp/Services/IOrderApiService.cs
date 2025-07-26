@@ -10,5 +10,9 @@ namespace Final.WebApp.Services
         Task<OrderDTO> GetOrderByIdAsync(long orderId);
         Task<PagedResult<OrderDTO>> GetMyOrdersAsync(OrderQuery query);
         Task<OrderDTO> CancelOrderAsync(long orderId);
+
+        Task<PagedResult<OrderDTO>> GetAllOrdersAsync(OrderQuery query);
+        Task<OrderDTO> GetAdminOrderDetailAsync(long orderId);
+        Task UpdateOrderStatusAsync(long orderId, UpdateOrderStatusDTO dto);
     }
 }

@@ -1,0 +1,63 @@
+﻿@page
+@model Final.WebApp.Pages.Admin.Products.CreateModel
+@{
+    ViewData["Title"] = "Tạo sản phẩm mới";
+}
+
+<div class="container my-5">
+    <div class="row">
+        <div class="col-lg-8 offset-lg-2">
+            <h2 class="mb-3">@ViewData["Title"]</h2>
+            <hr />
+            <form method="post" class="mt-4">
+                <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                <div class="row">
+                    <div class="col-md-8 mb-3">
+                        <label asp-for="Product.Name" class="form-label"></label>
+                        <input asp-for="Product.Name" class="form-control" />
+                        <span asp-validation-for="Product.Name" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Product.Price" class="form-label"></label>
+                        <input asp-for="Product.Price" type="number" class="form-control" step="1000" />
+                        <span asp-validation-for="Product.Price" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="Product.Description" class="form-label"></label>
+                    <textarea asp-for="Product.Description" class="form-control" rows="4"></textarea>
+                    <span asp-validation-for="Product.Description" class="text-danger"></span>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Product.StockQuantity" class="form-label">Tồn kho</label>
+                        <input asp-for="Product.StockQuantity" type="number" class="form-control" />
+                        <span asp-validation-for="Product.StockQuantity" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Product.CategoryId" class="form-label">Danh mục</label>
+                        <select asp-for="Product.CategoryId" asp-items="Model.Categories" class="form-select">
+                            <option value="">-- Chọn danh mục --</option>
+                        </select>
+                        <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-4 mb-3">
+                        <label asp-for="Product.BrandId" class="form-label">Thương hiệu</label>
+                        <select asp-for="Product.BrandId" asp-items="Model.Brands" class="form-select">
+                            <option value="">-- Chọn thương hiệu --</option>
+                        </select>
+                        <span asp-validation-for="Product.BrandId" class="text-danger"></span>
+                    </div>
+                </div>
+
+                <div class="mt-3">
+                    <button type="submit" class="btn btn-primary">Lưu sản phẩm</button>
+                    <a asp-page="/Admin/Products/Index" class="btn btn-secondary">Hủy</a>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

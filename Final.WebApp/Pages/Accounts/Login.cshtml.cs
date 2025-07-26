@@ -53,7 +53,13 @@ namespace Final.WebApp.Pages.Accounts
                 var claims = new List<Claim>(token.Claims);
                 claims.Add(new Claim("access_token", jwtToken));
 
-                var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
+                var claimsIdentity = new ClaimsIdentity(
+                    claims,
+                    CookieAuthenticationDefaults.AuthenticationScheme,
+                    "email",  // Dùng "email" cho NameClaimType (dựa trên ảnh debug)
+                    "role"    // Dùng "role" cho RoleClaimType (dựa trên ảnh debug)
+                );
+
                 var authProperties = new AuthenticationProperties
                 {
                     IsPersistent = true, 

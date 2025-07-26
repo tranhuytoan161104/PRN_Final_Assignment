@@ -21,11 +21,6 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Lấy giao dịch thanh toán theo ID.
-        /// </summary>
-        /// <param name="transactionId">ID của giao dịch thanh toán.</param>
-        /// <returns>Giao dịch thanh toán nếu tìm thấy, ngược lại trả về null.</returns>
         public async Task<PaymentTransaction?> GetTransactionByTransactionIdAsync(long transactionId)
         {
             return await _context.PaymentTransactions
@@ -33,11 +28,6 @@ namespace Final.Persistence.Repositories
                 .FirstOrDefaultAsync(t => t.Id == transactionId);
         }
 
-        /// <summary>
-        /// Lấy tất cả giao dịch thanh toán với phân trang.
-        /// </summary>
-        /// <param name="queries">Thông tin phân trang và lọc.</param>
-        /// <returns>Kết quả phân trang chứa danh sách giao dịch thanh toán.</returns>
         public async Task<PagedResult<PaymentTransaction>> GetAllTransactionsAsync(PaymentTransactionQuery queries)
         {
             var queryable = _context.PaymentTransactions

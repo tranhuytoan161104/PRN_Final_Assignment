@@ -16,12 +16,6 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
-
-        /// <summary>
-        /// Phuong thức này dùng để lấy danh sách sản phẩm với phân trang và lọc theo các tiêu chí.
-        /// </summary>
-        /// <param name="queries"> Truyền các thông tin phân trang và lọc sản phẩm </param>
-        /// <returns name="PagedResult<Product>"> Trả về danh sách sản phẩm đã được phân trang và lọc </returns>
         public async Task<PagedResult<Product>> GetAllProductsAsync(ProductQuery queries)
         {
             var products = _context.Products.AsQueryable();
@@ -77,12 +71,6 @@ namespace Final.Persistence.Repositories
             };
         }
 
-
-        /// <summary>
-        /// Phuong thức này dùng để lấy thông tin chi tiết của một sản phẩm dựa trên Id.
-        /// </summary>
-        /// <param name="productId"> Xác định sản phẩm cần lấy thông tin bằng Id </param>
-        /// <returns name="Product"> Trả về thông tin chi tiết của sản phẩm nếu tìm thấy, hoặc null nếu không tìm thấy </returns>
         public async Task<Product?> GetProductByProductIdAsync(long productId)
         {
             return await _context.Products
@@ -95,12 +83,6 @@ namespace Final.Persistence.Repositories
                 .FirstOrDefaultAsync(p => p.Id == productId);
         }
 
-
-        /// <summary>
-        /// Phuong thức này dùng để tạo một sản phẩm mới.
-        /// </summary>
-        /// <param name="product"> Xác định sản phẩm cần tạo </param>
-        /// <returns name="Product"> Trả về sản phẩm đã được tạo </returns>
         public async Task<Product?> CreateProductAsync(Product product)
         {
             product.CreatedAt = DateTime.UtcNow;
@@ -110,27 +92,15 @@ namespace Final.Persistence.Repositories
             return product;
         }
 
-
-        /// <summary>
-        /// Phương thức này dùng để cập nhật thông tin bất kì của một sản phẩm.
-        /// </summary>
-        /// <param name="product"> Xác định sản phẩm cần cập nhật </param>
-        /// <returns></returns>
         public async Task UpdateProductAsync(Product product)
         {
             await _context.SaveChangesAsync();
         }
 
-
-        /// <summary>
-        /// Phương thức này dùng để lấy sản phẩm theo Id và bao gồm các hình ảnh của nó.
-        /// </summary>
-        /// <param name="productId"> Xác định sản phẩm cần lấy thông tin bằng Id </param>
-        /// <returns name="Product"> Trả về sản phẩm bao gồm các hình ảnh của nó nếu tìm thấy, hoặc null nếu không tìm thấy </returns>
         public async Task<Product?> GetProductByProductIdWithImagesAsync(long productId)
         {
             return await _context.Products
-                .Include(p => p.Images) 
+                .Include(p => p.Images)
                 .FirstOrDefaultAsync(p => p.Id == productId);
         }
     }

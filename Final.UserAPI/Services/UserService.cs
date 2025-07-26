@@ -3,6 +3,7 @@ using Final.Domain.Entities;
 using Final.Domain.Enums;
 using Final.Domain.Interfaces;
 using Final.Domain.Queries;
+using Final.ProductAPI.DTOs;
 using Final.UserAPI.DTOs;
 using Final.UserAPI.DTOs.PasswordReset;
 using System.Security.Cryptography;
@@ -22,12 +23,6 @@ namespace Final.UserAPI.Services
             _emailService = emailService;
         }
 
-        /// <summary>
-        /// Đăng ký một người dùng mới vào hệ thống.
-        /// </summary>
-        /// <param name="registerDto">Thông tin đăng ký của người dùng.</param>
-        /// <returns>Thông tin chi tiết của người dùng vừa được tạo.</returns>
-        /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu email đã tồn tại.</exception>
         public async Task<UserDTO> RegisterUserAsync(RegisterDTO registerDto)
         {
             if (await _userRepository.GetUserByEmailAsync(registerDto.Email) != null)
@@ -41,8 +36,8 @@ namespace Final.UserAPI.Services
                 LastName = registerDto.LastName,
                 Email = registerDto.Email,
                 PasswordHash = BCrypt.Net.BCrypt.HashPassword(registerDto.Password),
-                Role = "Customer", 
-                Status = EUserStatus.Active, 
+                Role = "Customer",
+                Status = EUserStatus.Active,
                 CreatedAt = DateTime.UtcNow
             };
 
@@ -51,12 +46,6 @@ namespace Final.UserAPI.Services
             return MapToUserDTO(createdUser);
         }
 
-        /// <summary>
-        /// Xác thực thông tin đăng nhập và tạo token cho người dùng.
-        /// </summary>
-        /// <param name="loginDto">Thông tin đăng nhập (email và mật khẩu).</param>
-        /// <returns>Một đối tượng chứa Access Token.</returns>
-        /// <exception cref="UnauthorizedAccessException">Ném ngoại lệ nếu thông tin đăng nhập không hợp lệ hoặc tài khoản bị khóa.</exception>
         public async Task<TokenDTO> LoginUserAsync(LoginDTO loginDto)
         {
             var user = await _userRepository.GetUserByEmailAsync(loginDto.Email);
@@ -74,12 +63,6 @@ namespace Final.UserAPI.Services
             return new TokenDTO { AccessToken = token };
         }
 
-        /// <summary>
-        /// Lấy thông tin hồ sơ của một người dùng dựa trên ID.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần lấy thông tin.</param>
-        /// <returns>Thông tin hồ sơ của người dùng.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         public async Task<UserProfileDTO?> GetUserProfileByUserIdAsync(long userId)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
@@ -100,13 +83,6 @@ namespace Final.UserAPI.Services
             };
         }
 
-        /// <summary>
-        /// Cập nhật thông tin hồ sơ (tên, họ) của người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần cập nhật.</param>
-        /// <param name="updateDto">Thông tin cần cập nhật.</param>
-        /// <returns>Thông tin hồ sơ sau khi đã cập nhật.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         public async Task<UserProfileDTO?> UpdateUserProfileByUserIdAsync(long userId, UpdateProfileDTO updateDto)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
@@ -122,14 +98,6 @@ namespace Final.UserAPI.Services
             return await GetUserProfileByUserIdAsync(userId);
         }
 
-        /// <summary>
-        /// Thay đổi mật khẩu cho người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần đổi mật khẩu.</param>
-        /// <param name="changePasswordDto">Chứa mật khẩu cũ và mật khẩu mới.</param>
-        /// <returns>Trả về true nếu đổi mật khẩu thành công.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
-        /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu mật khẩu cũ không chính xác.</exception>
         public async Task<bool> ChangeUserPasswordByUserIdAsync(long userId, ChangePasswordDTO changePasswordDto)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
@@ -148,11 +116,6 @@ namespace Final.UserAPI.Services
             return true;
         }
 
-        /// <summary>
-        /// Lấy danh sách tất cả người dùng với phân trang (chỉ dành cho Admin).
-        /// </summary>
-        /// <param name="query">Thông tin phân trang.</param>
-        /// <returns>Danh sách người dùng đã được phân trang.</returns>
         public async Task<PagedResult<UserDTO>> GetAllUsersAsync(UserQuery query)
         {
             var pagedResultEntity = await _userRepository.GetAllUserAsync(query);
@@ -168,13 +131,6 @@ namespace Final.UserAPI.Services
             };
         }
 
-        /// <summary>
-        /// Cập nhật vai trò của một người dùng (chỉ dành cho Owner).
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần cập nhật.</param>
-        /// <param name="userRoleDto">Vai trò mới của người dùng.</param>
-        /// <returns>Thông tin người dùng sau khi cập nhật.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         public async Task<UserDTO?> UpdateUserRoleByUserIdAsync(long userId, UserRoleDTO userRoleDto)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
@@ -188,13 +144,6 @@ namespace Final.UserAPI.Services
             return MapToUserDTO(user);
         }
 
-        /// <summary>
-        /// Cập nhật trạng thái (active/inactive) của một người dùng (chỉ dành cho Admin).
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần cập nhật.</param>
-        /// <param name="updateUserStatusDto">Trạng thái mới của người dùng.</param>
-        /// <returns>Thông tin người dùng sau khi cập nhật.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu không tìm thấy người dùng.</exception>
         public async Task<UserDTO?> UpdateUserStatusByUserIdAsync(long userId, UpdateUserStatusDTO updateUserStatusDto)
         {
             var user = await _userRepository.GetUserByUserIdAsync(userId);
@@ -295,8 +244,7 @@ namespace Final.UserAPI.Services
             var token = GenerateSecureToken();
             user.PasswordResetToken = token;
             user.ResetTokenExpiry = DateTime.UtcNow.AddDays(1);
-            user.RecoveryEmail = dto.RecoveryEmail;
-            user.IsRecoveryEmailVerified = false;
+            user.PendingRecoveryEmail = dto.RecoveryEmail;
             await _userRepository.UpdateUserAsync(user);
             var verificationLink = $"{dto.VerificationUrl}?token={token}&userId={userId}";
             var body = $"<p>Vui lòng nhấp vào liên kết sau để xác thực email khôi phục:</p><a href='{verificationLink}'>Xác thực Email</a>";
@@ -310,20 +258,40 @@ namespace Final.UserAPI.Services
             {
                 return false;
             }
-            user.IsRecoveryEmailVerified = true;
-            // Giữ lại RecoveryEmail, chỉ xóa token
+
+            if (!string.IsNullOrEmpty(user.PendingRecoveryEmail))
+            {
+                user.RecoveryEmail = user.PendingRecoveryEmail; 
+                user.PendingRecoveryEmail = null;               
+                user.IsRecoveryEmailVerified = true;           
+            }
+
             user.PasswordResetToken = null;
             user.ResetTokenExpiry = null;
+
             await _userRepository.UpdateUserAsync(user);
             return true;
         }
 
-        // (Các phương thức private và helper khác như MapToUserDTO, GenerateSecureToken...)
         private string GenerateSecureToken()
         {
             return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64))
                 .Replace('+', '-')
                 .Replace('/', '_');
+        }
+
+        public async Task<List<RecentUserDTO>> GetRecentUsersAsync()
+        {
+            var recentUsers = await _userRepository.GetRecentUsersAsync(5);
+
+            // Mapping từ User (Entity) sang RecentUserDTO (API)
+            return recentUsers.Select(u => new RecentUserDTO
+            {
+                Id = u.Id,
+                FullName = $"{u.FirstName} {u.LastName}",
+                Email = u.Email,
+                CreatedAt = u.CreatedAt
+            }).ToList();
         }
     }
 }

@@ -29,7 +29,6 @@ namespace Final.Persistence.Data
         {
             base.OnModelCreating(modelBuilder);
 
-            // === Fluent API Configurations ===
             modelBuilder.Entity<Brand>(entity =>
             {
                 entity.HasKey(e => e.Id);
@@ -132,10 +131,8 @@ namespace Final.Persistence.Data
             });
 
 
-            // === SEED DATA (Phiên bản mở rộng và hoàn chỉnh) ===
             const string universalPasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2";
 
-            #region === User Seed Data ===
             modelBuilder.Entity<User>().HasData(
                 new User { Id = 1, FirstName = "Văn", LastName = "Toàn", Email = "owner@final.com", PasswordHash = universalPasswordHash, Role = "Owner", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 1, 1), DateTimeKind.Utc) },
                 new User { Id = 2, FirstName = "Quốc", LastName = "Tuấn", Email = "admin@final.com", PasswordHash = universalPasswordHash, Role = "Admin", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 1, 1), DateTimeKind.Utc) },
@@ -145,9 +142,7 @@ namespace Final.Persistence.Data
                 new User { Id = 6, FirstName = "Gia", LastName = "Hân", Email = "giahan@customer.com", PasswordHash = universalPasswordHash, Role = "Customer", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 5, 1), DateTimeKind.Utc) },
                 new User { Id = 7, FirstName = "Đăng", LastName = "Khoa", Email = "dangkhoa@customer.com", PasswordHash = universalPasswordHash, Role = "Customer", Status = EUserStatus.Active, CreatedAt = DateTime.SpecifyKind(new DateTime(2023, 6, 12), DateTimeKind.Utc) }
             );
-            #endregion
 
-            #region === Category & Brand Seed Data ===
             modelBuilder.Entity<Category>().HasData(
                 new Category { Id = 1, Name = "Vi xử lý (CPU)" },
                 new Category { Id = 2, Name = "Card đồ họa (GPU)" },
@@ -166,9 +161,7 @@ namespace Final.Persistence.Data
                 new Brand { Id = 13, Name = "ASUS" }, new Brand { Id = 14, Name = "Gigabyte" }, new Brand { Id = 15, Name = "LG" },
                 new Brand { Id = 16, Name = "Dell" }
             );
-            #endregion
 
-            #region === Product Seed Data ===
             modelBuilder.Entity<Product>().HasData(
                 new Product { Id = 1, CategoryId = 1, BrandId = 1, Name = "Intel Core i9-14900K", Price = 15500000m, Description = "Vi xử lý đầu bảng cho gaming và sáng tạo nội dung.", StockQuantity = 50, CreatedAt = DateTime.UtcNow.AddDays(-100), Status = EProductStatus.Available },
                 new Product { Id = 2, CategoryId = 1, BrandId = 2, Name = "AMD Ryzen 7 7800X3D", Price = 9800000m, Description = "Hiệu năng gaming thuần túy tốt nhất phân khúc nhờ 3D V-Cache.", StockQuantity = 120, CreatedAt = DateTime.UtcNow.AddDays(-90), Status = EProductStatus.Available },
@@ -185,9 +178,7 @@ namespace Final.Persistence.Data
                 new Product { Id = 13, CategoryId = 7, BrandId = 15, Name = "LG UltraGear 27GR95QE-B 240Hz OLED", Price = 24500000m, Description = "Màn hình OLED 2K 240Hz cho trải nghiệm gaming đỉnh cao.", StockQuantity = 30, CreatedAt = DateTime.UtcNow.AddDays(-40), Status = EProductStatus.Available },
                 new Product { Id = 14, CategoryId = 7, BrandId = 16, Name = "Dell UltraSharp U2723QE 4K IPS", Price = 13800000m, Description = "Màn hình 4K chuyên đồ họa với tấm nền IPS Black.", StockQuantity = 60, CreatedAt = DateTime.UtcNow.AddDays(-30), Status = EProductStatus.Available }
             );
-            #endregion
 
-            #region === ProductImage Seed Data ===
             modelBuilder.Entity<ProductImage>().HasData(
                 new ProductImage { Id = 1, ProductId = 1, ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i9-14900K-1" },
                 new ProductImage { Id = 2, ProductId = 1, ImageUrl = "https://placehold.co/600x600/EFEFEF/333?text=i9-14900K-2" },
@@ -200,9 +191,7 @@ namespace Final.Persistence.Data
                 new ProductImage { Id = 9, ProductId = 13, ImageUrl = "https://placehold.co/600x600/333/FFF?text=LG+OLED" },
                 new ProductImage { Id = 10, ProductId = 13, ImageUrl = "https://placehold.co/600x600/333/FFF?text=LG+OLED-2" }
             );
-            #endregion
 
-            #region === Review Seed Data ===
             modelBuilder.Entity<Review>().HasData(
                 new Review { Id = 1, ProductId = 2, UserId = 4, Rating = 5, Comment = "CPU gaming tốt nhất hiện tại, không có gì để chê!", CreatedAt = DateTime.UtcNow.AddDays(-80) },
                 new Review { Id = 2, ProductId = 4, UserId = 5, Rating = 5, Comment = "Đắt nhưng xắt ra miếng. Cân mọi game 4K max setting.", CreatedAt = DateTime.UtcNow.AddDays(-70) },
@@ -210,9 +199,7 @@ namespace Final.Persistence.Data
                 new Review { Id = 4, ProductId = 12, UserId = 4, Rating = 5, Comment = "Mainboard p/p quá tốt, đầy đủ cổng kết nối.", CreatedAt = DateTime.UtcNow.AddDays(-40) },
                 new Review { Id = 5, ProductId = 13, UserId = 7, Rating = 5, Comment = "Màu sắc và tần số quét của màn hình này thật sự tuyệt vời.", CreatedAt = DateTime.UtcNow.AddDays(-20) }
             );
-            #endregion
 
-            #region === ShoppingCart & Items Seed Data ===
             modelBuilder.Entity<ShoppingCart>().HasData(
                 new ShoppingCart { Id = 1, UserId = 5 },
                 new ShoppingCart { Id = 2, UserId = 6 }
@@ -223,9 +210,7 @@ namespace Final.Persistence.Data
                 new ShoppingCartItem { Id = 2, ShoppingCartId = 1, ProductId = 10, Quantity = 1 },
                 new ShoppingCartItem { Id = 3, ShoppingCartId = 2, ProductId = 14, Quantity = 2 }
             );
-            #endregion
 
-            #region === Order & OrderItems Seed Data ===
             modelBuilder.Entity<Order>().HasData(
                 new Order { Id = 1, UserId = 4, TotalAmount = 15100000m, OrderDate = DateTime.UtcNow.AddDays(-45), Status = EOrderStatus.Delivered, ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM", PhoneNumber = "0901234567" },
                 new Order { Id = 2, UserId = 7, TotalAmount = 53000000m, OrderDate = DateTime.UtcNow.AddDays(-25), Status = EOrderStatus.Processing, ShippingAddress = "456 Đường XYZ, Quận Hoàn Kiếm, Hà Nội", PhoneNumber = "0987654321" },
@@ -238,9 +223,7 @@ namespace Final.Persistence.Data
                 new OrderItem { Id = 4, OrderId = 2, ProductId = 13, Quantity = 1, Price = 24500000m },
                 new OrderItem { Id = 5, OrderId = 3, ProductId = 7, Quantity = 1, Price = 3200000m }
             );
-            #endregion
 
-            #region === Payment Seed Data ===
             modelBuilder.Entity<PaymentMethod>().HasData(
                 new PaymentMethod { Id = 1, Code = "COD", IsActive = true },
                 new PaymentMethod { Id = 2, Code = "MOMO", IsActive = true },
@@ -253,7 +236,6 @@ namespace Final.Persistence.Data
                 new PaymentTransaction { Id = 2, OrderId = 2, Amount = 53000000m, TransactionDate = DateTime.UtcNow.AddDays(-25), Status = EPaymentStatus.Success, PaymentMethod = "VNPAY", TransactionId = "VNPAY987654321" },
                 new PaymentTransaction { Id = 3, OrderId = 3, Amount = 3200000m, TransactionDate = DateTime.UtcNow.AddDays(-10), Status = EPaymentStatus.Failed, PaymentMethod = "MOMO", TransactionId = "MOMOFAILED001" }
             );
-            #endregion
         }
     }
 }

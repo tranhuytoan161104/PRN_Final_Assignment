@@ -12,10 +12,6 @@ namespace Final.ProductAPI.Services
             _brandRepository = brandRepository;
         }
 
-        /// <summary>
-        /// Lấy tất cả các thương hiệu từ kho dữ liệu và chuyển đổi chúng thành danh sách DTO.
-        /// </summary>
-        /// <returns>Danh sách các thương hiệu dưới dạng DTO.</returns>
         public async Task<List<BrandDTO>> GetAllBrandsAsync()
         {
             var categories = await _brandRepository.GetAllBrandsAsync();

@@ -21,11 +21,6 @@ namespace Final.UserAPI.Controllers
             _userService = userService;
         }
 
-        /// <summary>
-        /// Lấy ID của người dùng đã được xác thực từ token.
-        /// Cho phép truy cập ID người dùng hiện tại trong các phương thức khác.
-        /// </summary>
-        /// <exception cref="UnauthorizedAccessException">Ném ngoại lệ nếu không tìm thấy thông tin người dùng trong token.</exception>
         private long CurrentUserId
         {
             get
@@ -39,14 +34,6 @@ namespace Final.UserAPI.Controllers
             }
         }
 
-        /// <summary>
-        /// Đăng ký một tài khoản người dùng mới.
-        /// Cho phép người dùng cung cấp thông tin cần thiết để tạo tài khoản mới.
-        /// </summary>
-        /// <param name="registerDto">Thông tin cần thiết để đăng ký.</param>
-        /// <returns>Thông tin của người dùng vừa được tạo.</returns>
-        /// <response code="201">Trả về người dùng vừa được tạo.</response>
-        /// <response code="400">Nếu thông tin đăng ký không hợp lệ hoặc email đã tồn tại.</response>
         [HttpPost("register")]
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status201Created)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -56,14 +43,6 @@ namespace Final.UserAPI.Controllers
             return CreatedAtRoute("GetUserProfileByUserIdAsync", new { userId = user.Id }, user);
         }
 
-        /// <summary>
-        /// Đăng nhập vào hệ thống.
-        /// Cho phép người dùng đăng nhập bằng email và mật khẩu để nhận token xác thực.
-        /// </summary>
-        /// <param name="loginDto">Thông tin đăng nhập (email và mật khẩu).</param>
-        /// <returns>Một token JWT để xác thực các yêu cầu sau này.</returns>
-        /// <response code="200">Đăng nhập thành công và trả về token.</response>
-        /// <response code="401">Nếu thông tin đăng nhập không chính xác hoặc tài khoản bị khóa.</response>
         [HttpPost("login")]
         [ProducesResponseType(typeof(TokenDTO), StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status401Unauthorized)]
@@ -73,14 +52,6 @@ namespace Final.UserAPI.Controllers
             return Ok(tokenDto);
         }
 
-        /// <summary>
-        /// Lấy thông tin hồ sơ của người dùng hiện tại (đã đăng nhập).
-        /// Cho phép người dùng xem thông tin cá nhân của mình như tên, họ, email, v.v.
-        /// </summary>
-        /// <returns>Thông tin hồ sơ của người dùng.</returns>
-        /// <response code="200">Trả về thông tin hồ sơ thành công.</response>
-        /// <response code="401">Nếu người dùng chưa đăng nhập.</response>
-        /// <response code="404">Nếu không tìm thấy người dùng (ví dụ: đã bị xóa sau khi đăng nhập).</response>
         [HttpGet("profile")]
         [Authorize]
         [ProducesResponseType(typeof(UserProfileDTO), StatusCodes.Status200OK)]
@@ -92,16 +63,6 @@ namespace Final.UserAPI.Controllers
             return Ok(userProfile);
         }
 
-        /// <summary>
-        /// Cập nhật thông tin hồ sơ (tên, họ) của người dùng hiện tại.
-        /// Cho phép người dùng cập nhật thông tin cá nhân của mình.
-        /// </summary>
-        /// <param name="updateDto">Thông tin cần cập nhật.</param>
-        /// <returns>Thông tin hồ sơ sau khi đã cập nhật.</returns>
-        /// <response code="200">Cập nhật thành công.</response>
-        /// <response code="400">Nếu dữ liệu đầu vào không hợp lệ.</response>
-        /// <response code="401">Nếu người dùng chưa đăng nhập.</response>
-        /// <response code="404">Nếu không tìm thấy người dùng.</response>
         [HttpPut("profile")]
         [Authorize]
         [ProducesResponseType(typeof(UserProfileDTO), StatusCodes.Status200OK)]
@@ -114,15 +75,6 @@ namespace Final.UserAPI.Controllers
             return Ok(updatedProfile);
         }
 
-        /// <summary>
-        /// Thay đổi mật khẩu của người dùng hiện tại.
-        /// Cho phép người dùng cập nhật mật khẩu của mình bằng cách cung cấp mật khẩu cũ và mật khẩu mới.
-        /// </summary>
-        /// <param name="changePasswordDto">Thông tin mật khẩu cũ và mới.</param>
-        /// <returns>Một thông báo thành công.</returns>
-        /// <response code="200">Đổi mật khẩu thành công.</response>
-        /// <response code="400">Nếu mật khẩu cũ không chính xác hoặc mật khẩu mới không hợp lệ.</response>
-        /// <response code="401">Nếu người dùng chưa đăng nhập.</response>
         [HttpPatch("change-password")]
         [Authorize]
         [ProducesResponseType(StatusCodes.Status200OK)]
@@ -134,15 +86,6 @@ namespace Final.UserAPI.Controllers
             return Ok(new { message = "Đổi mật khẩu thành công." });
         }
 
-        /// <summary>
-        /// [Admin] Lấy danh sách tất cả người dùng với phân trang.
-        /// Cho phép quản trị viên xem danh sách người dùng trong hệ thống với các tham số truy vấn để phân trang và lọc.
-        /// </summary>
-        /// <param name="queries">Các tham số truy vấn và phân trang.</param>
-        /// <returns>Danh sách người dùng đã được phân trang.</returns>
-        /// <response code="200">Trả về danh sách người dùng.</response>
-        /// <response code="401">Nếu người dùng chưa đăng nhập.</response>
-        /// <response code="403">Nếu người dùng không có quyền Admin.</response>
         [HttpGet]
         [Authorize(Roles = "Admin, Owner")]
         [ProducesResponseType(typeof(PagedResult<UserDTO>), StatusCodes.Status200OK)]
@@ -154,13 +97,6 @@ namespace Final.UserAPI.Controllers
             return Ok(pagedResult);
         }
 
-        /// <summary>
-        /// [Admin] Lấy thông tin hồ sơ của một người dùng bất kỳ bằng ID.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần lấy thông tin.</param>
-        /// <returns>Thông tin hồ sơ của người dùng.</returns>
-        /// <response code="200">Trả về thông tin hồ sơ.</response>
-        /// <response code="404">Nếu không tìm thấy người dùng.</response>
         [HttpGet("{userId:long}", Name = "GetUserProfileByUserIdAsync")]
         [Authorize(Roles = "Admin, Owner")]
         [ProducesResponseType(typeof(UserProfileDTO), StatusCodes.Status200OK)]
@@ -170,16 +106,7 @@ namespace Final.UserAPI.Controllers
             var userProfile = await _userService.GetUserProfileByUserIdAsync(userId);
             return Ok(userProfile);
         }
-            
-        /// <summary>
-        /// [Owner] Cập nhật vai trò của một người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần cập nhật.</param>
-        /// <param name="userRoleDto">Vai trò mới.</param>
-        /// <returns>Thông tin người dùng sau khi cập nhật.</returns>
-        /// <response code="200">Cập nhật thành công.</response>
-        /// <response code="404">Nếu không tìm thấy người dùng.</response>
-        /// <response code="403">Nếu người thực hiện không có quyền Owner.</response>
+
         [HttpPatch("{userId:long}/role")]
         [Authorize(Roles = "Owner")]
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
@@ -191,15 +118,6 @@ namespace Final.UserAPI.Controllers
             return Ok(updatedUser);
         }
 
-        /// <summary>
-        /// [Admin] Cập nhật trạng thái (active/inactive) của một người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng cần cập nhật.</param>
-        /// <param name="updateUserStatusDto">Trạng thái mới.</param>
-        /// <returns>Thông tin người dùng sau khi cập nhật.</returns>
-        /// <response code="200">Cập nhật thành công.</response>
-        /// <response code="404">Nếu không tìm thấy người dùng.</response>
-        /// <response code="403">Nếu người thực hiện không có quyền Admin.</response>
         [HttpPatch("{userId:long}/status")]
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(UserDTO), StatusCodes.Status200OK)]
@@ -211,12 +129,10 @@ namespace Final.UserAPI.Controllers
             return Ok(updatedUser);
         }
 
-        #region Password Recovery Endpoints
         [HttpPost("setup-security-question")]
-        [AllowAnonymous] // SỬA từ [Authorize]
+        [AllowAnonymous]
         public async Task<IActionResult> SetupSecurityQuestion([FromBody] SetupSecurityQuestionDTO dto)
         {
-            // SỬA logic bên trong
             await _userService.SetupSecurityQuestionAsync(dto);
             return Ok(new { message = "Thiết lập câu hỏi bảo mật thành công." });
         }
@@ -272,6 +188,13 @@ namespace Final.UserAPI.Controllers
             }
             return Content("<h1>Xác thực thất bại.</h1><p>Liên kết không hợp lệ hoặc đã hết hạn.</p>", "text/html; charset=utf-8");
         }
-        #endregion
+
+        [HttpGet("recent")]
+        [Authorize(Roles = "Admin, Owner")]
+        public async Task<IActionResult> GetRecentUsers()
+        {
+            var recentUsers = await _userService.GetRecentUsersAsync();
+            return Ok(recentUsers);
+        }
     }
 }

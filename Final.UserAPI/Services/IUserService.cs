@@ -1,5 +1,6 @@
 ﻿using Final.Domain.Common;
 using Final.Domain.Queries;
+using Final.ProductAPI.DTOs;
 using Final.UserAPI.DTOs;
 using Final.UserAPI.DTOs.PasswordReset;
 
@@ -25,5 +26,7 @@ namespace Final.UserAPI.Services
         Task ResetPasswordAsync(ResetPasswordDTO dto);
         Task SendVerificationEmailAsync(long userId, LinkRecoveryEmailDTO dto);
         Task<bool> VerifyRecoveryEmailTokenAsync(long userId, string token);
+
+        Task<List<RecentUserDTO>> GetRecentUsersAsync();
     }
 }

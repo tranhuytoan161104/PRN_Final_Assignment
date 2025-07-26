@@ -9,5 +9,8 @@ namespace Final.WebApp.Services
         Task<List<CategoryDTO>> GetCategoriesAsync();
         Task<List<BrandDTO>> GetBrandsAsync();
         Task<ProductDetailDTO> GetProductDetailAsync(long productId);
+        Task<ProductDetailDTO> CreateProductAsync(ProductCreationDTO newProduct);
+        Task<ProductDetailDTO> UpdateProductAsync(long productId, ProductUpdateDTO productToUpdate);
+        Task ArchiveProductAsync(long productId);
     }
 }

@@ -24,6 +24,8 @@ builder.Services.AddScoped<IPaymentTransactionRepository, PaymentTransactionRepo
 builder.Services.AddScoped<IPaymentTransactionService, PaymentTransactionService>();
 builder.Services.AddScoped<IPaymentMethodRepository, PaymentMethodRepository>();
 builder.Services.AddScoped<IPaymentMethodService, PaymentMethodService>();
+builder.Services.AddScoped<IUserRepository, UserRepository>(); 
+builder.Services.AddScoped<IDashboardService, DashboardService>();
 
 builder.Services.AddAuthentication(options =>
 {

@@ -19,7 +19,6 @@ namespace Final.WebApp.Pages.Accounts
 
         public string? SecurityQuestion { get; set; }
 
-        // Quản lý các bước của form
         public int CurrentStep { get; set; } = 1;
 
         public void OnGet() { CurrentStep = 1; }
@@ -29,7 +28,7 @@ namespace Final.WebApp.Pages.Accounts
             try
             {
                 SecurityQuestion = await _userApiService.GetSecurityQuestionByEmailAsync(Email!);
-                CurrentStep = 2; // Chuyển sang bước trả lời câu hỏi
+                CurrentStep = 2; 
             }
             catch (HttpRequestException ex)
             {
@@ -51,7 +50,7 @@ namespace Final.WebApp.Pages.Accounts
             catch (HttpRequestException ex)
             {
                 ModelState.AddModelError("Answer", ex.Message);
-                await OnPostEnterEmailAsync(); // Tải lại câu hỏi
+                await OnPostEnterEmailAsync(); 
                 return Page();
             }
         }
@@ -60,7 +59,6 @@ namespace Final.WebApp.Pages.Accounts
         {
             try
             {
-                // Xây dựng URL đầy đủ của trang ResetPassword
                 var resetUrl = Url.Page("/Accounts/ResetPassword", pageHandler: null, values: null, protocol: Request.Scheme);
                 await _userApiService.SendRecoveryEmailAsync(
                     new SendRecoveryEmailDTO { Email = Email!, ResetPasswordUrl = resetUrl! });

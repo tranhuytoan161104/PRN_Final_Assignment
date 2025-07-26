@@ -21,6 +21,20 @@
                         <li class="nav-item">
                             <a class="nav-link text-dark" asp-page="/Cart/Index">Giỏ hàng</a>
                         </li>
+                        @if (User.IsInRole("Admin") || User.IsInRole("Owner"))
+                        {
+                            <li class="nav-item dropdown">
+                                <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                    Quản lý
+                                </a>
+                                <ul class="dropdown-menu">
+                                    <li><a class="dropdown-item" asp-page="/Admin/Index">Dashboard</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Products/Index">Quản lý Sản phẩm</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Users/Index">Quản lý Người dùng</a></li>
+                                    <li><a class="dropdown-item" asp-page="/Admin/Orders/Index">Quản lý Đơn hàng</a></li>
+                                </ul>
+                            </li>
+                        }
                     </ul>
 
                     <ul class="navbar-nav">
@@ -28,7 +42,7 @@
                         {
                             <li class="nav-item dropdown">
                                 <a class="nav-link dropdown-toggle text-dark" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
-                                    Tài khoản
+                                    Xin chào, @User.Identity?.Name
                                 </a>
                                 <ul class="dropdown-menu">
                                     <li><a class="dropdown-item" asp-page="/Accounts/Profile">Hồ sơ</a></li>

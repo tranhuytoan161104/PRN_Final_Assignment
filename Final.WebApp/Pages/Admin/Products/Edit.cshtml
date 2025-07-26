@@ -1,0 +1,89 @@
+﻿@page "{id:long}"
+@model Final.WebApp.Pages.Admin.Products.EditModel
+@{
+    ViewData["Title"] = "Chỉnh sửa sản phẩm";
+}
+
+<div class="container my-5">
+    <h2>@ViewData["Title"]: @Model.ProductDetail.Name</h2>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-body">
+                    <form method="post">
+                        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+
+                        <div class="row">
+                            <div class="col-md-8 mb-3">
+                                <label asp-for="Product.Name" class="form-label"></label>
+                                <input asp-for="Product.Name" class="form-control" />
+                                <span asp-validation-for="Product.Name" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-4 mb-3">
+                                <label asp-for="Product.Price" class="form-label"></label>
+                                <input asp-for="Product.Price" type="number" class="form-control" step="1000" />
+                                <span asp-validation-for="Product.Price" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="Product.Description" class="form-label"></label>
+                            <textarea asp-for="Product.Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Product.Description" class="text-danger"></span>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Product.CategoryId" class="form-label">Danh mục</label>
+                                <select asp-for="Product.CategoryId" asp-items="Model.Categories" class="form-select"></select>
+                                <span asp-validation-for="Product.CategoryId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="Product.BrandId" class="form-label">Thương hiệu</label>
+                                <select asp-for="Product.BrandId" asp-items="Model.Brands" class="form-select"></select>
+                                <span asp-validation-for="Product.BrandId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mt-3">
+                            <button type="submit" class="btn btn-primary">Lưu thay đổi</button>
+                            <a asp-page="/Admin/Products/Index" class="btn btn-secondary">Quay lại</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <h4>Thông tin khác</h4>
+            <div class="card">
+                <ul class="list-group list-group-flush">
+                    <li class="list-group-item"><strong>ID:</strong> @Model.ProductDetail.Id</li>
+                    <li class="list-group-item"><strong>Tồn kho:</strong> @Model.ProductDetail.StockQuantity</li>
+                    <li class="list-group-item"><strong>Trạng thái:</strong> @Model.ProductDetail.Status</li>
+                </ul>
+            </div>
+
+            <h4 class="mt-4">Hành động khác</h4>
+            <div class="card">
+                <div class="card-body">
+                    <form method="post" asp-page-handler="Archive" asp-route-id="@Model.ProductDetail.Id"
+                          onsubmit="return confirm('Bạn có chắc chắn muốn lưu trữ sản phẩm này?');">
+                        <button type="submit" class="btn btn-danger w-100">Lưu trữ sản phẩm</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

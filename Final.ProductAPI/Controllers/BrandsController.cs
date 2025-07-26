@@ -16,10 +16,6 @@ namespace Final.ProductAPI.Controllers
             _brandService = brandService;
         }
 
-        /// <summary>
-        /// Lấy danh sách tất cả các thương hiệu.
-        /// </summary>
-        /// <returns>Danh sách các thương hiệu.</returns>
         [HttpGet]
         public async Task<ActionResult<List<BrandDTO>>> GetAllBrandsAsync()
         {

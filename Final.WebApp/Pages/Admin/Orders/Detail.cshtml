@@ -1,0 +1,40 @@
+﻿@page "{orderId:long}"
+@model Final.WebApp.Pages.Admin.Orders.DetailModel
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Order.Id}";
+}
+<div class="container my-5">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="row">
+        <div class="col-lg-8">
+        </div>
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-header">Cập nhật trạng thái (Admin)</div>
+                <div class="card-body">
+                    <form method="post" asp-page-handler="UpdateStatus" asp-route-orderId="@Model.Order.Id">
+                        <div class="mb-3">
+                            <label asp-for="StatusInput.Status" class="form-label">Trạng thái mới</label>
+                            <select asp-for="StatusInput.Status" asp-items="Model.OrderStatuses" class="form-select"></select>
+                        </div>
+                        <button type="submit" class="btn btn-primary w-100">Cập nhật</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="mt-4">
+        <a asp-page="/Admin/Orders/Index" class="btn btn-secondary">Quay lại danh sách</a>
+    </div>
+</div>

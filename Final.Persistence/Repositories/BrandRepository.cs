@@ -19,10 +19,6 @@ namespace Final.Persistence.Repositories
             _context = context;
         }
 
-        /// <summary>
-        /// Lấy tất cả các thương hiệu.
-        /// </summary> 
-        /// <returns>Danh sách các thương hiệu.</returns>
         public async Task<List<Brand>> GetAllBrandsAsync()
         {
             return await _context.Brands.ToListAsync();

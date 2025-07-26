@@ -7,8 +7,12 @@
         public decimal Price { get; set; }
         public string? Description { get; set; }
         public int StockQuantity { get; set; }
+        public string Status { get; set; } = null!; 
         public string? BrandName { get; set; }
         public string? CategoryName { get; set; }
+        public long CategoryId { get; set; }
+        public long BrandId { get; set; }
+
         public List<ProductReviewDTO> Reviews { get; set; } = [];
         public List<ProductImageDTO> Images { get; set; } = [];
     }

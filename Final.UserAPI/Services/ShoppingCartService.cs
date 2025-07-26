@@ -16,11 +16,6 @@ namespace Final.UserAPI.Services
             _productRepository = productRepository;
         }
 
-        /// <summary>
-        /// Lấy thông tin giỏ hàng của một người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng.</param>
-        /// <returns>Thông tin chi tiết giỏ hàng.</returns>
         public async Task<CartDTO> GetCartByUserIdAsync(long userId)
         {
             var cartEntity = await _shoppingCartRepository.GetOrCreateCartForUserAsync(userId);
@@ -41,14 +36,6 @@ namespace Final.UserAPI.Services
             return cartDto;
         }
 
-        /// <summary>
-        /// Thêm một sản phẩm vào giỏ hàng hoặc cập nhật số lượng nếu đã tồn tại.
-        /// </summary>
-        /// <param name="userId">ID của người dùng.</param>
-        /// <param name="itemDto">Thông tin sản phẩm và số lượng cần thêm.</param>
-        /// <returns>Thông tin giỏ hàng sau khi đã cập nhật.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu sản phẩm không tồn tại.</exception>
-        /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu số lượng tồn kho không đủ.</exception>
         public async Task<CartDTO> AddItemToUserCartAsync(long userId, AddCartItemDTO itemDto)
         {
             var product = await _productRepository.GetProductByProductIdWithImagesAsync(itemDto.ProductId);
@@ -70,13 +57,6 @@ namespace Final.UserAPI.Services
             return await GetCartByUserIdAsync(userId);
         }
 
-        /// <summary>
-        /// Xóa một sản phẩm khỏi giỏ hàng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng.</param>
-        /// <param name="productId">ID của sản phẩm cần xóa.</param>
-        /// <returns>Thông tin giỏ hàng sau khi đã cập nhật.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu sản phẩm không có trong giỏ hàng.</exception>
         public async Task<CartDTO> RemoveItemFromUserCartAsync(long userId, long productId)
         {
             var success = await _shoppingCartRepository.RemoveItemFromUserCartAsync(userId, productId);
@@ -87,24 +67,11 @@ namespace Final.UserAPI.Services
             return await GetCartByUserIdAsync(userId);
         }
 
-        /// <summary>
-        /// Xóa toàn bộ sản phẩm khỏi giỏ hàng của người dùng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng.</param>
         public async Task ClearUserCartAsync(long userId)
         {
             await _shoppingCartRepository.ClearUserCartAsync(userId);
         }
 
-        /// <summary>
-        /// Cập nhật số lượng của một sản phẩm trong giỏ hàng.
-        /// </summary>
-        /// <param name="userId">ID của người dùng.</param>
-        /// <param name="productId">ID của sản phẩm cần cập nhật.</param>
-        /// <param name="newQuantity">Số lượng mới.</param>
-        /// <returns>Thông tin giỏ hàng sau khi đã cập nhật.</returns>
-        /// <exception cref="KeyNotFoundException">Ném ngoại lệ nếu sản phẩm không tồn tại hoặc không có trong giỏ hàng.</exception>
-        /// <exception cref="InvalidOperationException">Ném ngoại lệ nếu số lượng tồn kho không đủ.</exception>
         public async Task<CartDTO> UpdateItemQuantityInUserCartAsync(long userId, long productId, int newQuantity)
         {
             if (newQuantity <= 0)

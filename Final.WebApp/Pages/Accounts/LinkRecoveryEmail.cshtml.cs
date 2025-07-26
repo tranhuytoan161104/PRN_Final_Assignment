@@ -23,7 +23,6 @@ public class LinkRecoveryEmailModel : PageModel
 
     public void OnGet()
     {
-        // Đảm bảo DTO được khởi tạo
         if (RecoveryEmailInput == null)
         {
             RecoveryEmailInput = new LinkRecoveryEmailDTO();
@@ -37,7 +36,6 @@ public class LinkRecoveryEmailModel : PageModel
 
         if (!ModelState.IsValid)
         {
-            // In ra tất cả lỗi validation
             foreach (var modelState in ModelState)
             {
                 var key = modelState.Key;

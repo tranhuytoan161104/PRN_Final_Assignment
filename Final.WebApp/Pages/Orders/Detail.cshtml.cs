@@ -26,7 +26,6 @@ public class DetailModel : PageModel
         }
         catch (KeyNotFoundException)
         {
-            // Nếu không tìm thấy đơn hàng hoặc không phải của user này, trả về 404
             return NotFound();
         }
     }
@@ -40,7 +39,6 @@ public class DetailModel : PageModel
         }
         catch (HttpRequestException ex)
         {
-            // Bắt lỗi nghiệp vụ từ API (ví dụ: đơn hàng không thể hủy)
             TempData["ErrorMessage"] = ex.Message;
         }
         return RedirectToPage(new { orderId });

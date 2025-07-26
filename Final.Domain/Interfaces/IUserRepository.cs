@@ -11,5 +11,8 @@ namespace Final.Domain.Interfaces
         Task<User?> GetUserByUserIdAsync(long userId);
         Task UpdateUserAsync(User user);
         Task<PagedResult<User>> GetAllUserAsync(UserQuery query);
+
+        Task<int> CountUsersInDateRange(DateTime startDate, DateTime endDate);
+        Task<List<User>> GetRecentUsersAsync(int count);
     }
 }

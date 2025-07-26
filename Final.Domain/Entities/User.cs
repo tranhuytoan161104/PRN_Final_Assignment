@@ -14,15 +14,14 @@ namespace Final.Domain.Entities
         public string Role { get; set; } = null!;
         public EUserStatus Status { get; set; }
         public DateTime CreatedAt { get; set; }
-
         public string? SecurityQuestion { get; set; }
         public string? SecurityAnswerHash { get; set; }
-
         public string? RecoveryEmail { get; set; }
         public bool IsRecoveryEmailVerified { get; set; }
-
         public string? PasswordResetToken { get; set; }
         public DateTime? ResetTokenExpiry { get; set; }
+
+        public string? PendingRecoveryEmail { get; set; }
 
         public virtual ICollection<Order>? Orders { get; set; }
         public virtual ICollection<Review>? Reviews { get; set; }

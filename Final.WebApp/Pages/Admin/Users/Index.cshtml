@@ -1,0 +1,61 @@
+﻿@page
+@model Final.WebApp.Pages.Admin.Users.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Người dùng";
+}
+
+<div class="container my-5">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <div class="card mb-4">
+        <div class="card-body">
+            <form method="get" class="row g-3 align-items-end">
+                <div class="col-md-6">
+                    <label asp-for="Query.SearchTerm" class="form-label">Tìm kiếm (Tên, Email)</label>
+                    <input asp-for="Query.SearchTerm" class="form-control" />
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Query.Role" class="form-label">Vai trò</label>
+                    <select asp-for="Query.Role" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="Owner">Owner</option>
+                        <option value="Admin">Admin</option>
+                        <option value="Customer">Customer</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label asp-for="Query.Status" class="form-label">Trạng thái</label>
+                    <select asp-for="Query.Status" class="form-select">
+                        <option value="">Tất cả</option>
+                        <option value="Active">Active</option>
+                        <option value="Inactive">Inactive</option>
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <button type="submit" class="btn btn-outline-primary w-100">Lọc</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <table class="table table-bordered table-hover align-middle">
+        <tbody>
+            @foreach (var user in Model.UsersResult.Items)
+            {
+                <tr>
+                    <td>@user.Id</td>
+                    <td>@user.FirstName @user.LastName</td>
+                    <td>@user.Email</td>
+                    <td>@user.Role</td>
+                    <td>@user.Status</td>
+                    <td class="text-center">
+                        <a asp-page="/Admin/Users/Edit" asp-route-userId="@user.Id" class="btn btn-sm btn-outline-secondary">
+                            Sửa
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

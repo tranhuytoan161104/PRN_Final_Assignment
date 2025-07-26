@@ -1,5 +1,6 @@
 ﻿using Final.Domain.Common;
 using Final.Domain.Entities;
+using Final.Domain.Enums;
 using Final.Domain.Queries;
 using Microsoft.EntityFrameworkCore.Storage;
 
@@ -17,5 +18,11 @@ namespace Final.Domain.Interfaces
         Task<IDbContextTransaction> BeginTransactionAsync();
         Task AddPaymentTransactionAsync(PaymentTransaction transaction);
         Task<int> UpdateOrderAsync();
+
+        Task<decimal> GetTotalRevenueInDateRange(DateTime startDate, DateTime endDate);
+        Task<int> CountOrdersInDateRange(DateTime startDate, DateTime endDate);
+        Task<int> CountOrdersByStatus(EOrderStatus status);
+        Task<List<Order>> GetRecentOrdersAsync(int count); 
+        Task<List<RevenueData>> GetRevenueGroupedByDate(DateTime startDate, DateTime endDate);
     }
 }

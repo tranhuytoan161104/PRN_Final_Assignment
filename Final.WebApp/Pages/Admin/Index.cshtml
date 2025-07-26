@@ -1,0 +1,149 @@
+﻿@page
+@model Final.WebApp.Pages.Admin.IndexModel
+@{
+    ViewData["Title"] = "Dashboard";
+}
+
+<div class="container-fluid my-4">
+    <div class="row">
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-primary shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-primary text-uppercase mb-1">Doanh thu (Tháng này)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Stats.MonthlyRevenue.ToString("N0") ₫</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-success shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-success text-uppercase mb-1">Đơn hàng (Hôm nay)</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Stats.NewOrdersToday</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-info shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-info text-uppercase mb-1">Người dùng mới (Tháng này)</div>
+                            <div class="h5 mb-0 mr-3 font-weight-bold text-gray-800">@Model.Stats.NewUsersThisMonth</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-3 col-md-6 mb-4">
+            <div class="card border-left-warning shadow h-100 py-2">
+                <div class="card-body">
+                    <div class="row no-gutters align-items-center">
+                        <div class="col mr-2">
+                            <div class="text-xs font-weight-bold text-warning text-uppercase mb-1">Đơn hàng chờ xử lý</div>
+                            <div class="h5 mb-0 font-weight-bold text-gray-800">@Model.Stats.PendingOrders</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-xl-8 col-lg-7">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Doanh thu 30 ngày gần nhất</h6>
+                </div>
+                <div class="card-body">
+                    <canvas id="revenueChart"></canvas>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-xl-4 col-lg-5">
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Đơn hàng gần đây</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var order in Model.RecentOrders)
+                    {
+                        <div class="d-flex justify-content-between align-items-center mb-2">
+                            <div>
+                                <a asp-page="/Admin/Orders/Detail" asp-route-orderId="@order.Id"><strong>#@order.Id</strong> - @order.CustomerName</a>
+                                <small class="d-block text-muted">@order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</small>
+                            </div>
+                            <span class="badge bg-info text-dark">@order.Status</span>
+                        </div>
+                    }
+                </div>
+            </div>
+
+            <div class="card shadow mb-4">
+                <div class="card-header py-3">
+                    <h6 class="m-0 font-weight-bold text-primary">Người dùng mới</h6>
+                </div>
+                <div class="card-body">
+                    @foreach (var user in Model.RecentUsers)
+                    {
+                        <div class="mb-2">
+                            <a asp-page="/Admin/Users/Edit" asp-route-userId="@user.Id"><strong>@user.FullName</strong> (@user.Email)</a>
+                            <small class="d-block text-muted">Tham gia: @user.CreatedAt.ToLocalTime().ToString("dd/MM/yyyy")</small>
+                        </div>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function () {
+            // Lấy dữ liệu từ PageModel
+            const revenueData = JSON.parse('@Html.Raw(Model.RevenueChartJsonData)');
+
+            const labels = revenueData.map(d => d.Date);
+            const dataPoints = revenueData.map(d => d.Revenue);
+
+            const ctx = document.getElementById('revenueChart').getContext('2d');
+            new Chart(ctx, {
+                type: 'bar', // hoặc 'line'
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        label: 'Doanh thu (₫)',
+                        data: dataPoints,
+                        backgroundColor: 'rgba(54, 162, 235, 0.6)',
+                        borderColor: 'rgba(54, 162, 235, 1)',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value, index, values) {
+                                    return new Intl.NumberFormat('vi-VN').format(value) + ' ₫';
+                                }
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+}

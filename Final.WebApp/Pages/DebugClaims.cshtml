@@ -1,0 +1,26 @@
+﻿@page
+@model Final.WebApp.Pages.DebugClaimsModel
+@{
+    ViewData["Title"] = "Debug Claims";
+}
+
+<h2>@ViewData["Title"]</h2>
+<p>Dưới đây là tất cả các claim có trong identity của bạn sau khi đăng nhập.</p>
+
+<table class="table table-bordered">
+    <thead class="table-light">
+        <tr>
+            <th>Claim Type</th>
+            <th>Claim Value</th>
+        </tr>
+    </thead>
+    <tbody>
+        @foreach (var claim in User.Claims)
+        {
+            <tr>
+                <td>@claim.Type</td>
+                <td>@claim.Value</td>
+            </tr>
+        }
+    </tbody>
+</table>

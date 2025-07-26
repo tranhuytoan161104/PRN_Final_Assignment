@@ -5,7 +5,6 @@ using System.Security.Claims;
 namespace Final.WebApp.Handlers
 {
 
-    // Handler này sẽ tự động thêm token vào header của mỗi request
     public class HttpAuthHandler : DelegatingHandler
     {
         private readonly IHttpContextAccessor _httpContextAccessor;
@@ -20,7 +19,6 @@ namespace Final.WebApp.Handlers
             var httpContext = _httpContextAccessor.HttpContext;
             if (httpContext?.User.Identity?.IsAuthenticated ?? false)
             {
-                // Lấy token đã lưu trong cookie claims
                 var token = httpContext.User.FindFirstValue("access_token");
 
                 if (!string.IsNullOrEmpty(token))

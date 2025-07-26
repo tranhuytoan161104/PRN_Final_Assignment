@@ -1,0 +1,40 @@
+﻿@page
+@model Final.WebApp.Pages.Admin.Orders.IndexModel
+@{
+    ViewData["Title"] = "Quản lý Đơn hàng";
+}
+
+<div class="container my-5">
+    <h2>@ViewData["Title"]</h2>
+    <hr />
+
+    <table class="table table-bordered table-hover align-middle">
+        <thead class="table-light">
+            <tr>
+                <th>Mã ĐH</th>
+                <th>Ngày đặt</th>
+                <th>Địa chỉ giao hàng</th>
+                <th>Tổng tiền</th>
+                <th>Trạng thái</th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var order in Model.OrdersResult.Items)
+            {
+                <tr>
+                    <td>#@order.Id</td>
+                    <td>@order.OrderDate.ToLocalTime().ToString("dd/MM/yyyy HH:mm")</td>
+                    <td>@order.ShippingAddress</td>
+                    <td>@order.TotalAmount.ToString("N0") ₫</td>
+                    <td><span class="badge bg-primary">@order.Status</span></td>
+                    <td class="text-center">
+                        <a asp-page="/Admin/Orders/Detail" asp-route-orderId="@order.Id" class="btn btn-sm btn-outline-secondary">
+                            Xem & Cập nhật
+                        </a>
+                    </td>
+                </tr>
+            }
+        </tbody>
+    </table>
+</div>

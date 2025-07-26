@@ -33,16 +33,12 @@ namespace Final.UserAPI.Services
             {
                 _logger.LogInformation("Đang chuẩn bị gửi email đến {ToEmail}...", toEmail);
 
-                // Kết nối tới Gmail SMTP
                 await client.ConnectAsync(_mailSettings.SmtpHost, _mailSettings.SmtpPort, SecureSocketOptions.StartTls);
 
-                // Xác thực
                 await client.AuthenticateAsync(_mailSettings.SmtpUser, _mailSettings.SmtpPass);
 
-                // Gửi email  
                 await client.SendAsync(message);
 
-                // Ngắt kết nối
                 await client.DisconnectAsync(true);
 
                 _logger.LogInformation("Gửi email đến {ToEmail} thành công.", toEmail);

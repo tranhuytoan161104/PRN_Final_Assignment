@@ -15,11 +15,6 @@ namespace Final.ProductAPI.Controllers
             _categoryService = categoryService;
         }
 
-        /// <summary>
-        /// Lấy tất cả các danh mục sản phẩm.
-        /// </summary>
-        /// <returns>Một danh sách các danh mục.</returns>
-        /// <response code="200">Trả về danh sách các danh mục thành công.</response>
         [HttpGet]
         [ProducesResponseType(typeof(List<CategoryDTO>), StatusCodes.Status200OK)]
         public async Task<ActionResult<List<CategoryDTO>>> GetAllCategoriesAsync()

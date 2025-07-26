@@ -1,5 +1,6 @@
 ﻿using Final.WebApp.DTOs.Common;
 using Final.WebApp.DTOs.Products;
+using System.Net;
 using System.Text.Json;
 using System.Web;
 
@@ -85,6 +86,78 @@ namespace Final.WebApp.Services
 
             _logger.LogError("Lỗi khi gọi ProductAPI. Status code: {StatusCode}", response.StatusCode);
             throw new HttpRequestException($"Lỗi truy vấn chi tiết sản phẩm. Mã lỗi: {response.StatusCode}");
+        }
+
+        public async Task<ProductDetailDTO> CreateProductAsync(ProductCreationDTO newProduct)
+        {
+            var response = await _httpClient.PostAsJsonAsync("api/products", newProduct);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ProductDetailDTO>() ?? throw new InvalidOperationException();
+            }
+            await HandleErrorResponse(response);
+            return null!;
+        }
+
+        public async Task<ProductDetailDTO> UpdateProductAsync(long productId, ProductUpdateDTO productToUpdate)
+        {
+            var response = await _httpClient.PutAsJsonAsync($"api/products/{productId}", productToUpdate);
+            if (response.IsSuccessStatusCode)
+            {
+                return await response.Content.ReadFromJsonAsync<ProductDetailDTO>() ?? throw new InvalidOperationException();
+            }
+            await HandleErrorResponse(response);
+            return null!;
+        }
+
+        public async Task ArchiveProductAsync(long productId)
+        {
+            var response = await _httpClient.PatchAsync($"api/products/{productId}/archive", null);
+            if (!response.IsSuccessStatusCode)
+            {
+                await HandleErrorResponse(response);
+            }
+        }
+
+        private async Task HandleErrorResponse(HttpResponseMessage response)
+        {
+            if (response.StatusCode == HttpStatusCode.Unauthorized)
+            {
+                throw new HttpRequestException("Phiên đăng nhập hết hạn hoặc không hợp lệ.", null, response.StatusCode);
+            }
+
+            var errorJsonString = await response.Content.ReadAsStringAsync();
+
+            if (string.IsNullOrEmpty(errorJsonString))
+            {
+                throw new HttpRequestException($"Yêu cầu không thành công. Mã trạng thái: {response.StatusCode}", null, response.StatusCode);
+            }
+
+            if (response.StatusCode == HttpStatusCode.BadRequest)
+            {
+                try
+                {
+                    var validationProblem = JsonSerializer.Deserialize<ValidationProblemDTO>(errorJsonString);
+                    if (validationProblem != null && validationProblem.Errors.Any())
+                    {
+                        var errorMessages = validationProblem.Errors.SelectMany(e => e.Value);
+                        throw new HttpRequestException(string.Join("\n", errorMessages), null, response.StatusCode);
+                    }
+                }
+                catch (JsonException) { }
+            }
+
+            try
+            {
+                var errorContent = JsonSerializer.Deserialize<Dictionary<string, string>>(errorJsonString);
+                if (errorContent != null && errorContent.TryGetValue("message", out var message))
+                {
+                    throw new HttpRequestException(message, null, response.StatusCode);
+                }
+            }
+            catch (JsonException) { }
+
+            throw new HttpRequestException($"Yêu cầu không thành công. Mã trạng thái: {response.StatusCode}", null, response.StatusCode);
         }
     }
 }

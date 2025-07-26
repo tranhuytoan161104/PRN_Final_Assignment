@@ -1,0 +1,20 @@
+﻿@page
+@model Final.WebApp.Pages.Checkout.SuccessModel
+@{
+    ViewData["Title"] = "Đặt hàng thành công";
+}
+<div class="container my-5 text-center">
+    <div class="row justify-content-center">
+        <div class="col-lg-6">
+            <i class="bi bi-check-circle-fill text-success" style="font-size: 5rem;"></i>
+            <h1 class="mt-3">Đặt hàng thành công!</h1>
+            <p class="lead">Cảm ơn bạn đã mua hàng. Đơn hàng của bạn đã được ghi nhận với mã số:</p>
+            <h3 class="my-3">#@Model.OrderId</h3>
+            <p>Chúng tôi sẽ xử lý và giao hàng cho bạn trong thời gian sớm nhất.</p>
+            <div class="mt-4">
+                <a asp-page="/Index" class="btn btn-outline-primary">Tiếp tục mua sắm</a>
+                <a asp-page="/Orders/Index" class="btn btn-primary">Xem lịch sử đơn hàng</a>
+            </div>
+        </div>
+    </div>
+</div>

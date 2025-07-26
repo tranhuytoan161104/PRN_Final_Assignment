@@ -1,0 +1,32 @@
+﻿@page
+@model Final.WebApp.Pages.Accounts.SetupSecurityQuestionModel
+@{
+    ViewData["Title"] = "Thiết lập bảo mật";
+}
+<div class="row justify-content-center">
+    <div class="col-md-6">
+        <div class="card shadow-sm">
+            <div class="card-body">
+                <h2 class="card-title text-center">Bước cuối: Câu hỏi bảo mật</h2>
+                <p class="text-muted text-center">Đây là bước cần thiết để khôi phục tài khoản nếu bạn quên mật khẩu.</p>
+                <form method="post">
+                    <input type="hidden" asp-for="Input.UserId" />
+                    <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Question" class="form-label">Câu hỏi</label>
+                        <input asp-for="Input.Question" class="form-control" placeholder="Tên con vật cưng đầu tiên của bạn là gì?" />
+                        <span asp-validation-for="Input.Question" class="text-danger"></span>
+                    </div>
+                    <div class="mb-3">
+                        <label asp-for="Input.Answer" class="form-label">Câu trả lời</label>
+                        <input asp-for="Input.Answer" class="form-control" />
+                        <span asp-validation-for="Input.Answer" class="text-danger"></span>
+                    </div>
+                    <div class="d-grid">
+                        <button type="submit" class="btn btn-primary">Hoàn tất</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>

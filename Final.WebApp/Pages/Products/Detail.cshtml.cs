@@ -1,5 +1,7 @@
 ﻿using Final.WebApp.DTOs.Products;
+using Final.WebApp.DTOs.Carts;
 using Final.WebApp.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 
@@ -9,19 +11,20 @@ namespace Final.WebApp.Pages.Products
     public class DetailModel : PageModel
     {
         private readonly IProductApiService _productApiService;
+        private readonly ICartApiService _cartApiService;
         private readonly ILogger<DetailModel> _logger;
 
-        public DetailModel(IProductApiService productApiService, ILogger<DetailModel> logger)
+        public DetailModel(IProductApiService productApiService, ICartApiService cartApiService, ILogger<DetailModel> logger)
         {
             _productApiService = productApiService;
+            _cartApiService = cartApiService;
             _logger = logger;
         }
 
         public ProductDetailDTO? Product { get; set; }
         public string? ErrorMessage { get; set; }
 
-        // [BindProperty] s? ???c dùng cho nút "Thêm vào gi? hàng" sau này
-        // public int Quantity { get; set; } = 1;
+        public int Quantity { get; set; } = 1;
 
         public async Task<IActionResult> OnGetAsync(long id)
         {
@@ -41,6 +44,31 @@ namespace Final.WebApp.Pages.Products
             }
 
             return Page();
+        }
+
+        [Authorize] 
+        public async Task<IActionResult> OnPostAsync(long id)
+        {
+            var product = await _productApiService.GetProductDetailAsync(id);
+            if (Quantity > product.StockQuantity)
+            {
+                TempData["ErrorMessage"] = $"Số lượng tồn kho không đủ. Chỉ còn {product.StockQuantity} sản phẩm.";
+                return RedirectToPage(new { id });
+            }
+
+            try
+            {
+                var item = new AddCartItemDTO { ProductId = id, Quantity = this.Quantity };
+                await _cartApiService.AddItemToCartAsync(item);
+
+                TempData["SuccessMessage"] = "Đã thêm sản phẩm vào giỏ hàng thành công!";
+                return RedirectToPage("/Cart/Index");
+            }
+            catch (HttpRequestException ex)
+            {
+                TempData["ErrorMessage"] = ex.Message;
+                return RedirectToPage(new { id });
+            }
         }
     }
 }

@@ -1,0 +1,89 @@
+﻿@page
+@model Final.WebApp.Pages.Cart.IndexModel
+@{
+    ViewData["Title"] = "Giỏ hàng";
+}
+
+<div class="container my-5">
+    <h2>Giỏ hàng của bạn</h2>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    @if (Model.Cart.Items.Any())
+    {
+        <div class="row">
+            <div class="col-lg-8">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th scope="col" colspan="2">Sản phẩm</th>
+                            <th scope="col">Đơn giá</th>
+                            <th scope="col">Số lượng</th>
+                            <th scope="col">Tạm tính</th>
+                            <th scope="col"></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var item in Model.Cart.Items)
+                        {
+                            <tr>
+                                <td style="width: 100px;">
+                                    <img src="@(item.ImageUrl ?? "https://placehold.co/100x100")" class="img-fluid rounded" alt="@item.ProductName">
+                                </td>
+                                <td>@item.ProductName</td>
+                                <td>@item.Price.ToString("N0") ₫</td>
+                                <td>
+                                    <form method="post" asp-page-handler="UpdateQuantity">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <input type="number" name="quantity" value="@item.Quantity" class="form-control" style="width: 80px;" onchange="this.form.submit()" />
+                                    </form>
+                                </td>
+                                <td>@((item.Price * item.Quantity).ToString("N0")) ₫</td>
+                                <td>
+                                    <form method="post" asp-page-handler="RemoveItem">
+                                        <input type="hidden" name="productId" value="@item.ProductId" />
+                                        <button type="submit" class="btn btn-sm btn-outline-danger">&times;</button>
+                                    </form>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+            <div class="col-lg-4">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">Tổng cộng</h5>
+                        <ul class="list-group list-group-flush">
+                            <li class="list-group-item d-flex justify-content-between">
+                                <span>Tạm tính</span>
+                                <span>@Model.Cart.TotalPrice.ToString("N0") ₫</span>
+                            </li>
+                            <li class="list-group-item d-flex justify-content-between fw-bold">
+                                <span>Thành tiền</span>
+                                <span>@Model.Cart.TotalPrice.ToString("N0") ₫</span>
+                            </li>
+                        </ul>
+                        <div class="d-grid mt-3">
+                            <a asp-page="/Checkout/Index" class="btn btn-primary">Tiến hành thanh toán</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
+    else
+    {
+        <div class="text-center">
+            <p>Giỏ hàng của bạn đang trống.</p>
+            <a asp-page="/Index" class="btn btn-primary">Tiếp tục mua sắm</a>
+        </div>
+    }
+</div>

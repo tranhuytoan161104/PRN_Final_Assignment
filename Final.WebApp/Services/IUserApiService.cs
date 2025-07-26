@@ -1,4 +1,5 @@
 ﻿using Final.WebApp.DTOs.Users;
+using Final.WebApp.DTOs.PasswordReset;
 
 namespace Final.WebApp.Services
 {
@@ -6,5 +7,15 @@ namespace Final.WebApp.Services
     {
         Task<string> LoginAsync(LoginDTO loginDto);
         Task<UserDTO> RegisterAsync(RegisterDTO registerDto);
+        Task<UserProfileDTO> GetMyProfileAsync();
+        Task<UserProfileDTO> UpdateMyProfileAsync(UpdateProfileDTO profile);
+        Task ChangeMyPasswordAsync(ChangePasswordDTO passwords);
+
+        Task SetupSecurityQuestionAsync(SetupSecurityQuestionDTO dto);
+        Task<string> GetSecurityQuestionByEmailAsync(string email);
+        Task<string> VerifySecurityAnswerAndGenerateTokenAsync(VerifySecurityAnswerDTO dto);
+        Task SendRecoveryEmailAsync(SendRecoveryEmailDTO dto);
+        Task ResetPasswordAsync(ResetPasswordDTO dto);
+        Task LinkRecoveryEmailAsync(LinkRecoveryEmailDTO dto);
     }
 }

@@ -50,7 +50,8 @@ namespace Final.WebApp.Pages.Accounts
 
                 var handler = new JwtSecurityTokenHandler();
                 var token = handler.ReadJwtToken(jwtToken);
-                var claims = token.Claims;
+                var claims = new List<Claim>(token.Claims);
+                claims.Add(new Claim("access_token", jwtToken));
 
                 var claimsIdentity = new ClaimsIdentity(claims, CookieAuthenticationDefaults.AuthenticationScheme);
                 var authProperties = new AuthenticationProperties

@@ -31,11 +31,9 @@ namespace Final.WebApp.Pages.Accounts
 
             try
             {
-                await _userApiService.RegisterAsync(RegisterInput);
+                var createdUser = await _userApiService.RegisterAsync(RegisterInput);
 
-                TempData["SuccessMessage"] = "Đăng ký tài khoản thành công! Vui lòng đăng nhập.";
-
-                return RedirectToPage("/Accounts/Login");
+                return RedirectToPage("/Accounts/SetupSecurityQuestion", new { userId = createdUser.Id });
             }
             catch (HttpRequestException ex)
             {

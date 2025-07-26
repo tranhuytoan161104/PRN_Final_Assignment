@@ -1,6 +1,7 @@
-using System.Text.Json.Serialization;
+using Final.WebApp.Handlers;
 using Final.WebApp.Services;
 using Microsoft.AspNetCore.Authentication.Cookies;
+using System.Text.Json.Serialization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -15,15 +16,28 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
         options.SlidingExpiration = true;
     });
 
+builder.Services.AddHttpContextAccessor();
+builder.Services.AddTransient<HttpAuthHandler>();
+
 builder.Services.AddHttpClient<IProductApiService, ProductApiService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:ProductApiUrl"]!);
-});
+}).AddHttpMessageHandler<HttpAuthHandler>();
 
 builder.Services.AddHttpClient<IUserApiService, UserApiService>(client =>
 {
     client.BaseAddress = new Uri(builder.Configuration["ApiSettings:UserApiUrl"]!);
-});
+}).AddHttpMessageHandler<HttpAuthHandler>();
+
+builder.Services.AddHttpClient<ICartApiService, CartApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:UserApiUrl"]!);
+}).AddHttpMessageHandler<HttpAuthHandler>();
+
+builder.Services.AddHttpClient<IOrderApiService, OrderApiService>(client =>
+{
+    client.BaseAddress = new Uri(builder.Configuration["ApiSettings:OrderApiUrl"]!);
+}).AddHttpMessageHandler<HttpAuthHandler>();
 
 var app = builder.Build();
 

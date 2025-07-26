@@ -1,4 +1,4 @@
-﻿namespace Final.WebApp.DTOs.Products
+﻿namespace Final.WebApp.DTOs.Common
 {
     public class PagedResult<T>
     {

@@ -217,7 +217,7 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 1L,
-                            OrderDate = new DateTime(2025, 6, 9, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3804),
+                            OrderDate = new DateTime(2025, 6, 11, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5288),
                             PhoneNumber = "0901234567",
                             ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM",
                             Status = "Delivered",
@@ -227,17 +227,17 @@ namespace Final.Persistence.Migrations
                         new
                         {
                             Id = 2L,
-                            OrderDate = new DateTime(2025, 6, 29, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3807),
+                            OrderDate = new DateTime(2025, 7, 1, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5291),
                             PhoneNumber = "0987654321",
                             ShippingAddress = "456 Đường XYZ, Quận Hoàn Kiếm, Hà Nội",
-                            Status = "Shipped",
+                            Status = "Processing",
                             TotalAmount = 53000000m,
                             UserId = 7L
                         },
                         new
                         {
                             Id = 3L,
-                            OrderDate = new DateTime(2025, 7, 14, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3809),
+                            OrderDate = new DateTime(2025, 7, 16, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5293),
                             PhoneNumber = "0901234567",
                             ShippingAddress = "123 Đường ABC, Quận 1, TP.HCM",
                             Status = "Cancelled",
@@ -395,6 +395,7 @@ namespace Final.Persistence.Migrations
                         .HasColumnType("datetime2");
 
                     b.Property<string>("TransactionId")
+                        .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
                     b.HasKey("Id");
@@ -411,7 +412,7 @@ namespace Final.Persistence.Migrations
                             OrderId = 1L,
                             PaymentMethod = "MOMO",
                             Status = "Success",
-                            TransactionDate = new DateTime(2025, 6, 9, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3882),
+                            TransactionDate = new DateTime(2025, 6, 11, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5380),
                             TransactionId = "MOMO123456789"
                         },
                         new
@@ -421,7 +422,7 @@ namespace Final.Persistence.Migrations
                             OrderId = 2L,
                             PaymentMethod = "VNPAY",
                             Status = "Success",
-                            TransactionDate = new DateTime(2025, 6, 29, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3886),
+                            TransactionDate = new DateTime(2025, 7, 1, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5383),
                             TransactionId = "VNPAY987654321"
                         },
                         new
@@ -431,7 +432,7 @@ namespace Final.Persistence.Migrations
                             OrderId = 3L,
                             PaymentMethod = "MOMO",
                             Status = "Failed",
-                            TransactionDate = new DateTime(2025, 7, 14, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3888),
+                            TransactionDate = new DateTime(2025, 7, 16, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5384),
                             TransactionId = "MOMOFAILED001"
                         });
                 });
@@ -493,7 +494,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 1L,
                             CategoryId = 1L,
-                            CreatedAt = new DateTime(2025, 4, 15, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3445),
+                            CreatedAt = new DateTime(2025, 4, 17, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5132),
                             Description = "Vi xử lý đầu bảng cho gaming và sáng tạo nội dung.",
                             Name = "Intel Core i9-14900K",
                             Price = 15500000m,
@@ -506,7 +507,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 2L,
                             CategoryId = 1L,
-                            CreatedAt = new DateTime(2025, 4, 25, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3454),
+                            CreatedAt = new DateTime(2025, 4, 27, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5147),
                             Description = "Hiệu năng gaming thuần túy tốt nhất phân khúc nhờ 3D V-Cache.",
                             Name = "AMD Ryzen 7 7800X3D",
                             Price = 9800000m,
@@ -519,7 +520,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 1L,
                             CategoryId = 1L,
-                            CreatedAt = new DateTime(2025, 5, 5, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3456),
+                            CreatedAt = new DateTime(2025, 5, 7, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5149),
                             Description = "Vi xử lý tầm trung p/p tốt nhất cho gaming.",
                             Name = "Intel Core i5-14600K",
                             Price = 8500000m,
@@ -532,7 +533,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 3L,
                             CategoryId = 2L,
-                            CreatedAt = new DateTime(2025, 3, 26, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3458),
+                            CreatedAt = new DateTime(2025, 3, 28, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5151),
                             Description = "Sức mạnh tối thượng cho gaming 4K và các tác vụ AI.",
                             Name = "NVIDIA GeForce RTX 4090",
                             Price = 45000000m,
@@ -545,7 +546,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 2L,
                             CategoryId = 2L,
-                            CreatedAt = new DateTime(2025, 4, 5, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3460),
+                            CreatedAt = new DateTime(2025, 4, 7, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5153),
                             Description = "Card đồ họa đầu bảng của AMD, đối thủ cạnh tranh trực tiếp với RTX 4080.",
                             Name = "AMD Radeon RX 7900 XTX",
                             Price = 28500000m,
@@ -558,7 +559,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 14L,
                             CategoryId = 2L,
-                            CreatedAt = new DateTime(2025, 1, 5, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3461),
+                            CreatedAt = new DateTime(2025, 1, 7, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5154),
                             Description = "Card đồ họa quốc dân cho gaming Full HD.",
                             Name = "Gigabyte RTX 3060 Gaming OC",
                             Price = 8200000m,
@@ -571,7 +572,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 4L,
                             CategoryId = 3L,
-                            CreatedAt = new DateTime(2025, 2, 24, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3463),
+                            CreatedAt = new DateTime(2025, 2, 26, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5156),
                             Description = "Kit RAM DDR5 hiệu năng cao, tản nhiệt nhôm.",
                             Name = "Corsair Vengeance DDR5 32GB 6000MHz",
                             Price = 3200000m,
@@ -584,7 +585,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 8L,
                             CategoryId = 3L,
-                            CreatedAt = new DateTime(2025, 3, 6, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3465),
+                            CreatedAt = new DateTime(2025, 3, 8, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5158),
                             Description = "Thiết kế đẹp mắt với LED RGB, tốc độ bus cao.",
                             Name = "G.Skill Trident Z5 RGB DDR5 32GB 6400MHz",
                             Price = 3800000m,
@@ -597,7 +598,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 6L,
                             CategoryId = 4L,
-                            CreatedAt = new DateTime(2025, 1, 25, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3467),
+                            CreatedAt = new DateTime(2025, 1, 27, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5160),
                             Description = "Ổ cứng NVMe Gen4 nhanh nhất thị trường.",
                             Name = "Samsung 990 Pro NVMe M.2 SSD 2TB",
                             Price = 4500000m,
@@ -610,7 +611,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 7L,
                             CategoryId = 4L,
-                            CreatedAt = new DateTime(2025, 2, 4, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3468),
+                            CreatedAt = new DateTime(2025, 2, 6, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5163),
                             Description = "Tốc độ đọc ghi cực nhanh, lựa chọn hàng đầu của game thủ.",
                             Name = "WD Black SN850X NVMe M.2 SSD 1TB",
                             Price = 2600000m,
@@ -623,7 +624,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 13L,
                             CategoryId = 6L,
-                            CreatedAt = new DateTime(2025, 5, 25, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3470),
+                            CreatedAt = new DateTime(2025, 5, 27, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5165),
                             Description = "Bo mạch chủ cao cấp cho CPU Intel thế hệ 14.",
                             Name = "ASUS ROG STRIX Z790-E GAMING WIFI II",
                             Price = 16000000m,
@@ -636,7 +637,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 12L,
                             CategoryId = 6L,
-                            CreatedAt = new DateTime(2025, 6, 4, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3472),
+                            CreatedAt = new DateTime(2025, 6, 6, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5167),
                             Description = "Bo mạch chủ tầm trung tốt nhất cho nhu cầu gaming.",
                             Name = "MSI MAG B760M MORTAR WIFI DDR5",
                             Price = 5300000m,
@@ -649,7 +650,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 15L,
                             CategoryId = 7L,
-                            CreatedAt = new DateTime(2025, 6, 14, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3473),
+                            CreatedAt = new DateTime(2025, 6, 16, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5168),
                             Description = "Màn hình OLED 2K 240Hz cho trải nghiệm gaming đỉnh cao.",
                             Name = "LG UltraGear 27GR95QE-B 240Hz OLED",
                             Price = 24500000m,
@@ -662,7 +663,7 @@ namespace Final.Persistence.Migrations
                             AddAt = new DateTime(1, 1, 1, 0, 0, 0, 0, DateTimeKind.Unspecified),
                             BrandId = 16L,
                             CategoryId = 7L,
-                            CreatedAt = new DateTime(2025, 6, 24, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3475),
+                            CreatedAt = new DateTime(2025, 6, 26, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5170),
                             Description = "Màn hình 4K chuyên đồ họa với tấm nền IPS Black.",
                             Name = "Dell UltraSharp U2723QE 4K IPS",
                             Price = 13800000m,
@@ -791,7 +792,7 @@ namespace Final.Persistence.Migrations
                         {
                             Id = 1L,
                             Comment = "CPU gaming tốt nhất hiện tại, không có gì để chê!",
-                            CreatedAt = new DateTime(2025, 5, 5, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3699),
+                            CreatedAt = new DateTime(2025, 5, 7, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5225),
                             ProductId = 2L,
                             Rating = 5,
                             UserId = 4L
@@ -800,7 +801,7 @@ namespace Final.Persistence.Migrations
                         {
                             Id = 2L,
                             Comment = "Đắt nhưng xắt ra miếng. Cân mọi game 4K max setting.",
-                            CreatedAt = new DateTime(2025, 5, 15, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3701),
+                            CreatedAt = new DateTime(2025, 5, 17, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5227),
                             ProductId = 4L,
                             Rating = 5,
                             UserId = 5L
@@ -809,7 +810,7 @@ namespace Final.Persistence.Migrations
                         {
                             Id = 3L,
                             Comment = "Tốc độ rất nhanh, nhưng giá hơi cao so với các hãng khác.",
-                            CreatedAt = new DateTime(2025, 5, 25, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3702),
+                            CreatedAt = new DateTime(2025, 5, 27, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5228),
                             ProductId = 10L,
                             Rating = 4,
                             UserId = 6L
@@ -818,7 +819,7 @@ namespace Final.Persistence.Migrations
                         {
                             Id = 4L,
                             Comment = "Mainboard p/p quá tốt, đầy đủ cổng kết nối.",
-                            CreatedAt = new DateTime(2025, 6, 14, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3704),
+                            CreatedAt = new DateTime(2025, 6, 16, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5229),
                             ProductId = 12L,
                             Rating = 5,
                             UserId = 4L
@@ -827,7 +828,7 @@ namespace Final.Persistence.Migrations
                         {
                             Id = 5L,
                             Comment = "Màu sắc và tần số quét của màn hình này thật sự tuyệt vời.",
-                            CreatedAt = new DateTime(2025, 7, 4, 18, 59, 7, 820, DateTimeKind.Utc).AddTicks(3705),
+                            CreatedAt = new DateTime(2025, 7, 6, 10, 42, 29, 498, DateTimeKind.Utc).AddTicks(5231),
                             ProductId = 13L,
                             Rating = 5,
                             UserId = 7L
@@ -935,6 +936,9 @@ namespace Final.Persistence.Migrations
                         .HasMaxLength(50)
                         .HasColumnType("nvarchar(50)");
 
+                    b.Property<bool>("IsRecoveryEmailVerified")
+                        .HasColumnType("bit");
+
                     b.Property<string>("LastName")
                         .IsRequired()
                         .HasMaxLength(50)
@@ -944,10 +948,25 @@ namespace Final.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
+                    b.Property<string>("PasswordResetToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RecoveryEmail")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("ResetTokenExpiry")
+                        .HasColumnType("datetime2");
+
                     b.Property<string>("Role")
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("nvarchar(20)");
+
+                    b.Property<string>("SecurityAnswerHash")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("SecurityQuestion")
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<int>("Status")
                         .HasColumnType("int");
@@ -966,6 +985,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "owner@final.com",
                             FirstName = "Văn",
+                            IsRecoveryEmailVerified = false,
                             LastName = "Toàn",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Owner",
@@ -977,6 +997,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 1, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin@final.com",
                             FirstName = "Quốc",
+                            IsRecoveryEmailVerified = false,
                             LastName = "Tuấn",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Admin",
@@ -988,6 +1009,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 1, 15, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "admin2@final.com",
                             FirstName = "Thanh",
+                            IsRecoveryEmailVerified = false,
                             LastName = "Bình",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Admin",
@@ -999,6 +1021,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 2, 10, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "minhan@customer.com",
                             FirstName = "Minh",
+                            IsRecoveryEmailVerified = false,
                             LastName = "An",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Customer",
@@ -1010,6 +1033,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 3, 20, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "baochau@customer.com",
                             FirstName = "Bảo",
+                            IsRecoveryEmailVerified = false,
                             LastName = "Châu",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Customer",
@@ -1021,6 +1045,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 5, 1, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "giahan@customer.com",
                             FirstName = "Gia",
+                            IsRecoveryEmailVerified = false,
                             LastName = "Hân",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Customer",
@@ -1032,6 +1057,7 @@ namespace Final.Persistence.Migrations
                             CreatedAt = new DateTime(2023, 6, 12, 0, 0, 0, 0, DateTimeKind.Utc),
                             Email = "dangkhoa@customer.com",
                             FirstName = "Đăng",
+                            IsRecoveryEmailVerified = false,
                             LastName = "Khoa",
                             PasswordHash = "$2a$11$N1brDk6.a9UHivirpPppuuV30cywfm.PCZIOdKoe6RPb1zfVdjlM2",
                             Role = "Customer",

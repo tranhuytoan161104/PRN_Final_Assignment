@@ -1,0 +1,60 @@
+﻿@page
+@model Final.WebApp.Pages.Checkout.IndexModel
+@{
+    ViewData["Title"] = "Thanh toán";
+}
+
+<div class="container my-5">
+    <h2>Thông tin thanh toán</h2>
+    <hr />
+
+    <form method="post">
+        <div asp-validation-summary="ModelOnly" class="alert alert-danger"></div>
+        <div class="row">
+            <div class="col-md-7">
+                <h4>Thông tin giao hàng</h4>
+                <div class="mb-3">
+                    <label asp-for="OrderInput.ShippingAddress" class="form-label">Địa chỉ</label>
+                    <input asp-for="OrderInput.ShippingAddress" class="form-control" />
+                    <span asp-validation-for="OrderInput.ShippingAddress" class="text-danger"></span>
+                </div>
+                <div class="mb-3">
+                    <label asp-for="OrderInput.PhoneNumber" class="form-label">Số điện thoại</label>
+                    <input asp-for="OrderInput.PhoneNumber" class="form-control" />
+                    <span asp-validation-for="OrderInput.PhoneNumber" class="text-danger"></span>
+                </div>
+
+                <h4 class="mt-4">Phương thức thanh toán</h4>
+                <div class="mb-3">
+                    <select asp-for="OrderInput.PaymentMethod" asp-items="Model.PaymentMethods" class="form-select">
+                        <option value="">-- Chọn phương thức --</option>
+                    </select>
+                    <span asp-validation-for="OrderInput.PaymentMethod" class="text-danger"></span>
+                </div>
+            </div>
+
+            <div class="col-md-5">
+                <div class="card">
+                    <div class="card-body">
+                        <h4 class="card-title">Tóm tắt đơn hàng</h4>
+                        @foreach (var item in Model.Cart.Items)
+                        {
+                            <div class="d-flex justify-content-between">
+                                <span>@item.ProductName x @item.Quantity</span>
+                                <span>@((item.Price * item.Quantity).ToString("N0")) ₫</span>
+                            </div>
+                        }
+                        <hr />
+                        <div class="d-flex justify-content-between fw-bold fs-5">
+                            <span>Tổng cộng</span>
+                            <span>@Model.Cart.TotalPrice.ToString("N0") ₫</span>
+                        </div>
+                        <div class="d-grid mt-3">
+                            <button type="submit" class="btn btn-primary btn-lg">Hoàn tất đơn hàng</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </form>
+</div>

@@ -4,6 +4,8 @@ using Final.Domain.Enums;
 using Final.Domain.Interfaces;
 using Final.Domain.Queries;
 using Final.UserAPI.DTOs;
+using Final.UserAPI.DTOs.PasswordReset;
+using System.Security.Cryptography;
 
 namespace Final.UserAPI.Services
 {
@@ -11,11 +13,13 @@ namespace Final.UserAPI.Services
     {
         private readonly IUserRepository _userRepository;
         private readonly ITokenService _tokenService;
+        private readonly IEmailService _emailService;
 
-        public UserService(IUserRepository userRepository, ITokenService tokenService)
+        public UserService(IUserRepository userRepository, ITokenService tokenService, IEmailService emailService)
         {
             _userRepository = userRepository;
             _tokenService = tokenService;
+            _emailService = emailService;
         }
 
         /// <summary>
@@ -216,6 +220,110 @@ namespace Final.UserAPI.Services
                 Status = user.Status,
                 CreatedAt = user.CreatedAt
             };
+        }
+
+        public async Task SetupSecurityQuestionAsync(SetupSecurityQuestionDTO dto)
+        {
+            var user = await _userRepository.GetUserByUserIdAsync(dto.UserId)
+                ?? throw new KeyNotFoundException("Không tìm thấy người dùng.");
+
+            user.SecurityQuestion = dto.Question;
+            user.SecurityAnswerHash = BCrypt.Net.BCrypt.HashPassword(dto.Answer);
+            await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task<string> GetSecurityQuestionByEmailAsync(string email)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(email)
+                ?? throw new KeyNotFoundException("Email không tồn tại trong hệ thống.");
+            if (string.IsNullOrEmpty(user.SecurityQuestion))
+                throw new InvalidOperationException("Người dùng này chưa thiết lập câu hỏi bảo mật.");
+            return user.SecurityQuestion;
+        }
+
+        public async Task<string> VerifySecurityAnswerAndGenerateTokenAsync(VerifySecurityAnswerDTO dto)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(dto.Email)
+                ?? throw new KeyNotFoundException("Email không tồn tại.");
+
+            if (string.IsNullOrEmpty(user.SecurityAnswerHash) || !BCrypt.Net.BCrypt.Verify(dto.Answer, user.SecurityAnswerHash))
+            {
+                throw new InvalidOperationException("Câu trả lời bảo mật không chính xác.");
+            }
+            var token = GenerateSecureToken();
+            user.PasswordResetToken = token;
+            user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+            await _userRepository.UpdateUserAsync(user);
+            return token;
+        }
+
+        public async Task SendRecoveryEmailAsync(SendRecoveryEmailDTO dto)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(dto.Email)
+                ?? throw new KeyNotFoundException("Email không tồn tại.");
+            if (!user.IsRecoveryEmailVerified || string.IsNullOrEmpty(user.RecoveryEmail))
+            {
+                throw new InvalidOperationException("Tài khoản này chưa liên kết hoặc chưa xác thực email khôi phục.");
+            }
+            var token = GenerateSecureToken();
+            user.PasswordResetToken = token;
+            user.ResetTokenExpiry = DateTime.UtcNow.AddHours(1);
+            await _userRepository.UpdateUserAsync(user);
+            var resetLink = $"{dto.ResetPasswordUrl}?token={token}&email={Uri.EscapeDataString(user.Email)}";
+            var body = $"<p>Vui lòng nhấp vào liên kết sau để đặt lại mật khẩu của bạn:</p><a href='{resetLink}'>Đặt lại mật khẩu</a>";
+            await _emailService.SendEmailAsync(user.RecoveryEmail, "Yêu cầu đặt lại mật khẩu", body);
+        }
+
+        public async Task ResetPasswordAsync(ResetPasswordDTO dto)
+        {
+            var user = await _userRepository.GetUserByEmailAsync(dto.Email)
+                ?? throw new KeyNotFoundException("Email không tồn tại.");
+            if (user.PasswordResetToken != dto.Token || user.ResetTokenExpiry <= DateTime.UtcNow)
+            {
+                throw new InvalidOperationException("Token không hợp lệ hoặc đã hết hạn.");
+            }
+            user.PasswordHash = BCrypt.Net.BCrypt.HashPassword(dto.NewPassword);
+            user.PasswordResetToken = null;
+            user.ResetTokenExpiry = null;
+            await _userRepository.UpdateUserAsync(user);
+        }
+
+        public async Task SendVerificationEmailAsync(long userId, LinkRecoveryEmailDTO dto)
+        {
+            var user = await _userRepository.GetUserByUserIdAsync(userId)
+                 ?? throw new KeyNotFoundException("Không tìm thấy người dùng.");
+            var token = GenerateSecureToken();
+            user.PasswordResetToken = token;
+            user.ResetTokenExpiry = DateTime.UtcNow.AddDays(1);
+            user.RecoveryEmail = dto.RecoveryEmail;
+            user.IsRecoveryEmailVerified = false;
+            await _userRepository.UpdateUserAsync(user);
+            var verificationLink = $"{dto.VerificationUrl}?token={token}&userId={userId}";
+            var body = $"<p>Vui lòng nhấp vào liên kết sau để xác thực email khôi phục:</p><a href='{verificationLink}'>Xác thực Email</a>";
+            await _emailService.SendEmailAsync(dto.RecoveryEmail, "Xác thực email khôi phục", body);
+        }
+
+        public async Task<bool> VerifyRecoveryEmailTokenAsync(long userId, string token)
+        {
+            var user = await _userRepository.GetUserByUserIdAsync(userId);
+            if (user == null || user.PasswordResetToken != token || user.ResetTokenExpiry <= DateTime.UtcNow)
+            {
+                return false;
+            }
+            user.IsRecoveryEmailVerified = true;
+            // Giữ lại RecoveryEmail, chỉ xóa token
+            user.PasswordResetToken = null;
+            user.ResetTokenExpiry = null;
+            await _userRepository.UpdateUserAsync(user);
+            return true;
+        }
+
+        // (Các phương thức private và helper khác như MapToUserDTO, GenerateSecureToken...)
+        private string GenerateSecureToken()
+        {
+            return Convert.ToBase64String(RandomNumberGenerator.GetBytes(64))
+                .Replace('+', '-')
+                .Replace('/', '_');
         }
     }
 }

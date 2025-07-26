@@ -1,0 +1,67 @@
+﻿@page "{orderId:long}"
+@model Final.WebApp.Pages.Orders.DetailModel
+@{
+    ViewData["Title"] = $"Chi tiết đơn hàng #{Model.Order.Id}";
+}
+
+<div class="container my-5">
+    <nav aria-label="breadcrumb">
+        <ol class="breadcrumb">
+            <li class="breadcrumb-item"><a asp-page="/Index">Trang chủ</a></li>
+            <li class="breadcrumb-item"><a asp-page="/Orders/Index">Lịch sử đơn hàng</a></li>
+            <li class="breadcrumb-item active" aria-current="page">Đơn hàng #@Model.Order.Id</li>
+        </ol>
+    </nav>
+
+    @if (TempData["SuccessMessage"] != null)
+    {
+        <div class="alert alert-success">@TempData["SuccessMessage"]</div>
+    }
+    @if (TempData["ErrorMessage"] != null)
+    {
+        <div class="alert alert-danger">@TempData["ErrorMessage"]</div>
+    }
+
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <h4 class="mb-0">Chi tiết đơn hàng #@Model.Order.Id</h4>
+            <span class="badge bg-info fs-6">@Model.Order.Status</span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <strong>Ngày đặt:</strong> @Model.Order.OrderDate.ToString("dd/MM/yyyy HH:mm")<br>
+                    <strong>Địa chỉ giao hàng:</strong> @Model.Order.ShippingAddress<br>
+                    <strong>Số điện thoại:</strong> @Model.Order.PhoneNumber
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <h5 class="fw-bold">Tổng cộng: @Model.Order.TotalAmount.ToString("N0") ₫</h5>
+                </div>
+            </div>
+
+            <hr />
+            <h5>Các sản phẩm đã đặt</h5>
+            <table class="table">
+                <tbody>
+                    @foreach (var item in Model.Order.OrderItems)
+                    {
+                        <tr>
+                            <td>@item.ProductName</td>
+                            <td>Số lượng: @item.Quantity</td>
+                            <td class="text-end">@((item.Price * item.Quantity).ToString("N0")) ₫</td>
+                        </tr>
+                    }
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer text-end">
+            @if (Model.Order.Status is "Pending" or "Processing")
+            {
+                <form method="post" asp-page-handler="CancelOrder" asp-route-orderId="@Model.Order.Id"
+                      onsubmit="return confirm('Bạn có chắc chắn muốn hủy đơn hàng này không?');">
+                    <button type="submit" class="btn btn-danger">Hủy đơn hàng</button>
+                </form>
+            }
+        </div>
+    </div>
+</div>

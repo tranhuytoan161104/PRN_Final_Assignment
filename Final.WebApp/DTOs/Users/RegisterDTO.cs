@@ -14,11 +14,16 @@ namespace Final.WebApp.DTOs.Users
 
         [Required(ErrorMessage = "Email không được để trống.")]
         [EmailAddress(ErrorMessage = "Email không đúng định dạng.")]
+        // --- VALIDATION MỚI CHO EMAIL ---
+        [RegularExpression(@"^[a-zA-Z0-9._%+-]+@gmail\.com$", ErrorMessage = "Email phải có đuôi @gmail.com.")]
         public string Email { get; set; } = null!;
 
         [Required(ErrorMessage = "Mật khẩu không được để trống.")]
         [MinLength(6, ErrorMessage = "Mật khẩu phải có ít nhất 6 ký tự.")]
         [DataType(DataType.Password)]
+        // --- VALIDATION MỚI CHO MẬT KHẨU ---
+        [RegularExpression(@"^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{6,}$",
+            ErrorMessage = "Mật khẩu phải chứa ít nhất 1 chữ hoa, 1 chữ thường, 1 số và 1 ký tự đặc biệt.")]
         public string Password { get; set; } = null!;
 
         [DataType(DataType.Password)]

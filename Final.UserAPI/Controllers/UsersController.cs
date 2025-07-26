@@ -1,6 +1,7 @@
 ﻿using Final.Domain.Common;
 using Final.Domain.Queries;
 using Final.UserAPI.DTOs;
+using Final.UserAPI.DTOs.PasswordReset;
 using Final.UserAPI.Services;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -209,5 +210,68 @@ namespace Final.UserAPI.Controllers
             var updatedUser = await _userService.UpdateUserStatusByUserIdAsync(userId, updateUserStatusDto);
             return Ok(updatedUser);
         }
+
+        #region Password Recovery Endpoints
+        [HttpPost("setup-security-question")]
+        [AllowAnonymous] // SỬA từ [Authorize]
+        public async Task<IActionResult> SetupSecurityQuestion([FromBody] SetupSecurityQuestionDTO dto)
+        {
+            // SỬA logic bên trong
+            await _userService.SetupSecurityQuestionAsync(dto);
+            return Ok(new { message = "Thiết lập câu hỏi bảo mật thành công." });
+        }
+
+        [HttpPost("forgot-password/question")]
+        [AllowAnonymous]
+        public async Task<IActionResult> GetSecurityQuestion([FromBody] ForgotPasswordRequestDTO dto)
+        {
+            var question = await _userService.GetSecurityQuestionByEmailAsync(dto.Email);
+            return Ok(new { question });
+        }
+
+        [HttpPost("forgot-password/verify-answer")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyAnswer([FromBody] VerifySecurityAnswerDTO dto)
+        {
+            var token = await _userService.VerifySecurityAnswerAndGenerateTokenAsync(dto);
+            return Ok(new { resetToken = token });
+        }
+
+        [HttpPost("forgot-password/send-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> SendRecoveryEmail([FromBody] SendRecoveryEmailDTO dto)
+        {
+            await _userService.SendRecoveryEmailAsync(dto);
+            return Ok(new { message = "Nếu email khôi phục của bạn tồn tại và đã được xác thực, chúng tôi đã gửi một liên kết đặt lại mật khẩu." });
+        }
+
+        [HttpPost("reset-password")]
+        [AllowAnonymous]
+        public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordDTO dto)
+        {
+            await _userService.ResetPasswordAsync(dto);
+            return Ok(new { message = "Đặt lại mật khẩu thành công." });
+        }
+
+        [HttpPost("profile/link-recovery-email")]
+        [Authorize]
+        public async Task<IActionResult> LinkRecoveryEmail([FromBody] LinkRecoveryEmailDTO dto)
+        {
+            await _userService.SendVerificationEmailAsync(CurrentUserId, dto);
+            return Ok(new { message = "Email xác thực đã được gửi đến địa chỉ mới." });
+        }
+
+        [HttpGet("verify-recovery-email")]
+        [AllowAnonymous]
+        public async Task<IActionResult> VerifyRecoveryEmail([FromQuery] long userId, [FromQuery] string token)
+        {
+            var isSuccess = await _userService.VerifyRecoveryEmailTokenAsync(userId, token);
+            if (isSuccess)
+            {
+                return Content("<h1>Xác thực email thành công!</h1><p>Bạn có thể đóng cửa sổ này.</p>", "text/html; charset=utf-8");
+            }
+            return Content("<h1>Xác thực thất bại.</h1><p>Liên kết không hợp lệ hoặc đã hết hạn.</p>", "text/html; charset=utf-8");
+        }
+        #endregion
     }
 }

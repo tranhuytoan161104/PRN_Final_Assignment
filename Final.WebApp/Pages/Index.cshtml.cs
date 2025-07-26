@@ -1,4 +1,5 @@
-﻿using Final.WebApp.DTOs.Products;
+﻿using Final.WebApp.DTOs.Common;
+using Final.WebApp.DTOs.Products;
 using Final.WebApp.Services;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
